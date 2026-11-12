@@ -25,6 +25,8 @@ type EditorState = {
   revision: number;
   /** Stores an image and returns its reference. Missing while editing without an account. */
   uploader: ((file: File) => Promise<AssetRef>) | null;
+  /** Plan of the signed-in account; null while editing without an account. */
+  plan: "free" | "pro" | null;
 
   load: (doc: PortfolioDoc) => void;
   /** Makes `next` the current document and records an undo step. */
@@ -68,6 +70,7 @@ export const useEditor = create<EditorState>((set, get) => {
     device: "desktop",
     revision: 0,
     uploader: null,
+    plan: null,
 
     load: (doc) =>
       set({

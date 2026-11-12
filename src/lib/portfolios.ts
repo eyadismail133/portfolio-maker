@@ -144,3 +144,16 @@ export function isOffline(error: unknown): boolean {
     error instanceof Error ? error.message : String((error as { message?: string })?.message ?? "");
   return /failed to fetch|network|load failed|fetch failed/i.test(message);
 }
+
+/** The plan of the signed-in account, or null when nobody is signed in or it cannot be read. */
+export async function getMyPlan(): Promise<"free" | "pro" | null> {
+  const supabase = createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return null;
+  const { data } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  return (data as { plan?: string } | null)?.plan === "pro" ? "pro" : "free";
+}

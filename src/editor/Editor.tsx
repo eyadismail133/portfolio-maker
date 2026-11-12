@@ -9,7 +9,7 @@ import {
   writeDraft,
   writeUnsynced,
 } from "@/lib/local-drafts";
-import { friendlyError, getPortfolio, isOffline, savePortfolio } from "@/lib/portfolios";
+import { friendlyError, getMyPlan, getPortfolio, isOffline, savePortfolio } from "@/lib/portfolios";
 import { uploadImage } from "@/lib/upload";
 import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
 import { downloadHtml } from "@/lib/export-download";
@@ -71,14 +71,17 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   useEffect(() => {
     let cancelled = false;
     if (!portfolioId) {
-      useEditor.setState({ uploader: null });
+      useEditor.setState({ uploader: null, plan: null });
       load(readDraft() ?? createSampleDoc());
       Promise.resolve().then(() => !cancelled && setOpening({ state: "ready" }));
       return () => {
         cancelled = true;
       };
     }
-    useEditor.setState({ uploader: (file) => uploadImage(file, portfolioId) });
+    useEditor.setState({ uploader: (file) => uploadImage(file, portfolioId), plan: null });
+    getMyPlan()
+      .then((plan) => !cancelled && useEditor.setState({ plan }))
+      .catch(() => undefined);
     getPortfolio(portfolioId)
       .then((found) => {
         if (cancelled) return;

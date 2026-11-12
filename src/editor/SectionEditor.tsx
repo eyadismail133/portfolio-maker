@@ -28,6 +28,7 @@ type Tab = "content" | "layout" | "style";
 export function SectionEditor({ section }: { section: Section }) {
   const [tab, setTab] = useState<Tab>("content");
   const lang = useEditor((s) => s.lang);
+  const title = useEditor((s) => s.doc?.meta.title ?? "");
   const languages = useEditor((s) => s.doc?.meta.languages ?? ONLY_ENGLISH);
   const { updateContent, setVariant, setSectionStyle, select } = useEditor.getState();
   const def = getSection(section.type);
@@ -35,9 +36,14 @@ export function SectionEditor({ section }: { section: Section }) {
   const ctx = useMemo<FormContext | null>(
     () =>
       def
-        ? { lang, languages, isLocalized: (path) => isLocalizedIn(def, section.content, path) }
+        ? {
+            lang,
+            languages,
+            isLocalized: (path) => isLocalizedIn(def, section.content, path),
+            about: `the ${def.name} section of the portfolio "${title}"`,
+          }
         : null,
-    [def, lang, languages, section.content],
+    [def, lang, languages, section.content, title],
   );
   if (!def || !ctx) return null;
 

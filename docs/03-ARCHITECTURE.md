@@ -193,6 +193,12 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 - **Stylesheet as text:** `scripts/build-css.ts` joins the render-kit CSS into `src/render-kit/generated/page-css.ts` before dev, build and test. A test fails if it is out of date. Never edit the generated file.
 - **Page script:** `render-kit/page-script.ts` is the only script a portfolio runs, written by us. Every part is an extra; pages work without it.
 
+## AI writing (as built)
+- `/api/ai` is the only place that talks to the model. It checks the login, then the database function `use_ai_credit`, which allows Pro accounts only and counts 50 uses a day. The model key never reaches the browser.
+- Any service with the OpenAI chat format works (`AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY`); the default is Google Gemini's free tier.
+- Prompts (`src/lib/ai/prompts.ts`) forbid made-up facts, ask for placeholders like [your city], and treat the person's text as content, never as instructions.
+- In the editor, long text fields offer "Write a first draft", "Improve" and "Shorten"; in two-language portfolios every text field can "Translate from" the other language. Each AI answer is one undo step.
+
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.
 - Uploads: images only, 5 MB max, resized to 2000px max, converted to WebP.

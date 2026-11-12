@@ -13,6 +13,8 @@ import {
   writeLocalized,
   type Path,
 } from "./doc-ops";
+import { askAi } from "@/lib/ai/client";
+import type { AiAction } from "@/lib/ai/prompts";
 import { useEditor } from "./store";
 import { IconButton, Label, buttonClass, inputClass } from "./ui";
 
@@ -21,6 +23,8 @@ export type FormContext = {
   languages: readonly Lang[];
   /** True when the text at this path keeps one value per language. */
   isLocalized: (path: Path) => boolean;
+  /** What the form is about, for AI writing: section name and portfolio title. */
+  about: string;
 };
 
 type FieldProps = {
@@ -34,15 +38,94 @@ type FieldProps = {
 
 const MONTH = /^\d{4}(-(0[1-9]|1[0-2]))?$/;
 
+const LANGUAGE_NAME: Record<Lang, string> = { en: "English", ar: "Arabic" };
+
+/** Small AI buttons under a text field. Shown to signed-in accounts; they work on Pro. */
+function AiBar(props: {
+  long: boolean;
+  text: string;
+  other: string;
+  lang: Lang;
+  otherLang: Lang | null;
+  about: string;
+  label: string;
+  onResult: (text: string) => void;
+}) {
+  const plan = useEditor((s) => s.plan);
+  const [busy, setBusy] = useState<AiAction | null>(null);
+  const [note, setNote] = useState("");
+  if (plan === null) return null;
+
+  const actions: [AiAction, string][] = [];
+  if (props.long) {
+    if (props.text.trim()) actions.push(["improve", "Improve"], ["shorten", "Shorten"]);
+    else actions.push(["write", "Write a first draft"]);
+  }
+  if (props.otherLang && props.other.trim())
+    actions.push(["translate", `Translate from ${LANGUAGE_NAME[props.otherLang]}`]);
+  if (actions.length === 0) return null;
+
+  const run = async (action: AiAction) => {
+    if (plan !== "pro") {
+      setNote("AI writing is part of the Pro plan.");
+      return;
+    }
+    setBusy(action);
+    setNote("");
+    try {
+      const result = await askAi({
+        action,
+        text: action === "translate" ? props.other : props.text,
+        lang: props.lang,
+        context: `the "${props.label}" field of ${props.about}`,
+      });
+      props.onResult(result.text);
+      if (result.left <= 5) setNote(`${result.left} AI uses left today.`);
+    } catch (error) {
+      setNote(error instanceof Error ? error.message : "The AI did not answer. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-1 gap-y-1">
+      {actions.map(([action, label]) => (
+        <button
+          key={action}
+          type="button"
+          disabled={busy !== null}
+          onClick={() => run(action)}
+          className="rounded px-1.5 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-violet-600 disabled:opacity-50 dark:text-violet-300 dark:hover:bg-violet-950"
+        >
+          {busy === action ? "Writing…" : label}
+          {plan !== "pro" && (
+            <span className="ms-1 rounded bg-violet-100 px-1 text-[10px] dark:bg-violet-900">
+              Pro
+            </span>
+          )}
+        </button>
+      ))}
+      {note && (
+        <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
+          {note}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function TextField({ field, value, path, ctx, onChange }: FieldProps) {
   const id = useId();
   const localized = ctx.isLocalized(path);
   const text = localized ? readLocalized(value as LocalizedText, ctx.lang) : String(value ?? "");
   const hint = localized ? otherLanguageText(value as LocalizedText, ctx.lang) : "";
-  const write = (next: string) =>
+  const otherLang = localized ? (ctx.languages.find((l) => l !== ctx.lang) ?? null) : null;
+  /** `group: null` makes the change its own undo step; by default typing in one field is grouped. */
+  const write = (next: string, group: string | null = path.join(".")) =>
     onChange(
       localized ? writeLocalized(value as LocalizedText, ctx.lang, next, ctx.languages) : next,
-      path.join("."),
+      group ?? undefined,
     );
   const shared = {
     id,
@@ -59,6 +142,18 @@ function TextField({ field, value, path, ctx, onChange }: FieldProps) {
       ) : (
         <input {...shared} type="text" onChange={(e) => write(e.target.value)} />
       )}
+      <AiBar
+        long={field.type === "longtext"}
+        text={text}
+        // Text written before a second language was added is shared by both; it can still be translated.
+        other={localized && typeof value === "string" && ctx.languages.length > 1 ? value : hint}
+        lang={ctx.lang}
+        otherLang={otherLang}
+        about={ctx.about}
+        label={field.label}
+        // No group: an AI answer is its own undo step.
+        onResult={(next) => write(next, null)}
+      />
     </div>
   );
 }

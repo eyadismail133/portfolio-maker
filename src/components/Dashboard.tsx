@@ -10,6 +10,7 @@ import {
   deletePortfolio,
   duplicatePortfolio,
   friendlyError,
+  getMyPlan,
   listPortfolios,
   renamePortfolio,
   saveOnboardingAnswers,
@@ -46,6 +47,7 @@ export function Dashboard() {
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [views, setViews] = useState<Record<string, number>>({});
   const [unread, setUnread] = useState(0);
+  const [plan, setPlan] = useState<"free" | "pro" | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const refresh = useCallback(async () => {
@@ -83,6 +85,9 @@ export function Dashboard() {
       // Extras: if these tables are not set up yet, the dashboard still works without them.
       viewCounts()
         .then((counts) => !cancelled && setViews(counts))
+        .catch(() => undefined);
+      getMyPlan()
+        .then((found) => !cancelled && setPlan(found))
         .catch(() => undefined);
       listMessages()
         .then((messages) => !cancelled && setUnread(messages.filter((m) => !m.isRead).length))
@@ -137,6 +142,13 @@ export function Dashboard() {
         <span className="ms-auto truncate text-sm text-zinc-500" dir="ltr">
           {email}
         </span>
+        {plan && (
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${plan === "pro" ? "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"}`}
+          >
+            {plan === "pro" ? "Pro" : "Free plan"}
+          </span>
+        )}
         <button type="button" className={buttonClass} onClick={signOut}>
           Log out
         </button>

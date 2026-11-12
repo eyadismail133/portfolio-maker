@@ -63,7 +63,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Dashboard: list, create, rename, duplicate, delete
 - [x] Autosave to database with saved indicator, offline copy and "changed elsewhere" check
 - [x] Image upload: resize, WebP
-- [ ] Run the setup in `docs/07-SUPABASE-SETUP.md` and test with the real Supabase project (needs the owner's dashboard)
+- [x] Run the setup in `docs/07-SUPABASE-SETUP.md` (done by the owner; checked on 13 November 2026, one permission fixed in `0003`)
+- [ ] Run `0003_ai_and_permissions.sql`, confirm the Site URL and Redirect URLs, and try a real sign-up
 - [ ] Image crop tool
 - [ ] Media library to reuse uploaded images
 - [ ] Account settings page (name, change password, delete account)
@@ -91,7 +92,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Share: copy link, QR code
 - [x] Take offline (unpublish)
 - [x] Marketing home page with example portfolios
-- [ ] Run `0002_publishing.sql` and test publishing with the real Supabase project
+- [x] Run `0002_publishing.sql`
+- [ ] Test publishing with a real account on the live project
 - [ ] Unknown links show the "does not exist" page but answer with status 200 (a Next.js streaming limit); they are marked noindex. Return a real 404.
 
 **Result:** version 1 complete. Test with 5 to 10 real people before going further.
@@ -105,14 +107,17 @@ The core. No login, no editor yet; work with JSON files.
 - [ ] Remaining "later" sections
 - [ ] Edit text directly in the preview
 - [ ] CV / LinkedIn import to fill data
-- [ ] AI writing help
+- [x] AI writing help for Pro accounts: first draft, improve, shorten, translate between English and Arabic; free model (Google Gemini by default, any OpenAI-format service), 50 uses a day
+- [ ] Add the AI key in Vercel and `.env.local`
 - [ ] PDF CV download from the same data
 - [ ] Dark/light switch for visitors
 - [ ] Email the owner when a message arrives
 - [ ] App interface in Arabic
 
 ## Phase 7 - Launch and business
-- [ ] Plans and payment (Stripe, or Paymob for Egypt)
+- [ ] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`)
+- [ ] Payments: subscriptions table, checkout, provider webhooks, account page (Paymob first is recommended)
+- [ ] Enforce the Free and Pro limits
 - [ ] Custom domains
 - [ ] Remove badge for paid plan
 - [ ] Terms, privacy policy, report abuse link on published pages
