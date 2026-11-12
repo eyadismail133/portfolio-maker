@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { getSection } from "@/render-kit/registry";
 import type { PortfolioDoc, Section, Theme } from "@/render-kit/schema/document";
-import type { Lang } from "@/render-kit/schema/primitives";
+import type { AssetRef, Lang } from "@/render-kit/schema/primitives";
 import { applyFamily } from "@/render-kit/themes/apply";
 import * as ops from "./doc-ops";
 
@@ -23,6 +23,8 @@ type EditorState = {
   device: Device;
   /** Goes up on every change, so the saver knows there is something new. */
   revision: number;
+  /** Stores an image and returns its reference. Missing while editing without an account. */
+  uploader: ((file: File) => Promise<AssetRef>) | null;
 
   load: (doc: PortfolioDoc) => void;
   /** Makes `next` the current document and records an undo step. */
@@ -65,6 +67,7 @@ export const useEditor = create<EditorState>((set, get) => {
     lang: "en",
     device: "desktop",
     revision: 0,
+    uploader: null,
 
     load: (doc) =>
       set({

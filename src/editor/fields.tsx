@@ -13,6 +13,7 @@ import {
   writeLocalized,
   type Path,
 } from "./doc-ops";
+import { useEditor } from "./store";
 import { IconButton, Label, buttonClass, inputClass } from "./ui";
 
 export type FormContext = {
@@ -111,11 +112,14 @@ function LinkField(props: FieldProps) {
 function ImageField({ field, value, path, onChange }: FieldProps) {
   const id = useId();
   const asset = value as AssetRef | undefined;
+  const uploader = useEditor((s) => s.uploader);
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState("");
   const update = (url: string, alt: string) =>
     onChange(
       url.trim()
         ? {
-            assetId: asset?.assetId ?? url,
+            assetId: asset?.url === url.trim() ? asset.assetId : url.trim(),
             url: url.trim(),
             alt,
             width: asset?.width ?? 1200,
@@ -124,13 +128,62 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
         : undefined,
       path.join("."),
     );
+  const upload = async (file: File | undefined) => {
+    if (!file || !uploader) return;
+    setBusy(true);
+    setProblem("");
+    try {
+      onChange({ ...(await uploader(file)), alt: asset?.alt ?? "" });
+    } catch (error) {
+      setProblem(error instanceof Error ? error.message : "The upload failed. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <fieldset className="grid gap-2 rounded-md border border-zinc-200 p-2.5 dark:border-zinc-800">
       <legend className="px-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
         {field.label}
       </legend>
+      {asset && (
+        // eslint-disable-next-line @next/next/no-img-element -- a plain preview of the chosen image
+        <img
+          src={asset.url}
+          alt=""
+          className="max-h-32 w-full rounded border border-zinc-200 object-cover dark:border-zinc-800"
+        />
+      )}
+      {uploader && (
+        <div className="flex items-center gap-2">
+          <label
+            className={`${buttonClass} cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}
+          >
+            {busy ? "Uploading…" : asset ? "Replace image" : "Upload image"}
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={busy}
+              onChange={(e) => {
+                void upload(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          {asset && (
+            <button type="button" className={buttonClass} onClick={() => onChange(undefined)}>
+              Remove
+            </button>
+          )}
+        </div>
+      )}
+      {problem && (
+        <p role="alert" className="text-xs text-red-600">
+          {problem}
+        </p>
+      )}
       <div className="grid gap-1">
-        <Label htmlFor={id}>Image address</Label>
+        <Label htmlFor={id}>{uploader ? "Or paste an image address" : "Image address"}</Label>
         <input
           id={id}
           type="url"
@@ -154,9 +207,11 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
           />
         </div>
       )}
-      <p className="text-xs text-zinc-500">
-        Paste a link to an image for now. Uploading from your device comes with accounts.
-      </p>
+      {!uploader && (
+        <p className="text-xs text-zinc-500">
+          Create an account to upload images from your device.
+        </p>
+      )}
     </fieldset>
   );
 }
