@@ -6,7 +6,9 @@ describe("AI prompts", () => {
   const base = { text: "I do bookkeeping.", lang: "en" as const, context: "the About section" };
 
   test("each action asks for the right thing in the right language", () => {
-    expect(buildMessages({ ...base, action: "improve" })[1].content).toMatch(/clearer[\s\S]*English/);
+    expect(buildMessages({ ...base, action: "improve" })[1].content).toMatch(
+      /clearer[\s\S]*English/,
+    );
     expect(buildMessages({ ...base, action: "shorten" })[1].content).toMatch(/half as long/);
     expect(buildMessages({ ...base, action: "translate", lang: "ar" })[1].content).toMatch(
       /Translate[\s\S]*Arabic/,
