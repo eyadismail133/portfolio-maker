@@ -340,6 +340,35 @@ beforeAll(async () => {
     (await as("authenticated", B, "select use_ai_credit(50) n")).rows[0].n === 49,
   );
   check(
+    "visitor can report a published page",
+    (
+      await as(
+        "anon",
+        null,
+        "select submit_abuse_report('ann', 'spam', 'Selling fake followers', 'r@x.co') r",
+      )
+    ).rows[0]?.r === "ok",
+  );
+  check(
+    "reports about unknown pages are refused",
+    (await as("anon", null, "select submit_abuse_report('nobody-here', 'spam', '', '') r")).rows[0]
+      ?.r === "not_found",
+  );
+  check(
+    "reports with an unknown reason are refused",
+    (await as("anon", null, "select submit_abuse_report('ann', 'whatever', '', '') r")).rows[0]
+      ?.r === "invalid",
+  );
+  check(
+    "visitors cannot read reports",
+    (await as("anon", null, "select * from abuse_reports")).rows.length === 0,
+  );
+  check(
+    "accounts cannot read reports",
+    (await as("authenticated", A, "select * from abuse_reports")).rows.length === 0,
+  );
+  check("the report was stored", (await q("select count(*)::int n from abuse_reports"))[0].n === 1);
+  check(
     "visitor slug lookup after 0004 still blocked",
     /permission denied/.test((await as("anon", null, "select is_slug_available('x')")).error ?? ""),
   );

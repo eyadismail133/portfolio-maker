@@ -71,6 +71,11 @@ export async function PublishedPage({ slug, wanted }: { slug: string; wanted?: s
           Made with Portfolio Maker
         </Link>
       )}
+      <p className="bg-white py-3 text-center text-xs text-zinc-500 dark:bg-zinc-950">
+        <Link href={`/report?page=${slug}`} rel="nofollow" className="hover:underline">
+          Report this page
+        </Link>
+      </p>
       <script dangerouslySetInnerHTML={{ __html: PAGE_SCRIPT }} />
       <script dangerouslySetInnerHTML={{ __html: counter }} />
     </>

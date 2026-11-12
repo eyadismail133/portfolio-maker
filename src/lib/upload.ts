@@ -90,3 +90,31 @@ export async function uploadImage(file: File, portfolioId?: string): Promise<Ass
     height: converted.height,
   };
 }
+
+/** The account's uploaded images, newest first, for choosing one again. */
+export async function listMyImages(): Promise<(AssetRef & { size: number })[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("assets")
+    .select("id, path, width, height, size")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (data as { id: string; path: string; width: number; height: number; size: number }[]).map(
+    (a) => ({
+      assetId: a.id,
+      url: supabase.storage.from(IMAGE_BUCKET).getPublicUrl(a.path).data.publicUrl,
+      alt: "",
+      width: a.width,
+      height: a.height,
+      size: a.size,
+    }),
+  );
+}
+
+/** Bytes of images the account has stored. */
+export async function storageUsed(): Promise<number> {
+  const { data, error } = await createClient().from("assets").select("size");
+  if (error) throw error;
+  return (data as { size: number }[]).reduce((sum, a) => sum + a.size, 0);
+}

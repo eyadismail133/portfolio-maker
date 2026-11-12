@@ -188,8 +188,17 @@ export default function Home() {
         <Link href="/dev/render" className="hover:text-zinc-900 dark:hover:text-zinc-100">
           All designs
         </Link>
-        <Link href="/login" className="hover:text-zinc-900 dark:hover:text-zinc-100">
-          Log in
+        <Link href="/pro" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          Pricing
+        </Link>
+        <Link href="/terms" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          Terms
+        </Link>
+        <Link href="/privacy" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          Privacy
+        </Link>
+        <Link href="/refunds" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          Refunds
         </Link>
       </footer>
     </div>

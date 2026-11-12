@@ -234,6 +234,19 @@ export function AuthForm({ mode }: { mode: Mode }) {
               >
                 {busy ? "One moment…" : copy.submit}
               </button>
+              {mode === "signup" && (
+                <p className="text-xs text-zinc-500">
+                  By creating an account you accept the{" "}
+                  <Link href="/terms" className="underline">
+                    terms
+                  </Link>{" "}
+                  and the{" "}
+                  <Link href="/privacy" className="underline">
+                    privacy policy
+                  </Link>
+                  .
+                </p>
+              )}
             </form>
           </>
         )}

@@ -47,12 +47,12 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Device size switch
 - [x] Settings tab: page title, description, languages
 - [x] Save to browser storage for now
-- [ ] Section toolbar inside the preview (move, duplicate, delete)
-- [ ] Small pictures of each layout and each design family in the pickers
-- [ ] Editing each palette color by hand
-- [ ] Editor layout for phones and small tablets
-- [ ] More keyboard shortcuts: Delete, Ctrl+D, Ctrl+S
-- [ ] Share image, favicon and link name in Settings (need uploads and publishing)
+- [x] Section toolbar inside the preview (move, duplicate, delete)
+- [x] Live previews of each layout and each design family in the pickers, using the person's own content
+- [x] Editing each palette color by hand, with a warning for hard-to-read colors
+- [x] Editor layout for phones and small tablets (panel slides in, section form as a bottom sheet)
+- [x] More keyboard shortcuts: Delete, Ctrl+D, Ctrl+S (also while the preview has focus)
+- [x] Share image and favicon in Settings (the link name is chosen in the Publish dialog)
 - [ ] Rich text (bold, italic, links, lists) in long text fields
 
 **Result:** full editing works locally without an account. Open `/editor`.
@@ -64,10 +64,11 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Autosave to database with saved indicator, offline copy and "changed elsewhere" check
 - [x] Image upload: resize, WebP
 - [x] Run the setup in `docs/07-SUPABASE-SETUP.md` (done by the owner; checked on 13 November 2026, one permission fixed in `0003`)
-- [ ] Run `0003` and `0004`, confirm the Site URL and Redirect URLs, and try a real sign-up
+- [x] Run `0003` and `0004` (checked live on 13 November 2026)
+- [ ] Confirm the Site URL and Redirect URLs, and try a real sign-up
 - [ ] Image crop tool
-- [ ] Media library to reuse uploaded images
-- [ ] Account settings page (name, change password, delete account)
+- [x] Media library to reuse uploaded images ("My images" on every image field)
+- [x] Account page: name, password, plan, storage used, payment history, delete account (`/account`)
 
 **Result:** users keep their work.
 
@@ -94,7 +95,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Marketing home page with example portfolios
 - [x] Run `0002_publishing.sql`
 - [ ] Test publishing with a real account on the live project
-- [ ] Unknown links show the "does not exist" page but answer with status 200 (a Next.js streaming limit); they are marked noindex. Return a real 404.
+- [x] Unknown or offline pages answer with a real 404 status (checked in `src/proxy.ts` before the page streams)
 
 **Result:** version 1 complete. Test with 5 to 10 real people before going further.
 
@@ -120,12 +121,15 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Enforce the Free and Pro limits (database first, friendly messages in the app)
 - [x] Remove badge for paid plan
 - [x] Database tests: every migration runs in a real Postgres in `npm test` (`supabase/__tests__`)
-- [ ] Run `0004`, add Paymob and Supabase secret keys, test with Paymob test keys on Vercel
-- [ ] Account page: payment history, receipts
+- [x] Run `0004` (checked live on 13 November 2026)
+- [ ] Run `0005`; test a payment with Paymob test keys on Vercel
+- [x] Account page with payment history
+- [ ] Receipts (PDF or email)
 - [ ] Emails: receipt, Pro ending soon
 - [ ] Auto-renewing card subscriptions (optional)
 - [ ] Custom domains
-- [ ] Terms, privacy policy, refund policy, report abuse link on published pages (needed before taking money)
+- [x] Terms, privacy and refund pages; "Report this page" on published pages (`0005_reports.sql`)
+- [ ] Have a lawyer review the terms, privacy and refund texts; set `NEXT_PUBLIC_LEGAL_NAME` and `NEXT_PUBLIC_CONTACT_EMAIL`
 - [ ] Error monitoring and backups
 - [ ] Template gallery page for SEO
 

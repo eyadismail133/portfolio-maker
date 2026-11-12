@@ -186,3 +186,30 @@ export async function viewCounts(): Promise<Record<string, number>> {
   }
   return totals;
 }
+
+export type PaymentRecord = {
+  id: string;
+  months: number;
+  amountCents: number;
+  currency: "EGP" | "USD";
+  status: "pending" | "paid" | "failed";
+  createdAt: string;
+  paidAt: string | null;
+};
+
+export async function listPayments(): Promise<PaymentRecord[]> {
+  const { data, error } = await createClient()
+    .from("payments")
+    .select("id, months, amount_cents, currency, status, created_at, paid_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as Record<string, unknown>[]).map((p) => ({
+    id: String(p.id),
+    months: Number(p.months),
+    amountCents: Number(p.amount_cents),
+    currency: p.currency === "USD" ? "USD" : "EGP",
+    status: p.status === "paid" ? "paid" : p.status === "failed" ? "failed" : "pending",
+    createdAt: String(p.created_at),
+    paidAt: p.paid_at ? String(p.paid_at) : null,
+  }));
+}

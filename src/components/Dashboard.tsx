@@ -161,6 +161,12 @@ export function Dashboard() {
         >
           {plan === "pro" ? "Add Pro months" : "Go Pro"}
         </Link>
+        <Link
+          href="/account"
+          className="rounded-md px-2.5 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+        >
+          Account
+        </Link>
         <button type="button" className={buttonClass} onClick={signOut}>
           Log out
         </button>

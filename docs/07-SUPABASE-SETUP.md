@@ -8,7 +8,7 @@ Do these steps once in the Supabase dashboard for the project in `.env.local`. U
 3. Check **Table Editor**: `profiles`, `portfolios`, `assets` and `onboarding_answers` exist, each marked "RLS enabled".
 4. Check **Storage**: a public bucket named `portfolio-images` exists.
 
-5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`. It adds publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views` and `portfolio_versions` exist.
+5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`. It adds publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views` and `portfolio_versions` exist.
 
 Run each file **once, in order**. Never run an older file again after a newer one: newer files change functions that older files create, and running an old file again would undo that. Later database changes will come as new numbered files.
 
@@ -60,7 +60,16 @@ Free tiers have daily limits for the whole site and can change without notice. G
 
 Until steps 2 and 3 are filled in, `/pro` says "Payments open soon" and nothing can be bought.
 
+## 8. Legal pages and reports
+- Add `NEXT_PUBLIC_LEGAL_NAME` (your business or your own name) and `NEXT_PUBLIC_CONTACT_EMAIL` (where people write about privacy, refunds and reports) in `.env.local` and Vercel. Until then the terms, privacy and refund pages show "[business name]" and "[contact email]".
+- The texts in `src/app/terms`, `src/app/privacy` and `src/app/refunds` are a plain-language starting point, not legal advice. Have a lawyer in Egypt review them before taking real payments. The refund rule (full refund within 14 days of the first purchase) is a suggested default: change it if you want something else.
+- Visitors' reports land in the `abuse_reports` table. Read them in the Table Editor; mark them `reviewed` or `actioned` in the `status` column. To take a page offline, set its portfolio's `status` to `draft` in the `portfolios` table.
+
 ## Check of the live project (13 November 2026)
+
+Second check, after the owner ran 0003 and 0004: the new tables and columns exist, and visitors are refused by `is_slug_available`, `is_pro` and `apply_paid_payment`. Vercel deploys from GitHub.
+
+First check:
 Checked from the browser with the publishable key:
 - All 7 tables exist and return nothing to visitors without an account (row security works).
 - The image bucket exists.

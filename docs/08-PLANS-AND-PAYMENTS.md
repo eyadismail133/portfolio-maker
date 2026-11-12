@@ -39,9 +39,13 @@ The browser never decides that a payment succeeded; only a signed callback from 
 
 The Paymob addresses (`https://accept.paymob.com/v1/intention/` and the `https://eg.checkout.paymob.com/` checkout) come from Paymob's documentation and can be changed with `PAYMOB_API_URL` and `PAYMOB_CHECKOUT_URL` if Paymob gives you different ones. They have not been tried against Paymob itself yet; the first test with Paymob's test keys will confirm them.
 
+## Refunds
+The refund page (`/refunds`) offers a full refund within 14 days of the first purchase, and always for double or mistaken charges. Refunds are made by hand in the Paymob dashboard; then set the payment's `status` and the account's `pro_until` back in Supabase. This rule is a suggested default for the owner to confirm.
+
 ## Not built yet
+- Refunds from the app (today: by hand in Paymob, see above).
 - Auto-renewing card subscriptions (Paymob subscriptions API).
-- An account page with payment history and receipts (payments are already stored and readable by their owner).
+- Receipts (the account page already lists payments).
 - Emails: receipt, "Pro ends in 7 days".
 - Per-day visit charts for Pro.
 - International buyers through a merchant of record (Lemon Squeezy) if USD through Paymob is not enough.

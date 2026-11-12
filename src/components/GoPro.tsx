@@ -223,7 +223,11 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
             )}
             <p className="mt-3 text-xs text-zinc-500">
               Paymob takes cards, mobile wallets and kiosk payments. When your months end you go
-              back to Free; nothing is deleted and published pages stay online.
+              back to Free; nothing is deleted and published pages stay online. See the{" "}
+              <Link href="/refunds" className="underline">
+                refund policy
+              </Link>
+              .
             </p>
           </div>
         </div>

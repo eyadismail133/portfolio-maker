@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { isMissingPublishedPage, NOT_FOUND_HTML } from "@/lib/published-check";
 
 /** Pages that need a signed-in account. `/editor` alone stays open: it edits a draft in the browser. */
 export function needsAccount(pathname: string): boolean {
@@ -7,7 +8,8 @@ export function needsAccount(pathname: string): boolean {
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/") ||
     pathname.startsWith("/editor/") ||
-    pathname === "/pro/done"
+    pathname === "/pro/done" ||
+    pathname === "/account"
   );
 }
 
@@ -49,6 +51,12 @@ export async function updateSession(request: NextRequest) {
   const signedIn = Boolean(data?.claims);
 
   const { pathname, search } = request.nextUrl;
+  if (pathname.startsWith("/p/") && (await isMissingPublishedPage(pathname))) {
+    return new NextResponse(NOT_FOUND_HTML, {
+      status: 404,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
   const redirect = (to: string) => {
     const result = NextResponse.redirect(new URL(to, request.url));
     // Keep any refreshed session cookies on the redirect.

@@ -65,6 +65,15 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - Later: autosave to the database with an offline copy, and "Updated elsewhere, reload" when the same portfolio is open in two tabs.
 - Keyboard: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y today. Ctrl+S, Delete and Ctrl+D are still to do.
 
+## Added on 13 November 2026
+- **Toolbar in the preview:** the selected section shows move up, move down, duplicate and delete at its top corner. After a move or copy the preview scrolls to keep it in view.
+- **Shortcuts:** Delete removes the selected section (with an "Undo" hint), Ctrl+D duplicates it, Ctrl+Z, Ctrl+Shift+Z / Ctrl+Y and Ctrl+S as before. They also work while the preview has focus: the frame forwards them with a `pk:key` message.
+- **Pickers with pictures:** design family cards show the person's own page in that design; the Layout tab shows the section in each layout.
+- **Colors one by one:** "Edit each color" in the Design tab, for light and dark colors, with a warning when text would be hard to read.
+- **Settings:** share picture and browser-tab icon.
+- **My images:** every image field can reuse an image uploaded before.
+- **Phones:** below 1024 px wide the left panel slides in from a button, and the section form opens as a bottom sheet. The header scrolls sideways instead of wrapping.
+
 ## Code map
 
 | File | What it does |
@@ -76,7 +85,7 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 | `src/editor/PreviewFrame.tsx` | The page inside the frame (`/preview`); renders what the editor sends, reports clicks |
 | `src/editor/store.ts`, `doc-ops.ts` | State and document changes |
 
-The editor and the frame talk with four messages: `pk:ready` and `pk:select` from the frame, `pk:state` and `pk:scroll` to it. Both sides ignore messages from any other origin.
+The editor and the frame talk with messages: `pk:ready`, `pk:select`, `pk:action` (toolbar) and `pk:key` (shortcuts) from the frame; `pk:state` and `pk:scroll` to it. Both sides ignore messages from any other origin.
 
 ## Images
 

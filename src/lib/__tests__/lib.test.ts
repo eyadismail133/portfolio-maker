@@ -5,7 +5,7 @@ import { fitWithin } from "../upload";
 
 describe("route protection", () => {
   test("only private pages need an account", () => {
-    for (const path of ["/dashboard", "/dashboard/x", "/editor/123", "/pro/done"])
+    for (const path of ["/dashboard", "/dashboard/x", "/editor/123", "/pro/done", "/account"])
       expect(needsAccount(path), path).toBe(true);
     for (const path of [
       "/",
