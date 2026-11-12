@@ -8,7 +8,7 @@ Do these steps once in the Supabase dashboard for the project in `.env.local`. U
 3. Check **Table Editor**: `profiles`, `portfolios`, `assets` and `onboarding_answers` exist, each marked "RLS enabled".
 4. Check **Storage**: a public bucket named `portfolio-images` exists.
 
-5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`. It adds publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views` and `portfolio_versions` exist.
+5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`, then `0006_signups_domains_errors.sql`. Together they add publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views`, `portfolio_versions`, `newsletter_signups`, `custom_domains` and `error_log` exist.
 
 Run each file **once, in order**. Never run an older file again after a newer one: newer files change functions that older files create, and running an old file again would undo that. Later database changes will come as new numbered files.
 

@@ -368,6 +368,105 @@ beforeAll(async () => {
     (await as("authenticated", A, "select * from abuse_reports")).rows.length === 0,
   );
   check("the report was stored", (await q("select count(*)::int n from abuse_reports"))[0].n === 1);
+  // 0006: newsletter sign-ups
+  const signup = (slug: string, email: string) =>
+    as("anon", null, "select submit_newsletter_signup($1, $2) r", [slug, email]);
+  check(
+    "visitors can sign up on a published page",
+    (await signup("ann", "Reader@x.co")).rows[0]?.r === "ok",
+  );
+  check(
+    "signing up twice keeps one row",
+    (await signup("ann", "reader@x.co ")).rows[0]?.r === "ok",
+  );
+  check(
+    "one sign-up row per address",
+    (await q("select count(*)::int n from newsletter_signups"))[0].n === 1,
+  );
+  check(
+    "sign-ups need a real address",
+    (await signup("ann", "not-an-email")).rows[0]?.r === "invalid",
+  );
+  check(
+    "sign-ups for unknown pages are refused",
+    (await signup("nobody-here", "a@b.co")).rows[0]?.r === "not_found",
+  );
+  check(
+    "visitors cannot add sign-ups directly",
+    !!(
+      await as(
+        "anon",
+        null,
+        "insert into newsletter_signups (portfolio_id, email) values ($1, 'x@y.co')",
+        [p1],
+      )
+    ).error,
+  );
+  check(
+    "the owner reads their sign-ups",
+    (await as("authenticated", A, "select email from newsletter_signups")).rows[0]?.email ===
+      "reader@x.co",
+  );
+  check(
+    "other accounts do not see them",
+    (await as("authenticated", B, "select * from newsletter_signups")).rows.length === 0,
+  );
+
+  // 0006: custom domains
+  const addDomain = (sub: string, domain: string, verified = false) =>
+    as(
+      "authenticated",
+      sub,
+      "insert into custom_domains (domain, portfolio_id, verified) values ($1, $2, $3)",
+      [domain, p1, verified],
+    );
+  await q(`update profiles set plan = 'free', pro_until = null where id = '${A}'`);
+  check("free accounts cannot add a domain", !!(await addDomain(A, "ann.example.com")).error);
+  await q(
+    `update profiles set plan = 'pro', pro_until = now() + interval '30 days' where id = '${A}'`,
+  );
+  check("Pro accounts can add a domain", !(await addDomain(A, "ann.example.com")).error);
+  check(
+    "a domain cannot be added already verified",
+    !!(await addDomain(A, "x.example.com", true)).error,
+  );
+  check("bad domain names are refused", !!(await addDomain(A, "not a domain")).error);
+  check(
+    "accounts cannot add a domain for someone else's page",
+    !!(await addDomain(B, "b.example.com")).error,
+  );
+  check(
+    "accounts cannot mark their domain verified",
+    !!(await as("authenticated", A, "update custom_domains set verified = true")).error ||
+      (await q("select verified from custom_domains"))[0]?.verified === false,
+  );
+  const resolve = async (domain: string) =>
+    (await as("anon", null, "select resolve_custom_domain($1) s", [domain])).rows[0]?.s;
+  check("an unverified domain shows nothing", (await resolve("ann.example.com")) == null);
+  await q("update custom_domains set verified = true");
+  check("a verified domain shows the page", (await resolve("ANN.example.com")) === "ann");
+  await q(`update profiles set pro_until = now() - interval '1 day' where id = '${A}'`);
+  check("the domain stops when Pro ends", (await resolve("ann.example.com")) == null);
+  check(
+    "visitors cannot read the domain list",
+    (await as("anon", null, "select * from custom_domains")).rows.length === 0,
+  );
+
+  // 0006: error log
+  check(
+    "visitors cannot write the error log",
+    !!(await as("anon", null, "insert into error_log (message) values ('x')")).error,
+  );
+  check(
+    "accounts cannot read the error log",
+    !!(await as("authenticated", A, "select * from error_log")).error ||
+      (await as("authenticated", A, "select * from error_log")).rows.length === 0,
+  );
+  check(
+    "the server can write the error log",
+    !(await as("service_role", null, "insert into error_log (message) values ('boom')")).error,
+  );
+
   check(
     "visitor slug lookup after 0004 still blocked",
     /permission denied/.test((await as("anon", null, "select is_slug_available('x')")).error ?? ""),
