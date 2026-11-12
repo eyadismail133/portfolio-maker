@@ -12,7 +12,7 @@ export type FontPair = {
 const sans = "system-ui, -apple-system, 'Segoe UI', sans-serif";
 const serif = "Georgia, 'Times New Roman', serif";
 
-/** Font pairs. Every pair has an Arabic partner. The full set of 15 is a later Phase 1 task. */
+/** Font pairs. Every pair has an Arabic partner. Five more are a later Phase 1 task. */
 export const fontPairs: FontPair[] = [
   {
     id: "grotesk",
@@ -55,6 +55,34 @@ export const fontPairs: FontPair[] = [
     heading: { family: "Newsreader", weights: [500, 700], fallback: serif },
     body: { family: "Newsreader", weights: [400, 500, 600], fallback: serif },
     arabic: { family: "Noto Naskh Arabic", weights: [400, 500, 700], fallback: serif },
+  },
+  {
+    id: "poster",
+    name: "Archivo",
+    heading: { family: "Archivo", weights: [700, 800], fallback: sans },
+    body: { family: "Archivo", weights: [400, 500, 600], fallback: sans },
+    arabic: { family: "Alexandria", weights: [400, 600, 800], fallback: sans },
+  },
+  {
+    id: "couture",
+    name: "Cormorant + Jost",
+    heading: { family: "Cormorant Garamond", weights: [400, 500, 600], fallback: serif },
+    body: { family: "Jost", weights: [400, 500], fallback: sans },
+    arabic: { family: "El Messiri", weights: [400, 500, 700], fallback: serif },
+  },
+  {
+    id: "business",
+    name: "Manrope + Source Sans",
+    heading: { family: "Manrope", weights: [600, 700], fallback: sans },
+    body: { family: "Source Sans 3", weights: [400, 600], fallback: sans },
+    arabic: { family: "Almarai", weights: [400, 700, 800], fallback: sans },
+  },
+  {
+    id: "expressive",
+    name: "Syne + DM Sans",
+    heading: { family: "Syne", weights: [700, 800], fallback: sans },
+    body: { family: "DM Sans", weights: [400, 500, 600], fallback: sans },
+    arabic: { family: "Rubik", weights: [400, 500, 700, 800], fallback: sans },
   },
 ];
 

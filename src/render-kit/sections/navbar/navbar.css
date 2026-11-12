@@ -10,7 +10,7 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-size: 1.125rem;
-  letter-spacing: calc(var(--pk-heading-tracking) * 0.5);
+  letter-spacing: calc(var(--pk-h-tracking) * 0.5);
   margin-inline-end: auto;
 }
 .pk-nav__links {

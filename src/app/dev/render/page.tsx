@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { families } from "@/render-kit/themes/families";
 import { fontPairs } from "@/render-kit/themes/fonts";
 import { palettes } from "@/render-kit/themes/palettes";
 
@@ -33,12 +34,13 @@ function Choice<T extends string>(props: {
 /** Try the render kit: switch language, colors, fonts, layouts and screen size on a sample portfolio. */
 export default function RenderDemo() {
   const [lang, setLang] = useState("en");
-  const [palette, setPalette] = useState(palettes[0].id);
-  const [fonts, setFonts] = useState(fontPairs[0].id);
+  const [family, setFamily] = useState(families[0].id);
+  const [palette, setPalette] = useState("");
+  const [fonts, setFonts] = useState("");
   const [layout, setLayout] = useState("default");
-  const [mode, setMode] = useState("light");
+  const [mode, setMode] = useState("");
   const [width, setWidth] = useState<keyof typeof WIDTHS>("Desktop");
-  const query = new URLSearchParams({ lang, palette, fonts, layout, mode }).toString();
+  const query = new URLSearchParams({ lang, family, palette, fonts, layout, mode }).toString();
 
   return (
     <div className="flex h-dvh flex-col bg-zinc-100 dark:bg-zinc-950">
@@ -54,10 +56,16 @@ export default function RenderDemo() {
           ]}
         />
         <Choice
+          label="Design"
+          value={family}
+          onChange={setFamily}
+          options={families.map((f) => [f.id, f.name] as const)}
+        />
+        <Choice
           label="Colors"
           value={palette}
           onChange={setPalette}
-          options={palettes.map((p) => [p.id, p.name] as const)}
+          options={[["", "Design default"], ...palettes.map((p) => [p.id, p.name] as const)]}
         />
         <Choice
           label="Mode"

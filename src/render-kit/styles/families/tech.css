@@ -1,0 +1,87 @@
+/* Tech: made for developers and products. Dark first, monospace details, grid lines, a soft glow. */
+.pk-root[data-pk-family="tech"] {
+  --pk-heading-weight: 600;
+  --pk-heading-tracking: -0.03em;
+  --pk-meta-font: var(--pk-font-mono);
+}
+.pk-root[data-pk-family="tech"] .pk-section {
+  --pk-rule: 1px dashed var(--pk-border);
+  --pk-card-bg: var(--pk-surface);
+  --pk-card-border: 1px solid var(--pk-border);
+  --pk-tag-bg: color-mix(in srgb, var(--pk-primary) 10%, transparent);
+  --pk-tag-border: 1px solid color-mix(in srgb, var(--pk-primary) 32%, transparent);
+  --pk-btn-shadow: 0 8px 28px color-mix(in srgb, var(--pk-primary) 35%, transparent);
+}
+
+/* Fading grid behind the hero. */
+.pk-root[data-pk-family="tech"] .pk-hero {
+  position: relative;
+  isolation: isolate;
+}
+.pk-root[data-pk-family="tech"] .pk-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--pk-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--pk-border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse 80% 90% at 50% 0%, #000 10%, transparent 75%);
+  opacity: 0.7;
+}
+.pk-root[data-pk-family="tech"]
+  :is(
+    .pk-hero__title,
+    .pk-hero__status,
+    .pk-nav__links,
+    .pk-facts dt,
+    .pk-langs__level,
+    .pk-contact__label
+  ) {
+  font-family: var(--pk-font-mono);
+  font-size: 0.875rem;
+}
+.pk-root[data-pk-family="tech"] .pk-hero__title {
+  font-weight: 500;
+}
+.pk-root[data-pk-family="tech"] .pk-navbar {
+  border-block-end: 1px solid var(--pk-border);
+}
+.pk-root[data-pk-family="tech"] .pk-tags li {
+  font-size: 0.8125rem;
+  color: var(--pk-text);
+  border-radius: min(var(--pk-radius-control), 6px);
+}
+.pk-root[data-pk-family="tech"] .pk-media--empty {
+  border: 1px solid var(--pk-border);
+  background:
+    linear-gradient(var(--pk-border) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, var(--pk-border) 1px, transparent 1px) 0 0 / 28px 28px,
+    var(--pk-surface);
+  color: var(--pk-primary);
+  font-family: var(--pk-font-mono);
+  font-weight: 500;
+}
+.pk-root[data-pk-family="tech"] .pk-meter {
+  height: 6px;
+  border-radius: 2px;
+}
+.pk-root[data-pk-family="tech"] .pk-timeline {
+  border-inline-start-style: dashed;
+}
+.pk-root[data-pk-family="tech"]
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar, .pk-hero)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer) {
+  border-block-start: var(--pk-rule);
+}
+.pk-root[data-pk-family="tech"] .pk-cta__box--banner {
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      color-mix(in srgb, var(--pk-c-accent) 55%, transparent),
+      transparent 60%
+    ),
+    var(--pk-c-primary);
+}

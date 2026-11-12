@@ -29,6 +29,7 @@
 .pk-entry__dates {
   color: var(--pk-muted);
   font-size: 0.9375rem;
+  font-family: var(--pk-meta-font);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

@@ -144,6 +144,10 @@ The Renderer writes the theme as CSS variables in the `style` of the page root (
 
 Section CSS only uses these variables. A design family is a set of token values in `styles/families/<family>.css`, selected with `data-pk-family`, plus its special details.
 
+A family is described in `themes/families.ts`: its default fonts, radius, spacing, mode and palette, and the layout it prefers for each section type. `applyFamily(doc, id)` in `themes/apply.ts` switches a whole portfolio to another family and never touches content.
+
+Family CSS changes tokens first (heading weight and size, card look, tag look, rules) and adds targeted rules only for its signature details. Headings use `--pk-h-tracking` and `--pk-h-leading`, which Arabic pages override, so a family's letter spacing never breaks Arabic text.
+
 Colors are repaired before use: `fixPalette` darkens or lightens any text color that does not reach WCAG AA contrast, so a hand-picked palette cannot produce unreadable text.
 
 All render-kit classes start with `pk-`, and `base.css` carries its own reset, so a page looks the same inside the app (with Tailwind loaded) and as an exported file.

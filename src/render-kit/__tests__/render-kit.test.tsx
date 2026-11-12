@@ -6,6 +6,7 @@ import { allSections, normalizeDoc } from "../registry";
 import { Renderer } from "../Renderer";
 import { createSampleDoc } from "../samples";
 import { migrateDoc, SCHEMA_VERSION } from "../schema";
+import { applyFamily } from "../themes/apply";
 import {
   buildPalette,
   contrastProblems,
@@ -13,7 +14,8 @@ import {
   ensureContrast,
   fixPalette,
 } from "../themes/color";
-import { fontPairs, googleFontsUrl } from "../themes/fonts";
+import { families } from "../themes/families";
+import { fontPairs, getFontPair, googleFontsUrl } from "../themes/fonts";
 import { palettes } from "../themes/palettes";
 
 describe("document", () => {
@@ -158,6 +160,38 @@ describe("theme", () => {
     const pair = fontPairs[0];
     expect(googleFontsUrl(pair.id, ["en"])).not.toContain(pair.arabic.family.replace(/ /g, "+"));
     expect(googleFontsUrl(pair.id, ["en", "ar"])).toContain(pair.arabic.family.replace(/ /g, "+"));
+  });
+});
+
+describe("design families", () => {
+  test("every family has a stylesheet, real fonts, a real palette and real variants", async () => {
+    const { readFileSync } = await import("node:fs");
+    const index = readFileSync("src/render-kit/styles/index.css", "utf8");
+    for (const family of families) {
+      expect(index, family.id).toContain(`./families/${family.id}.css`);
+      expect(getFontPair(family.defaults.fonts).id, family.id).toBe(family.defaults.fonts);
+      expect(
+        palettes.some((p) => p.id === family.defaults.palette),
+        family.id,
+      ).toBe(true);
+      for (const [type, variant] of Object.entries(family.preferredVariants)) {
+        const def = allSections().find((s) => s.type === type);
+        expect(def?.variants[variant], `${family.id}: ${type}.${variant}`).toBeDefined();
+      }
+    }
+  });
+
+  test("switching family keeps all content and changes theme and layouts", () => {
+    const before = createSampleDoc();
+    const after = applyFamily(before, "elegant");
+    expect(after.sections.map((s) => s.content)).toEqual(before.sections.map((s) => s.content));
+    expect(after.theme.family).toBe("elegant");
+    expect(after.theme.fonts).toBe("couture");
+    expect(after.sections.find((s) => s.type === "hero")?.variant).toBe("centered");
+    expect(applyFamily(before, "tech", { keepColors: true }).theme.palette).toEqual(
+      before.theme.palette,
+    );
+    expect(() => renderToHtml(normalizeDoc(after))).not.toThrow();
   });
 });
 

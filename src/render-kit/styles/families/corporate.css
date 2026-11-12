@@ -1,0 +1,62 @@
+/* Corporate: clear and trustworthy. Structured grid, white cards with a soft shadow, a color bar over headings. */
+.pk-root[data-pk-family="corporate"] {
+  --pk-heading-weight: 700;
+  --pk-heading-tracking: -0.02em;
+  --pk-heading-leading: 1.12;
+  --pk-display-scale: 0.86;
+  --pk-container: 1160px;
+}
+.pk-root[data-pk-family="corporate"] .pk-section {
+  --pk-card-bg: var(--pk-c-bg);
+  --pk-card-border: 1px solid var(--pk-border);
+  --pk-card-shadow:
+    0 1px 2px color-mix(in srgb, var(--pk-c-text) 6%, transparent),
+    0 10px 28px color-mix(in srgb, var(--pk-c-text) 7%, transparent);
+  --pk-tag-bg: var(--pk-surface);
+  --pk-tag-border: 1px solid transparent;
+}
+.pk-root[data-pk-family="corporate"] .pk-section[data-pk-bg="primary"] {
+  --pk-card-bg: var(--pk-surface);
+  --pk-card-shadow: none;
+}
+.pk-root[data-pk-family="corporate"] .pk-navbar {
+  border-block-end: 1px solid var(--pk-border);
+}
+
+/* The hero sits on the surface color. */
+.pk-root[data-pk-family="corporate"] .pk-hero[data-pk-bg="default"] {
+  --pk-bg: var(--pk-c-surface);
+  --pk-surface: var(--pk-c-bg);
+}
+.pk-root[data-pk-family="corporate"] .pk-hero__grid {
+  align-items: center;
+}
+.pk-root[data-pk-family="corporate"] .pk-hero__image {
+  box-shadow: var(--pk-card-shadow);
+}
+.pk-root[data-pk-family="corporate"] :is(.pk-rail__head, .pk-stack__head) .pk-h2::before {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--pk-primary);
+  margin-block-end: 18px;
+}
+.pk-root[data-pk-family="corporate"] .pk-facts {
+  border: 0;
+  padding: 0;
+  gap: 12px;
+}
+.pk-root[data-pk-family="corporate"] .pk-facts > div {
+  background: var(--pk-surface);
+  border-radius: var(--pk-radius);
+  padding: 14px 18px;
+}
+.pk-root[data-pk-family="corporate"] .pk-facts--stacked > div {
+  background: none;
+  padding: 0;
+}
+.pk-root[data-pk-family="corporate"] .pk-footer {
+  background: var(--pk-c-surface);
+}

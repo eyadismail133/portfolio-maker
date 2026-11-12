@@ -22,6 +22,7 @@
 .pk-project__year {
   color: var(--pk-muted);
   font-size: 0.9375rem;
+  font-family: var(--pk-meta-font);
   font-variant-numeric: tabular-nums;
 }
 .pk-project__text {

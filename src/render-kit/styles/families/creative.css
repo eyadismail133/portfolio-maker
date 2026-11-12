@@ -1,0 +1,105 @@
+/* Creative: artistic and a little unexpected. Organic shapes, tinted cards, marker lines under headings. */
+.pk-root[data-pk-family="creative"] {
+  --pk-heading-weight: 800;
+  --pk-heading-tracking: -0.035em;
+  --pk-heading-leading: 1.04;
+  --pk-display-scale: 1.08;
+  --pk-h2-scale: 1.15;
+}
+.pk-root[data-pk-family="creative"] .pk-section {
+  --pk-card-bg: color-mix(in srgb, var(--pk-primary) 9%, var(--pk-bg));
+  --pk-tag-bg: color-mix(in srgb, var(--pk-accent) 16%, var(--pk-bg));
+  --pk-tag-border: 1px solid transparent;
+}
+
+/* Headings look underlined with a marker. */
+.pk-root[data-pk-family="creative"] :is(.pk-rail__head, .pk-stack__head) .pk-h2 {
+  display: inline;
+  background: linear-gradient(
+    transparent 62%,
+    color-mix(in srgb, var(--pk-accent) 34%, transparent) 62% 92%,
+    transparent 92%
+  );
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-inline: 2px;
+}
+.pk-root[data-pk-family="creative"] :is(.pk-rail__head, .pk-stack__head) .pk-sub {
+  margin-block-start: 18px;
+}
+
+/* The hero image is an organic shape with a colored shape behind it. */
+.pk-root[data-pk-family="creative"] .pk-hero__grid {
+  align-items: center;
+}
+.pk-root[data-pk-family="creative"] .pk-hero__image {
+  border-radius: 46% 54% 58% 42% / 44% 40% 60% 56%;
+  box-shadow: 22px 18px 0 color-mix(in srgb, var(--pk-accent) 55%, var(--pk-bg));
+  max-width: 420px;
+  justify-self: center;
+}
+.pk-root[data-pk-family="creative"][dir="rtl"] .pk-hero__image {
+  box-shadow: -22px 18px 0 color-mix(in srgb, var(--pk-accent) 55%, var(--pk-bg));
+}
+.pk-root[data-pk-family="creative"] .pk-hero__title {
+  display: inline-block;
+  background: var(--pk-tag-bg);
+  color: var(--pk-text);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 1rem;
+}
+.pk-root[data-pk-family="creative"] .pk-media--empty {
+  background: color-mix(in srgb, var(--pk-primary) 16%, var(--pk-bg));
+  color: var(--pk-primary);
+}
+
+/* Cards alternate between two tints; on wide screens they lean a little. */
+.pk-root[data-pk-family="creative"] .pk-card:nth-child(even) {
+  --pk-card-bg: color-mix(in srgb, var(--pk-accent) 12%, var(--pk-bg));
+}
+@media (min-width: 900px) {
+  .pk-root[data-pk-family="creative"] .pk-card:nth-child(odd) {
+    rotate: -0.6deg;
+  }
+  .pk-root[data-pk-family="creative"] .pk-card:nth-child(even) {
+    rotate: 0.6deg;
+  }
+  .pk-root[data-pk-family="creative"] .pk-projects__list--grid .pk-project:nth-child(even) {
+    margin-block-start: 48px;
+  }
+  .pk-root[data-pk-family="creative"] .pk-section:nth-of-type(even) .pk-rail {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
+  .pk-root[data-pk-family="creative"] .pk-section:nth-of-type(even) .pk-rail__head {
+    order: 2;
+  }
+}
+.pk-root[data-pk-family="creative"] .pk-project__image {
+  border-radius: calc(var(--pk-radius) * 1.6);
+}
+.pk-root[data-pk-family="creative"] .pk-project:nth-child(3n + 2) .pk-media--empty {
+  background: color-mix(in srgb, var(--pk-accent) 20%, var(--pk-bg));
+  color: var(--pk-accent);
+}
+.pk-root[data-pk-family="creative"] .pk-tags li {
+  border-radius: 999px;
+  font-weight: 600;
+}
+.pk-root[data-pk-family="creative"] .pk-timeline {
+  border-inline-start: 3px dotted color-mix(in srgb, var(--pk-accent) 70%, var(--pk-bg));
+}
+.pk-root[data-pk-family="creative"] .pk-timeline .pk-entry::before {
+  inset-inline-start: -8px;
+  width: 13px;
+  height: 13px;
+  border: 0;
+  background: var(--pk-primary);
+}
+.pk-root[data-pk-family="creative"] .pk-cta__box--banner {
+  border-radius: calc(var(--pk-radius) * 2);
+}
+.pk-root[data-pk-family="creative"] .pk-footer {
+  border-block-start: 0;
+  background: var(--pk-c-surface);
+}

@@ -1,6 +1,11 @@
 /* All styles for portfolio pages. The HTML export joins these files into one stylesheet. */
 @import "./base.css";
 @import "./families/minimal.css";
+@import "./families/bold.css";
+@import "./families/elegant.css";
+@import "./families/tech.css";
+@import "./families/corporate.css";
+@import "./families/creative.css";
 @import "../sections/navbar/navbar.css";
 @import "../sections/hero/hero.css";
 @import "../sections/about/about.css";

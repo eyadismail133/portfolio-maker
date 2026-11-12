@@ -35,7 +35,7 @@ export const PERSONAL_RECIPE = [
 /** Builds a complete document from the sample content of each section. */
 export function createSampleDoc(options: SampleOptions = {}): PortfolioDoc {
   const family = getFamily(options.family ?? "minimal");
-  const palette = getPalette(options.palette ?? "cobalt");
+  const palette = getPalette(options.palette ?? family.defaults.palette);
   const sections = (options.sections ?? PERSONAL_RECIPE).flatMap((entry) => {
     const [type, wanted] = entry.split(":");
     const def = getSection(type);
@@ -66,7 +66,7 @@ export function createSampleDoc(options: SampleOptions = {}): PortfolioDoc {
       family: family.id,
       palette: palette.light,
       paletteDark: palette.dark,
-      mode: options.mode ?? "light",
+      mode: options.mode ?? family.defaults.mode,
       fonts: options.fonts ?? family.defaults.fonts,
       radius: family.defaults.radius,
       spacing: family.defaults.spacing,

@@ -1,0 +1,85 @@
+/* Bold: loud and confident. Huge headings, thick rules, the top of the page is one block of color. */
+.pk-root[data-pk-family="bold"] {
+  --pk-heading-weight: 800;
+  --pk-heading-tracking: -0.04em;
+  --pk-heading-leading: 1;
+  --pk-display-scale: 1.18;
+  --pk-h2-scale: 1.4;
+  --pk-btn-weight: 700;
+}
+.pk-root[data-pk-family="bold"] .pk-section {
+  --pk-rule: 3px solid var(--pk-text);
+  --pk-card-bg: transparent;
+  --pk-card-border: 3px solid var(--pk-text);
+  --pk-tag-border: 2px solid var(--pk-text);
+}
+
+/* Navbar and hero share the primary color. */
+.pk-root[data-pk-family="bold"] .pk-navbar[data-pk-bg="default"],
+.pk-root[data-pk-family="bold"] .pk-hero[data-pk-bg="default"] {
+  --pk-bg: var(--pk-c-primary);
+  --pk-surface: color-mix(in srgb, var(--pk-c-on-primary) 12%, var(--pk-c-primary));
+  --pk-text: var(--pk-c-on-primary);
+  --pk-muted: color-mix(in srgb, var(--pk-c-on-primary) 86%, var(--pk-c-primary));
+  --pk-primary: var(--pk-c-on-primary);
+  --pk-on-primary: var(--pk-c-primary);
+  --pk-accent: var(--pk-c-on-primary);
+  --pk-border: color-mix(in srgb, var(--pk-c-on-primary) 40%, var(--pk-c-primary));
+}
+.pk-root[data-pk-family="bold"] .pk-hero__title {
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+.pk-root[data-pk-family="bold"] .pk-hero__intro {
+  color: var(--pk-text);
+}
+
+/* Every section opens with a thick line. */
+.pk-root[data-pk-family="bold"]
+  .pk-section:not(.pk-hero, .pk-navbar, .pk-footer, .pk-cta)
+  > .pk-container
+  > :is(.pk-rail, .pk-stack) {
+  border-block-start: var(--pk-rule);
+  padding-block-start: 28px;
+}
+.pk-root[data-pk-family="bold"] .pk-btn {
+  min-height: 56px;
+  padding-inline: 28px;
+  font-size: 1.0625rem;
+}
+.pk-root[data-pk-family="bold"] .pk-btn--small {
+  min-height: 44px;
+  padding-inline: 18px;
+  font-size: 0.9375rem;
+}
+.pk-root[data-pk-family="bold"] .pk-btn--ghost {
+  border: 3px solid currentColor;
+}
+.pk-root[data-pk-family="bold"] .pk-tags li {
+  font-weight: 700;
+}
+.pk-root[data-pk-family="bold"] .pk-tags--small li {
+  border-width: 1.5px;
+  color: var(--pk-text);
+}
+.pk-root[data-pk-family="bold"] .pk-media--empty {
+  background: var(--pk-primary);
+  color: var(--pk-on-primary);
+}
+.pk-root[data-pk-family="bold"] .pk-timeline {
+  border-inline-start: 3px solid var(--pk-text);
+}
+.pk-root[data-pk-family="bold"] .pk-timeline .pk-entry::before {
+  inset-inline-start: -9px;
+  width: 15px;
+  height: 15px;
+  border-radius: 0;
+  border: 0;
+  background: var(--pk-primary);
+}
+.pk-root[data-pk-family="bold"] .pk-h3 {
+  font-size: 1.375rem;
+}
+.pk-root[data-pk-family="bold"] .pk-footer {
+  border-block-start: var(--pk-rule);
+}

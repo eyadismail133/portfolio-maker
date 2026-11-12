@@ -25,9 +25,10 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Right-to-left layout and Arabic sample content
 - [ ] Check the Arabic web fonts in a real browser (they could not load in the build sandbox)
 - [x] Demo page `/dev/render` that shows sample documents, with switches for family, palette, direction, screen size
-- [ ] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
+- [x] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
+- [x] One-step family switch that keeps content (`themes/apply.ts`)
 - [ ] Remaining version 1 sections (27 more), in this order: business group, work group, trust group, free blocks
-- [ ] 24 palettes and 15 font pairs (8 palettes and 6 pairs exist)
+- [ ] 24 palettes and 15 font pairs (8 palettes and 10 pairs exist)
 - [ ] Visual tests: screenshot every section x family
 
 **Result:** any sample JSON becomes a beautiful page in 6 designs.

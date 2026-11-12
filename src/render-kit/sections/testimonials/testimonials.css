@@ -43,7 +43,7 @@
   font-weight: 500;
   font-size: clamp(1.5rem, 1rem + 2.2vw, 2.5rem);
   line-height: 1.25;
-  letter-spacing: var(--pk-heading-tracking);
+  letter-spacing: var(--pk-h-tracking);
 }
 .pk-root[lang="ar"] .pk-quote--large blockquote {
   line-height: 1.6;

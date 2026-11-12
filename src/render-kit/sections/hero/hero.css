@@ -20,13 +20,11 @@
 .pk-hero__name {
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
-  font-size: clamp(2.75rem, 1.4rem + 6.4vw, 6rem);
-  line-height: calc(var(--pk-heading-leading) * 0.92);
-  letter-spacing: calc(var(--pk-heading-tracking) * 1.5);
+  font-style: var(--pk-heading-style);
+  font-size: calc(clamp(2.6rem, 1.4rem + 6vw, 5.75rem) * var(--pk-display-scale));
+  line-height: calc(var(--pk-h-leading) * 0.94);
+  letter-spacing: calc(var(--pk-h-tracking) * 1.4);
   text-wrap: balance;
-}
-.pk-root[lang="ar"] .pk-hero__name {
-  line-height: 1.25;
 }
 .pk-hero__intro {
   font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);

@@ -1,0 +1,103 @@
+/* Elegant: refined and quiet. Light serif headings, centered sections, thin lines. */
+.pk-root[data-pk-family="elegant"] {
+  --pk-heading-weight: 500;
+  --pk-heading-tracking: -0.012em;
+  --pk-heading-leading: 1.12;
+  --pk-display-scale: 1.05;
+  --pk-h2-scale: 1.1;
+  --pk-btn-weight: 500;
+  --pk-btn-tracking: 0.04em;
+  --pk-container: 1040px;
+}
+.pk-root[data-pk-family="elegant"] .pk-section {
+  --pk-card-bg: transparent;
+  --pk-card-border: 1px solid var(--pk-border);
+}
+
+/* Headings sit above the content, centered, with a short line under them. */
+.pk-root[data-pk-family="elegant"] .pk-rail {
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 56px);
+}
+.pk-root[data-pk-family="elegant"] :is(.pk-rail__head, .pk-stack__head) {
+  text-align: center;
+}
+.pk-root[data-pk-family="elegant"] :is(.pk-rail__head, .pk-stack__head) .pk-h2::after {
+  content: "";
+  display: block;
+  width: 56px;
+  margin: 22px auto 0;
+  border-block-start: 1px solid var(--pk-accent);
+}
+.pk-root[data-pk-family="elegant"] :is(.pk-rail__head, .pk-stack__head) .pk-sub {
+  margin-inline: auto;
+  margin-block-start: 18px;
+}
+.pk-root[data-pk-family="elegant"] .pk-rail__body {
+  width: 100%;
+  max-width: 800px;
+  margin-inline: auto;
+}
+.pk-root[data-pk-family="elegant"] .pk-hero__title {
+  font-family: var(--pk-font-heading);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.375rem;
+  color: var(--pk-muted);
+}
+.pk-root[data-pk-family="elegant"] .pk-hero__name {
+  font-weight: 400;
+}
+.pk-root[data-pk-family="elegant"] .pk-btn {
+  font-size: 0.9375rem;
+  padding-inline: 28px;
+}
+.pk-root[data-pk-family="elegant"] .pk-btn--ghost {
+  border-color: var(--pk-text);
+}
+.pk-root[data-pk-family="elegant"] .pk-nav__links {
+  font-size: 0.875rem;
+  letter-spacing: var(--pk-btn-tracking);
+}
+.pk-root[data-pk-family="elegant"] .pk-entry__place {
+  color: var(--pk-muted);
+  font-style: italic;
+  font-weight: 400;
+}
+.pk-root[data-pk-family="elegant"] .pk-timeline .pk-entry::before {
+  border-width: 1px;
+  border-color: var(--pk-accent);
+}
+.pk-root[data-pk-family="elegant"] .pk-quote--large {
+  margin-inline: auto;
+  text-align: center;
+  justify-items: center;
+}
+.pk-root[data-pk-family="elegant"] .pk-quote--large blockquote {
+  font-style: italic;
+  font-weight: 400;
+}
+.pk-root[data-pk-family="elegant"] .pk-cta__box {
+  flex-direction: column;
+  text-align: center;
+}
+.pk-root[data-pk-family="elegant"] .pk-cta__box .pk-sub {
+  margin-inline: auto;
+}
+.pk-root[data-pk-family="elegant"] .pk-media--empty {
+  background: var(--pk-surface);
+  color: color-mix(in srgb, var(--pk-accent) 60%, var(--pk-surface));
+  font-weight: 400;
+}
+.pk-root[data-pk-family="elegant"] .pk-footer__inner {
+  justify-content: center;
+  text-align: center;
+}
+.pk-root[data-pk-family="elegant"] .pk-footer__links {
+  margin-inline-start: 0;
+  justify-content: center;
+  flex-basis: 100%;
+}
+.pk-root[data-pk-family="elegant"] .pk-contact--cards .pk-socials {
+  justify-content: center;
+}

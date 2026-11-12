@@ -16,9 +16,20 @@
   --pk-heading-weight: 700;
   --pk-heading-tracking: -0.025em;
   --pk-heading-leading: 1.08;
+  --pk-heading-style: normal;
+  --pk-display-scale: 1;
+  --pk-h2-scale: 1;
   --pk-body-leading: 1.6;
   --pk-btn-weight: 600;
+  --pk-btn-tracking: 0;
   --pk-container: 1120px;
+  --pk-font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  /* Font for small facts such as dates, years and tags. */
+  --pk-meta-font: inherit;
+
+  /* What headings really use. Arabic replaces these, whatever the family asks for. */
+  --pk-h-tracking: var(--pk-heading-tracking);
+  --pk-h-leading: var(--pk-heading-leading);
 
   /* Sizes. */
   --pk-gutter: clamp(20px, 5vw, 48px);
@@ -64,8 +75,9 @@
 
 /* Arabic joins its letters, so it gets no tightening and more line height. */
 .pk-root[lang="ar"] {
-  --pk-heading-tracking: 0;
-  --pk-heading-leading: 1.35;
+  --pk-h-tracking: 0;
+  --pk-h-leading: 1.35;
+  --pk-btn-tracking: 0;
   --pk-body-leading: 1.85;
 }
 
@@ -84,6 +96,9 @@
   --pk-card-bg: var(--pk-surface);
   --pk-card-border: 1px solid transparent;
   --pk-card-shadow: none;
+  --pk-tag-bg: transparent;
+  --pk-tag-border: 1px solid var(--pk-border);
+  --pk-btn-shadow: none;
   --pk-pad: var(--pk-section-pad);
   background: var(--pk-bg);
   color: var(--pk-text);
@@ -156,9 +171,10 @@
 .pk-h2 {
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
-  font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem);
-  line-height: var(--pk-heading-leading);
-  letter-spacing: var(--pk-heading-tracking);
+  font-style: var(--pk-heading-style);
+  font-size: calc(clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale));
+  line-height: var(--pk-h-leading);
+  letter-spacing: var(--pk-h-tracking);
   text-wrap: balance;
 }
 .pk-h3 {
@@ -166,7 +182,7 @@
   font-weight: var(--pk-heading-weight);
   font-size: 1.1875rem;
   line-height: 1.3;
-  letter-spacing: calc(var(--pk-heading-tracking) * 0.4);
+  letter-spacing: calc(var(--pk-h-tracking) * 0.4);
 }
 .pk-sub {
   color: var(--pk-muted);
@@ -219,6 +235,7 @@
   padding: 10px 22px;
   border-radius: var(--pk-radius-control);
   font-weight: var(--pk-btn-weight);
+  letter-spacing: var(--pk-btn-tracking);
   line-height: 1.2;
   cursor: pointer;
   transition:
@@ -228,6 +245,7 @@
 .pk-btn--primary {
   background: var(--pk-primary);
   color: var(--pk-on-primary);
+  box-shadow: var(--pk-btn-shadow);
 }
 .pk-btn--primary:hover {
   background: color-mix(in srgb, var(--pk-primary) 86%, var(--pk-text));
@@ -268,7 +286,9 @@
   gap: 8px;
 }
 .pk-tags li {
-  border: 1px solid var(--pk-border);
+  background: var(--pk-tag-bg);
+  border: var(--pk-tag-border);
+  font-family: var(--pk-meta-font);
   border-radius: var(--pk-radius-control);
   padding: 6px 14px;
   font-size: 0.9375rem;
