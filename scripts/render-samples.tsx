@@ -27,6 +27,17 @@ const samples: Record<string, { doc: PortfolioDoc; lang: Lang }> = {
   },
   "minimal-dark-en": { doc: createSampleDoc({ mode: "dark" }), lang: "en" },
 };
+for (const [kind, family] of [
+  ["company", "corporate"],
+  ["startup", "tech"],
+  ["everything", "minimal"],
+  ["company", "bold"],
+  ["startup", "creative"],
+  ["company", "elegant"],
+] as const) {
+  samples[`${kind}-${family}-en`] = { doc: createSampleDoc({ kind, family }), lang: "en" };
+  samples[`${kind}-${family}-ar`] = { doc: createSampleDoc({ kind, family }), lang: "ar" };
+}
 for (const family of families) {
   samples[`${family.id}-en`] = { doc: createSampleDoc({ family: family.id }), lang: "en" };
   samples[`${family.id}-ar`] = { doc: createSampleDoc({ family: family.id }), lang: "ar" };

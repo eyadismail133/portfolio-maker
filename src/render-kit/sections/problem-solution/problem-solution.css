@@ -1,0 +1,40 @@
+.pk-ps__grid {
+  display: grid;
+  gap: clamp(24px, 4vw, 40px);
+  align-items: start;
+}
+@media (min-width: 760px) {
+  .pk-ps__grid--columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.pk-ps__grid--story {
+  max-width: 760px;
+}
+.pk-ps__side {
+  display: grid;
+  gap: 14px;
+}
+.pk-ps__side--problem {
+  padding-block: clamp(20px, 3vw, 28px);
+}
+.pk-ps__side--solution .pk-h3 {
+  color: var(--pk-primary);
+}
+.pk-ps__pains {
+  display: grid;
+  gap: 8px;
+  color: var(--pk-muted);
+}
+.pk-ps__pains li {
+  position: relative;
+  padding-inline-start: 26px;
+}
+.pk-ps__pains li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 3px;
+  inset-block-start: 0.75em;
+  width: 12px;
+  border-block-start: 2px solid var(--pk-muted);
+}

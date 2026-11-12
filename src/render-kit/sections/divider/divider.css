@@ -1,0 +1,22 @@
+.pk-root .pk-section.pk-divider {
+  padding-block: 0;
+}
+.pk-divider__line {
+  border-block-start: var(--pk-rule);
+  margin-block: 24px;
+}
+.pk-divider__line[data-size="small"] {
+  margin-block: 8px;
+}
+.pk-divider__line[data-size="large"] {
+  margin-block: 56px;
+}
+.pk-divider__space {
+  height: 48px;
+}
+.pk-divider__space[data-size="small"] {
+  height: 20px;
+}
+.pk-divider__space[data-size="large"] {
+  height: 112px;
+}

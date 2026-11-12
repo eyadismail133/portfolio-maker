@@ -1,14 +1,14 @@
 /* Shared by work experience and education. */
-.pk-timeline {
+.pk-history {
   border-inline-start: 1px solid var(--pk-border);
   display: grid;
   gap: 40px;
 }
-.pk-timeline .pk-entry {
+.pk-history .pk-entry {
   position: relative;
   padding-inline-start: clamp(20px, 3vw, 32px);
 }
-.pk-timeline .pk-entry::before {
+.pk-history .pk-entry::before {
   content: "";
   position: absolute;
   inset-inline-start: -5px;

@@ -41,7 +41,7 @@ function EntryBody({ entry, ctx }: { entry: Entry; ctx: SectionContext }) {
 /** A history as a vertical line with a marker per entry. */
 export function EntryTimeline({ entries, ctx }: { entries: Entry[]; ctx: SectionContext }) {
   return (
-    <ol className="pk-timeline">
+    <ol className="pk-history">
       {entries.map((entry, i) => (
         <li key={i} className="pk-entry">
           <EntryBody entry={entry} ctx={ctx} />

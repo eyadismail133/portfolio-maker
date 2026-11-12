@@ -27,7 +27,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Demo page `/dev/render` that shows sample documents, with switches for family, palette, direction, screen size
 - [x] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
 - [x] One-step family switch that keeps content (`themes/apply.ts`)
-- [ ] Remaining version 1 sections (27 more), in this order: business group, work group, trust group, free blocks
+- [x] Remaining version 1 sections (27 more): all 39 version 1 sections exist, each with at least 2 layouts
+- [ ] Section extras that need a small script: gallery lightbox, counting numbers in `stats`, sending the newsletter and contact forms without leaving the page
 - [ ] 24 palettes and 15 font pairs (8 palettes and 10 pairs exist)
 - [ ] Visual tests: screenshot every section x family
 

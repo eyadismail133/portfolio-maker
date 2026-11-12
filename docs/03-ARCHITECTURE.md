@@ -63,6 +63,12 @@ supabase/migrations/      database tables and security rules
 docs/
 ```
 
+Section pieces shared across types: `sections/shared.tsx` (heading layouts, image placeholder, buttons), `sections/entries.tsx` (history rows) and `sections/icons.tsx` (the built-in icon set; a section stores an icon by name, and the editor field type is `icon`).
+
+`samples.ts` builds sample documents of four kinds (`personal`, `company`, `startup`, `everything`) until the Phase 4 idea generator replaces it.
+
+Sections that embed other sites (`video`, `map`) build the frame address themselves from a YouTube or Vimeo link or a place name; a user can never supply a raw frame address.
+
 Variants of a section live together in its `index.tsx`. Split a variant into its own file when the file gets long.
 
 ## The portfolio document

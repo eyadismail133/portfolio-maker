@@ -347,6 +347,59 @@
   border: 0;
 }
 
+/* A grid that fits as many columns as there is room for. Set --pk-min for the smallest column. */
+.pk-grid {
+  display: grid;
+  gap: clamp(16px, 2.4vw, 28px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--pk-min, 260px)), 1fr));
+}
+.pk-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--pk-radius-control);
+  background: color-mix(in srgb, var(--pk-primary) 12%, transparent);
+  color: var(--pk-primary);
+  flex: none;
+}
+.pk-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.pk-muted {
+  color: var(--pk-muted);
+}
+.pk-points {
+  display: grid;
+  gap: 8px;
+}
+.pk-points li {
+  position: relative;
+  padding-inline-start: 26px;
+}
+.pk-points li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px;
+  inset-block-start: 0.45em;
+  width: 12px;
+  height: 7px;
+  border-inline-start: 2px solid var(--pk-accent);
+  border-block-end: 2px solid var(--pk-accent);
+  rotate: -45deg;
+}
+[dir="rtl"] .pk-points li::before {
+  rotate: 45deg;
+}
+.pk-embed {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--pk-radius);
+  background: var(--pk-surface);
+  display: block;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pk-root * {
     transition: none !important;

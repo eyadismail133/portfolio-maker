@@ -1,0 +1,23 @@
+.pk-cv-download {
+  --pk-pad: calc(var(--pk-section-pad) * 0.6);
+}
+.pk-cv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 40px;
+}
+.pk-cv--banner {
+  padding: clamp(24px, 5vw, 48px);
+}
+.pk-cv--inline .pk-sub {
+  margin-block-start: 4px;
+}
+.pk-cv__btn {
+  gap: 10px;
+}
+.pk-cv__btn svg {
+  width: 20px;
+  height: 20px;
+}

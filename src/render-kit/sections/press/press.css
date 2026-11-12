@@ -1,0 +1,21 @@
+.pk-press__row {
+  display: grid;
+  gap: 20px;
+}
+.pk-press__quotes li {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.pk-press__quotes blockquote {
+  font-size: 1.125rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.pk-root[lang="ar"] .pk-press__quotes blockquote {
+  line-height: 1.8;
+}
+.pk-press__outlet {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+}

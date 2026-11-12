@@ -1,0 +1,21 @@
+.pk-certs {
+  --pk-min: 240px;
+}
+.pk-certs--list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
+  padding-block: 18px;
+  border-block-start: var(--pk-rule);
+}
+.pk-certs--list li:first-child {
+  border: 0;
+  padding-block-start: 0;
+}
+.pk-certs--cards li {
+  display: grid;
+  gap: 16px;
+  align-content: space-between;
+}

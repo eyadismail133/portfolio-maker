@@ -27,10 +27,10 @@ function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: stri
         <p>{ctx.t(item.quote)}</p>
       </blockquote>
       <figcaption>
-        <Media asset={item.photo} label={ctx.t(item.name)} className="pk-quote__photo" />
+        <Media asset={item.photo} label={ctx.t(item.name)} className="pk-testi__photo" />
         <span>
           <strong>{ctx.t(item.name)}</strong>
-          {ctx.t(item.role) && <span className="pk-quote__role">{ctx.t(item.role)}</span>}
+          {ctx.t(item.role) && <span className="pk-testi__role">{ctx.t(item.role)}</span>}
         </span>
       </figcaption>
     </figure>
@@ -39,9 +39,9 @@ function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: stri
 
 const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} ctx={ctx}>
-    <div className="pk-quotes">
+    <div className="pk-testis">
       {content.items.map((item, i) => (
-        <Quote key={i} item={item} ctx={ctx} className="pk-card pk-quote" />
+        <Quote key={i} item={item} ctx={ctx} className="pk-card pk-testi" />
       ))}
     </div>
   </Stack>
@@ -53,7 +53,7 @@ const Single: VariantComponent<Content> = ({ content, ctx }) => {
   return (
     <>
       {ctx.t(content.heading) && <h2 className="pk-visually-hidden">{ctx.t(content.heading)}</h2>}
-      <Quote item={first} ctx={ctx} className="pk-quote pk-quote--large" />
+      <Quote item={first} ctx={ctx} className="pk-testi pk-testi--large" />
     </>
   );
 };

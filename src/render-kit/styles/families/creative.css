@@ -86,10 +86,10 @@
   border-radius: 999px;
   font-weight: 600;
 }
-.pk-root[data-pk-family="creative"] .pk-timeline {
+.pk-root[data-pk-family="creative"] .pk-history {
   border-inline-start: 3px dotted color-mix(in srgb, var(--pk-accent) 70%, var(--pk-bg));
 }
-.pk-root[data-pk-family="creative"] .pk-timeline .pk-entry::before {
+.pk-root[data-pk-family="creative"] .pk-history .pk-entry::before {
   inset-inline-start: -8px;
   width: 13px;
   height: 13px;

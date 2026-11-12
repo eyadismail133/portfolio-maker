@@ -19,10 +19,8 @@ export type SectionContext = {
   languages: Lang[];
 };
 
-export type VariantComponent<C> = (props: {
-  content: C;
-  ctx: SectionContext;
-}) => ReactElement | null;
+export type SectionProps<C> = { content: C; ctx: SectionContext };
+export type VariantComponent<C> = (props: SectionProps<C>) => ReactElement | null;
 
 /** Tells the editor which form field to show for a piece of content. */
 export type FieldDef = {
@@ -37,6 +35,7 @@ export type FieldDef = {
     | "month"
     | "end-month"
     | "level"
+    | "icon"
     | "toggle"
     | "select"
     | "text-list"

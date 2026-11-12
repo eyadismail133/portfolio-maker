@@ -1,0 +1,6 @@
+.pk-text__center {
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+  text-align: center;
+}

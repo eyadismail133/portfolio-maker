@@ -1,0 +1,28 @@
+.pk-social-links {
+  --pk-pad: calc(var(--pk-section-pad) * 0.7);
+}
+.pk-social {
+  display: grid;
+  gap: 24px;
+}
+.pk-social__list {
+  --pk-min: 200px;
+}
+.pk-social__list a {
+  display: grid;
+  gap: 2px;
+}
+.pk-social__list bdi {
+  color: var(--pk-muted);
+  font-size: 0.9375rem;
+}
+.pk-social__list--row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 40px;
+}
+.pk-social__list a:hover strong {
+  color: var(--pk-primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

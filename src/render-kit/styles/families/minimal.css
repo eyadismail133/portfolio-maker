@@ -5,13 +5,13 @@
 
 /* Two plain sections in a row are separated by a hairline instead of double padding. */
 .pk-root[data-pk-family="minimal"]
-  .pk-section[data-pk-bg="default"]:not(.pk-navbar)
-  + .pk-section[data-pk-bg="default"]:not(.pk-footer) {
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar, .pk-divider)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer, .pk-divider) {
   padding-block-start: 0;
 }
 .pk-root[data-pk-family="minimal"]
-  .pk-section[data-pk-bg="default"]:not(.pk-navbar)
-  + .pk-section[data-pk-bg="default"]:not(.pk-footer)
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar, .pk-divider)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer, .pk-divider)
   > .pk-container::before {
   content: "";
   display: block;

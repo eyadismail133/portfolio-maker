@@ -1,0 +1,63 @@
+.pk-pricing__cards {
+  --pk-min: 250px;
+  align-items: stretch;
+}
+.pk-plan {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.pk-pricing__cards .pk-plan {
+  grid-template-rows: auto auto auto auto 1fr auto;
+}
+.pk-pricing__cards .pk-plan:not([data-featured]) {
+  grid-template-rows: auto auto auto 1fr auto;
+}
+.pk-plan[data-featured] {
+  outline: 2px solid var(--pk-primary);
+  outline-offset: -2px;
+}
+.pk-plan__badge {
+  justify-self: start;
+  display: inline-block;
+  background: var(--pk-primary);
+  color: var(--pk-on-primary);
+  border-radius: var(--pk-radius-control);
+  padding: 2px 10px;
+  font-family: var(--pk-font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.pk-plan__price strong {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: 2rem;
+  line-height: 1.2;
+}
+.pk-plan__price span {
+  color: var(--pk-muted);
+}
+.pk-pricing__table .pk-plan {
+  padding: 24px;
+  border-block-start: var(--pk-rule);
+  align-items: center;
+  outline-offset: 0;
+  border-radius: var(--pk-radius);
+}
+.pk-pricing__table .pk-plan[data-featured] {
+  border-color: transparent;
+}
+.pk-pricing__table .pk-plan__badge {
+  margin-inline-start: 12px;
+  vertical-align: middle;
+}
+.pk-pricing__table .pk-plan__price strong {
+  font-size: 1.5rem;
+}
+@media (min-width: 900px) {
+  .pk-pricing__table .pk-plan {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 2fr) auto;
+    gap: 28px;
+  }
+}

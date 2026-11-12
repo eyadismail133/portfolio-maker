@@ -27,6 +27,21 @@ const UI = {
   intermediate: { en: "Intermediate", ar: "متوسط" },
   basic: { en: "Basic", ar: "مبتدئ" },
   skipToContent: { en: "Skip to content", ar: "انتقل إلى المحتوى" },
+  viewCertificate: { en: "View certificate", ar: "عرض الشهادة" },
+  challenge: { en: "The challenge", ar: "التحدي" },
+  solution: { en: "What we did", ar: "ما قمنا به" },
+  result: { en: "The result", ar: "النتيجة" },
+  client: { en: "Client", ar: "العميل" },
+  year: { en: "Year", ar: "السنة" },
+  role: { en: "Role", ar: "الدور" },
+  subscribe: { en: "Subscribe", ar: "اشترك" },
+  yourEmail: { en: "Your email address", ar: "بريدك الإلكتروني" },
+  addVideo: { en: "Add a YouTube or Vimeo link", ar: "أضف رابط يوتيوب أو فيميو" },
+  popular: { en: "Most popular", ar: "الأكثر طلباً" },
+  readArticle: { en: "Read the article", ar: "اقرأ المقال" },
+  openMap: { en: "Open in Google Maps", ar: "افتح في خرائط جوجل" },
+  mission: { en: "Mission", ar: "رسالتنا" },
+  vision: { en: "Vision", ar: "رؤيتنا" },
 } as const;
 export type UiKey = keyof typeof UI;
 
@@ -68,4 +83,44 @@ export function safeImageUrl(url: string | undefined): string | null {
   const value = (url ?? "").trim();
   if (/^(https?:\/\/|\/(?!\/))/i.test(value)) return value;
   return null;
+}
+
+/** Turns a YouTube or Vimeo page address into its player address. Other sites are refused. */
+export function videoEmbedUrl(url: string | undefined): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL((url ?? "").trim());
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+  const host = parsed.hostname.replace(/^(www|m)\./, "");
+  const parts = parsed.pathname.split("/").filter(Boolean);
+  let id: string | undefined;
+  if (host === "youtu.be") id = parts[0];
+  else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+    id =
+      parts[0] === "watch"
+        ? (parsed.searchParams.get("v") ?? undefined)
+        : ["embed", "shorts", "live"].includes(parts[0])
+          ? parts[1]
+          : undefined;
+  }
+  if (id && /^[\w-]{6,20}$/.test(id)) return `https://www.youtube-nocookie.com/embed/${id}`;
+  if (host === "vimeo.com" || host === "player.vimeo.com") {
+    const vimeoId = parts[parts.length - 1];
+    if (vimeoId && /^\d{5,12}$/.test(vimeoId)) return `https://player.vimeo.com/video/${vimeoId}`;
+  }
+  return null;
+}
+
+/** Google Maps frame address for a place name or street address. */
+export function mapEmbedUrl(query: string): string {
+  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+}
+
+/** Only real web addresses may receive form posts. */
+export function safeFormAction(url: string | undefined): string | undefined {
+  const value = (url ?? "").trim();
+  return /^https:\/\//i.test(value) ? value : undefined;
 }

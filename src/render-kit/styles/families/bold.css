@@ -66,10 +66,10 @@
   background: var(--pk-primary);
   color: var(--pk-on-primary);
 }
-.pk-root[data-pk-family="bold"] .pk-timeline {
+.pk-root[data-pk-family="bold"] .pk-history {
   border-inline-start: 3px solid var(--pk-text);
 }
-.pk-root[data-pk-family="bold"] .pk-timeline .pk-entry::before {
+.pk-root[data-pk-family="bold"] .pk-history .pk-entry::before {
   inset-inline-start: -9px;
   width: 15px;
   height: 15px;

@@ -1,0 +1,25 @@
+.pk-partners__grid {
+  --pk-min: 210px;
+}
+.pk-partners__grid li {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.pk-partners__logo {
+  max-height: 44px;
+  width: auto;
+}
+.pk-partners__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding-block: 16px;
+  border-block-start: var(--pk-rule);
+}
+.pk-partners__list li:first-child {
+  border: 0;
+  padding-block-start: 0;
+}

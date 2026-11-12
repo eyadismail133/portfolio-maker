@@ -1,0 +1,21 @@
+.pk-it {
+  display: grid;
+  gap: var(--pk-gap);
+  align-items: center;
+}
+.pk-it__image {
+  aspect-ratio: 4 / 3;
+}
+.pk-it__copy {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+@media (min-width: 760px) {
+  .pk-it {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pk-it--end .pk-it__image {
+    order: 2;
+  }
+}

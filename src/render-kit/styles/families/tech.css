@@ -68,12 +68,12 @@
   height: 6px;
   border-radius: 2px;
 }
-.pk-root[data-pk-family="tech"] .pk-timeline {
+.pk-root[data-pk-family="tech"] .pk-history {
   border-inline-start-style: dashed;
 }
 .pk-root[data-pk-family="tech"]
-  .pk-section[data-pk-bg="default"]:not(.pk-navbar, .pk-hero)
-  + .pk-section[data-pk-bg="default"]:not(.pk-footer) {
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar, .pk-hero, .pk-divider)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer, .pk-divider) {
   border-block-start: var(--pk-rule);
 }
 .pk-root[data-pk-family="tech"] .pk-cta__box--banner {

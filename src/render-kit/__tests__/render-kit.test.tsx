@@ -1,10 +1,17 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { renderToHtml } from "../export";
-import { formatRange, pickText, safeHref, safeImageUrl } from "../i18n";
+import {
+  formatRange,
+  pickText,
+  safeFormAction,
+  safeHref,
+  safeImageUrl,
+  videoEmbedUrl,
+} from "../i18n";
 import { allSections, normalizeDoc } from "../registry";
 import { Renderer } from "../Renderer";
-import { createSampleDoc } from "../samples";
+import { createSampleDoc, RECIPES } from "../samples";
 import { migrateDoc, SCHEMA_VERSION } from "../schema";
 import { applyFamily } from "../themes/apply";
 import {
@@ -19,14 +26,42 @@ import { fontPairs, getFontPair, googleFontsUrl } from "../themes/fonts";
 import { palettes } from "../themes/palettes";
 
 describe("document", () => {
-  test("sample document is valid and uses every section", () => {
-    const doc = createSampleDoc();
+  test("sample documents are valid, and the full sample uses every section", () => {
+    const doc = createSampleDoc({ kind: "everything" });
     expect(doc.schemaVersion).toBe(SCHEMA_VERSION);
     expect(doc.sections.map((s) => s.type).sort()).toEqual(
       allSections()
         .map((s) => s.type)
         .sort(),
     );
+    for (const kind of ["personal", "company", "startup"] as const) {
+      const sample = createSampleDoc({ kind });
+      expect(sample.sections.length, kind).toBe(RECIPES[kind].length);
+      expect(() => renderToHtml(sample, { lang: "ar" })).not.toThrow();
+    }
+  });
+
+  test("the plan's 39 version 1 sections all exist with unique types", () => {
+    const types = allSections().map((s) => s.type);
+    expect(types).toHaveLength(39);
+    expect(new Set(types).size).toBe(39);
+  });
+
+  test("embeds only accept known video sites and safe form addresses", () => {
+    expect(videoEmbedUrl("https://www.youtube.com/watch?v=abcdefghijk")).toBe(
+      "https://www.youtube-nocookie.com/embed/abcdefghijk",
+    );
+    expect(videoEmbedUrl("https://youtu.be/abcdefghijk")).toBe(
+      "https://www.youtube-nocookie.com/embed/abcdefghijk",
+    );
+    expect(videoEmbedUrl("https://vimeo.com/123456789")).toBe(
+      "https://player.vimeo.com/video/123456789",
+    );
+    expect(videoEmbedUrl("https://evil.example/watch?v=abcdefghijk")).toBeNull();
+    expect(videoEmbedUrl("javascript:alert(1)")).toBeNull();
+    expect(videoEmbedUrl("")).toBeNull();
+    expect(safeFormAction("https://example.com/subscribe")).toBe("https://example.com/subscribe");
+    expect(safeFormAction("javascript:alert(1)")).toBeUndefined();
   });
 
   test("normalizeDoc drops unknown sections and repairs unknown variants", () => {
@@ -85,6 +120,17 @@ describe("sections", () => {
       expect(html).toContain(lang === "ar" ? 'dir="rtl"' : 'dir="ltr"');
     }
   });
+
+  test.each(combos)(
+    "%s / %s keeps the wrapper class names for the wrapper only",
+    (type, variant) => {
+      const doc = createSampleDoc({ sections: [`${type}:${variant}`] });
+      const html = renderToStaticMarkup(<Renderer doc={doc} fontLink={false} />);
+      const classes = [...html.matchAll(/class="([^"]*)"/g)].flatMap((m) => m[1].split(/\s+/));
+      expect(classes.filter((c) => c === `pk-${type}`)).toHaveLength(1);
+      expect(classes.filter((c) => c.startsWith(`pk-${type}--`))).toHaveLength(1);
+    },
+  );
 
   test.each(combos)("%s / %s renders with empty content", (type, variant) => {
     const doc = normalizeDoc({

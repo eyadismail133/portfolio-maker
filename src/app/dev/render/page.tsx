@@ -34,13 +34,22 @@ function Choice<T extends string>(props: {
 /** Try the render kit: switch language, colors, fonts, layouts and screen size on a sample portfolio. */
 export default function RenderDemo() {
   const [lang, setLang] = useState("en");
+  const [sample, setSample] = useState("personal");
   const [family, setFamily] = useState(families[0].id);
   const [palette, setPalette] = useState("");
   const [fonts, setFonts] = useState("");
   const [layout, setLayout] = useState("default");
   const [mode, setMode] = useState("");
   const [width, setWidth] = useState<keyof typeof WIDTHS>("Desktop");
-  const query = new URLSearchParams({ lang, family, palette, fonts, layout, mode }).toString();
+  const query = new URLSearchParams({
+    sample,
+    lang,
+    family,
+    palette,
+    fonts,
+    layout,
+    mode,
+  }).toString();
 
   return (
     <div className="flex h-dvh flex-col bg-zinc-100 dark:bg-zinc-950">
@@ -53,6 +62,17 @@ export default function RenderDemo() {
           options={[
             ["en", "English"],
             ["ar", "Arabic"],
+          ]}
+        />
+        <Choice
+          label="Sample"
+          value={sample}
+          onChange={setSample}
+          options={[
+            ["personal", "Personal"],
+            ["company", "Company"],
+            ["startup", "Startup"],
+            ["everything", "All sections"],
           ]}
         />
         <Choice

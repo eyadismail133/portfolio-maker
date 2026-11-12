@@ -1,0 +1,25 @@
+.pk-awards__list--list li {
+  display: grid;
+  grid-template-columns: 4.5em minmax(0, 1fr);
+  gap: 16px;
+  padding-block: 20px;
+  border-block-start: var(--pk-rule);
+}
+.pk-awards__list--list li:first-child {
+  border: 0;
+  padding-block-start: 0;
+}
+.pk-awards__list--cards li {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.pk-awards__year {
+  font-family: var(--pk-meta-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--pk-muted);
+}
+.pk-awards__org {
+  color: var(--pk-primary);
+  font-weight: 600;
+}

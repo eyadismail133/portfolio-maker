@@ -64,16 +64,16 @@
   font-style: italic;
   font-weight: 400;
 }
-.pk-root[data-pk-family="elegant"] .pk-timeline .pk-entry::before {
+.pk-root[data-pk-family="elegant"] .pk-history .pk-entry::before {
   border-width: 1px;
   border-color: var(--pk-accent);
 }
-.pk-root[data-pk-family="elegant"] .pk-quote--large {
+.pk-root[data-pk-family="elegant"] .pk-testi--large {
   margin-inline: auto;
   text-align: center;
   justify-items: center;
 }
-.pk-root[data-pk-family="elegant"] .pk-quote--large blockquote {
+.pk-root[data-pk-family="elegant"] .pk-testi--large blockquote {
   font-style: italic;
   font-weight: 400;
 }

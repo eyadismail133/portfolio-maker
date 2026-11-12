@@ -1,0 +1,50 @@
+.pk-faq__accordion details {
+  border-block-start: var(--pk-rule);
+}
+.pk-faq__accordion details:last-child {
+  border-block-end: var(--pk-rule);
+}
+.pk-faq__accordion summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 20px;
+}
+.pk-faq__accordion summary::-webkit-details-marker {
+  display: none;
+}
+.pk-faq__accordion summary::after {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-inline-end: 2px solid var(--pk-primary);
+  border-block-end: 2px solid var(--pk-primary);
+  rotate: 45deg;
+  translate: 0 -3px;
+  transition: rotate 0.2s;
+}
+.pk-faq__accordion details[open] summary::after {
+  rotate: -135deg;
+  translate: 0 3px;
+}
+.pk-faq__accordion .pk-prose {
+  color: var(--pk-muted);
+  padding-block-end: 22px;
+}
+.pk-faq__columns {
+  display: grid;
+  gap: 32px var(--pk-gap);
+}
+.pk-faq__columns dd {
+  margin-block-start: 8px;
+  max-width: 52ch;
+}
+@media (min-width: 760px) {
+  .pk-faq__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

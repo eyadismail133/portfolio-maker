@@ -1,0 +1,50 @@
+.pk-milestones {
+  display: grid;
+}
+.pk-milestones__date {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: 1.25rem;
+  color: var(--pk-primary);
+  font-variant-numeric: tabular-nums;
+}
+.pk-milestones--vertical {
+  max-width: 760px;
+}
+.pk-milestones--vertical li {
+  display: grid;
+  grid-template-columns: 5.5em minmax(0, 1fr);
+  gap: 20px;
+  padding-block: 22px;
+  border-block-start: var(--pk-rule);
+}
+.pk-milestones--vertical li:first-child {
+  border: 0;
+  padding-block-start: 0;
+}
+.pk-milestones--horizontal {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 28px 0;
+}
+.pk-milestones--horizontal li {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  border-block-start: 2px solid var(--pk-border);
+  padding-block-start: 20px;
+  padding-inline-end: 24px;
+  position: relative;
+}
+.pk-milestones--horizontal li::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -6px;
+  inset-inline-start: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pk-primary);
+}
+.pk-milestones .pk-h3 {
+  margin-block-end: 4px;
+}

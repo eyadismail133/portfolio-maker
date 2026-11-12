@@ -1,0 +1,24 @@
+.pk-map__grid {
+  display: grid;
+  gap: var(--pk-gap);
+}
+.pk-map__details {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  align-content: start;
+}
+.pk-map__frame {
+  aspect-ratio: auto;
+  height: clamp(280px, 44vw, 460px);
+}
+@media (min-width: 900px) {
+  .pk-map__grid--card {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    align-items: stretch;
+  }
+  .pk-map__grid--card .pk-map__frame {
+    height: 100%;
+    min-height: 360px;
+  }
+}
