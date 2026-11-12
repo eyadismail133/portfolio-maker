@@ -2,7 +2,7 @@
 
 A website where anyone can build a rich portfolio landing page (personal profile, company, startup, freelancer, agency...) without design skills: log in, answer a few questions, pick a starting idea, fill in the data, adjust design and colors with a live preview, then publish or download as HTML.
 
-**Status:** Phases 1 to 4 are built: designs, editor, accounts with saving, and the questions with starter ideas. Before accounts work, do the one-time setup in `docs/07-SUPABASE-SETUP.md`. Next is Phase 5 (publish and export); open tasks are in `docs/06-ROADMAP.md`.
+**Status:** Phases 1 to 5 are built, plus the first Phase 6 features (inbox, visits, version history). Before accounts and publishing work, run the one-time setup in `docs/07-SUPABASE-SETUP.md`. Open tasks are in `docs/06-ROADMAP.md`.
 
 ## Run it on your computer
 
@@ -24,6 +24,7 @@ npm run dev                      (open http://localhost:3000)
 | `npm run format` | Format the code |
 | `npm run samples` | Write sample portfolios as plain HTML files into `out-samples/` |
 | `npm run visual` | Open every section in every design in a real browser, check the layout, save screenshots to `screenshots/` (first time: `npx playwright install chromium`) |
+| `npm run css` | Rebuild `src/render-kit/generated/page-css.ts` from the stylesheets (runs by itself before dev, build and test) |
 
 ## How to use these files
 

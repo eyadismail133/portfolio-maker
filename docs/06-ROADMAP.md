@@ -28,7 +28,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
 - [x] One-step family switch that keeps content (`themes/apply.ts`)
 - [x] Remaining version 1 sections (27 more): all 39 version 1 sections exist, each with at least 2 layouts
-- [ ] Section extras that need a small script: gallery lightbox, counting numbers in `stats`, sending the newsletter and contact forms without leaving the page
+- [x] Section extras that need a small script: gallery lightbox, counting numbers in `stats`, sending the contact form without leaving the page (`render-kit/page-script.ts`)
+- [ ] Newsletter form: send sign-ups to the inbox too (today it posts to the address the owner enters)
 - [x] 24 palettes and 15 font pairs
 - [x] Visual check: `npm run visual` opens every section in every family, both languages, phone and desktop; it fails on sideways scrolling or empty sections and saves screenshots
 - [ ] Compare screenshots against saved good ones automatically (today a person looks at them)
@@ -83,26 +84,31 @@ The core. No login, no editor yet; work with JSON files.
 **Result:** the full main idea works: login, questions, ideas, edit.
 
 ## Phase 5 - Publish and export (1 week)
-- [ ] Publish flow: slug, checklist, `published_doc`
-- [ ] Public page `/p/[slug]` with caching, SEO tags, share image
-- [ ] HTML zip export, tested offline
-- [ ] Auto thumbnail for the dashboard
-- [ ] Share: copy link, QR code
-- [ ] Marketing home page with example portfolios
+- [x] Publish flow: link name with live availability check, checklist, `published_doc` (`supabase/migrations/0002_publishing.sql`)
+- [x] Public page `/p/[slug]` (and `/p/[slug]/ar` for the second language) with caching, SEO tags, share image
+- [x] HTML zip export (one file per language, styles, script, images), tested offline
+- [x] Dashboard thumbnail: a live scaled-down preview instead of a stored image
+- [x] Share: copy link, QR code
+- [x] Take offline (unpublish)
+- [x] Marketing home page with example portfolios
+- [ ] Run `0002_publishing.sql` and test publishing with the real Supabase project
+- [ ] Unknown links show the "does not exist" page but answer with status 200 (a Next.js streaming limit); they are marked noindex. Return a real 404.
 
 **Result:** version 1 complete. Test with 5 to 10 real people before going further.
 
 ## Phase 6 - Power features (ongoing, pick by user feedback)
+- [x] Working contact form + inbox (`/dashboard/inbox`), with spam trap and 30 messages an hour per page
+- [x] Visitor statistics: visits in the last 30 days on each dashboard card
+- [x] Scroll animations: the "lively" animation setting fades sections in; numbers count up
+- [x] Version history: saved on every publish and by hand, newest 30 kept, restore is undoable
 - [ ] 6 more design families
 - [ ] Remaining "later" sections
 - [ ] Edit text directly in the preview
 - [ ] CV / LinkedIn import to fill data
 - [ ] AI writing help
 - [ ] PDF CV download from the same data
-- [ ] Working contact form + inbox
-- [ ] Visitor statistics
-- [ ] Scroll animations, dark/light switch for visitors
-- [ ] Version history
+- [ ] Dark/light switch for visitors
+- [ ] Email the owner when a message arrives
 - [ ] App interface in Arabic
 
 ## Phase 7 - Launch and business

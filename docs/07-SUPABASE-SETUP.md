@@ -8,7 +8,9 @@ Do these steps once in the Supabase dashboard for the project in `.env.local`. U
 3. Check **Table Editor**: `profiles`, `portfolios`, `assets` and `onboarding_answers` exist, each marked "RLS enabled".
 4. Check **Storage**: a public bucket named `portfolio-images` exists.
 
-The file is safe to run again.
+5. Do the same with `supabase/migrations/0002_publishing.sql`. It adds publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views` and `portfolio_versions` exist.
+
+Both files are safe to run again. Later database changes will come as new numbered files; run each one once, in order.
 
 ## 2. Tell Supabase where the app lives (required)
 **Authentication** then **URL Configuration**:
@@ -33,6 +35,7 @@ Add the two values from `.env.local` under **Settings**, **Environment Variables
 
 ## What the security rules do
 - Every table has row level security: an account can read and change only its own rows.
+- Visitors never read tables directly. They go through four functions: read a published page, check a link name, send a contact message (published pages only, 30 an hour), count a visit. None of them can reveal a draft.
 - An account cannot change its own `plan`.
 - Uploaded images go to the folder named after the account's id; nobody can write into another account's folder. Images are public to read, because published portfolios show them.
 - The bucket accepts only images, 5 MB at most. The app shrinks images to 2000 pixels and converts them to WebP before uploading.

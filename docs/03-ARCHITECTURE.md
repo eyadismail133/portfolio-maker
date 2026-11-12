@@ -185,9 +185,13 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 
 `src/recommend/` turns onboarding answers into documents with no AI: `recipes.ts` picks the sections from who the page is for and its goal, then adjusts them to the material the person has ready; `generate.ts` picks design looks from the chosen styles, colors and mode, and builds six documents, five in the chosen styles and one surprise; `content.ts` holds sample text for ten fields. The same answers and seed always give the same six ideas.
 
-## Export and publish
-- **Publish:** copy `doc` to `published_doc`, set the slug. `/p/[slug]` renders it on the server with caching.
-- **Download:** the server renders the document to static HTML, collects only the CSS for the sections and family in use, downloads the images, and returns a zip: `index.html`, `styles.css`, `images/`, and a tiny optional `script.js` (mobile menu, animations, language switch). The zip must open correctly by double-clicking `index.html` with no internet, except for web fonts.
+## Export and publish (as built)
+- **Publish:** the editor copies the document to `published_doc`, sets the link name and status, saves a version, then asks `/api/revalidate` to refresh the cached public page.
+- **Public page:** `/p/[slug]` (first language) and `/p/[slug]/[lang]` read the page through the database function `get_published_portfolio`, cached for a few minutes (`src/lib/published.ts`). They add the page script, a small "Made with Portfolio Maker" badge, and a visit counter that calls `/api/view`.
+- **Contact form:** on published pages it posts to `/api/contact?slug=...`, which stores the message for the owner's inbox. Without the page script the browser shows a plain "message sent" page instead.
+- **Download:** built entirely in the browser (`src/lib/export-download.ts`, `render-kit/export.tsx`): one HTML file per language (`index.html`, `ar.html`), `styles.css`, `script.js`, `images/` and a README. Images are downloaded and stored next to the page; any that cannot be downloaded keep their online address. The exported contact form opens the visitor's email program.
+- **Stylesheet as text:** `scripts/build-css.ts` joins the render-kit CSS into `src/render-kit/generated/page-css.ts` before dev, build and test. A test fails if it is out of date. Never edit the generated file.
+- **Page script:** `render-kit/page-script.ts` is the only script a portfolio runs, written by us. Every part is an extra; pages work without it.
 
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.

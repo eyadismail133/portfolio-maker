@@ -26,6 +26,13 @@ const UI = {
   advanced: { en: "Advanced", ar: "متقدم" },
   intermediate: { en: "Intermediate", ar: "متوسط" },
   basic: { en: "Basic", ar: "مبتدئ" },
+  sending: { en: "Sending…", ar: "جارٍ الإرسال…" },
+  sent: { en: "Thank you. Your message was sent.", ar: "شكراً لك. تم إرسال رسالتك." },
+  sendFailed: {
+    en: "The message could not be sent. Try again.",
+    ar: "تعذّر إرسال الرسالة. حاول مرة أخرى.",
+  },
+  close: { en: "Close", ar: "إغلاق" },
   skipToContent: { en: "Skip to content", ar: "انتقل إلى المحتوى" },
   viewCertificate: { en: "View certificate", ar: "عرض الشهادة" },
   challenge: { en: "The challenge", ar: "التحدي" },
@@ -78,10 +85,11 @@ export function safeHref(href: string | undefined): string {
   return "#";
 }
 
-/** Allows only web and site-relative image addresses. */
+/** Allows web addresses, site-relative addresses, and files next to an exported page ("images/1.webp"). */
 export function safeImageUrl(url: string | undefined): string | null {
   const value = (url ?? "").trim();
   if (/^(https?:\/\/|\/(?!\/))/i.test(value)) return value;
+  if (/^images\/[\w.-]+$/.test(value)) return value;
   return null;
 }
 

@@ -17,6 +17,10 @@ export type SectionContext = {
   nav: { id: string; label: string }[];
   /** Languages of the portfolio, default first. */
   languages: Lang[];
+  /** Links to the page in its other languages. Empty where there is nowhere to go (editor preview). */
+  languageLinks: { lang: Lang; label: string; href: string }[];
+  /** Where the contact form sends messages on a published page. Missing elsewhere: then it opens an email. */
+  formAction?: string;
 };
 
 export type SectionProps<C> = { content: C; ctx: SectionContext };

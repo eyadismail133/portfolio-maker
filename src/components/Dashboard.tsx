@@ -15,6 +15,7 @@ import {
   saveOnboardingAnswers,
   type PortfolioSummary,
 } from "@/lib/portfolios";
+import { listMessages, viewCounts } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { MiniPreview } from "./MiniPreview";
 
@@ -43,6 +44,8 @@ export function Dashboard() {
   const [busy, setBusy] = useState("");
   const [hasDraft, setHasDraft] = useState(false);
   const [dialog, setDialog] = useState<DialogState | null>(null);
+  const [views, setViews] = useState<Record<string, number>>({});
+  const [unread, setUnread] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const refresh = useCallback(async () => {
@@ -77,6 +80,13 @@ export function Dashboard() {
       if (cancelled) return;
       setHasDraft(readDraft() !== null);
       await refresh();
+      // Extras: if these tables are not set up yet, the dashboard still works without them.
+      viewCounts()
+        .then((counts) => !cancelled && setViews(counts))
+        .catch(() => undefined);
+      listMessages()
+        .then((messages) => !cancelled && setUnread(messages.filter((m) => !m.isRead).length))
+        .catch(() => undefined);
     })();
     return () => {
       cancelled = true;
@@ -135,9 +145,14 @@ export function Dashboard() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">My portfolios</h1>
-          <Link href="/new" className={`${primaryButtonClass} px-4 py-2`}>
-            New portfolio
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/dashboard/inbox" className={`${buttonClass} px-4 py-2`}>
+              Messages{unread > 0 ? ` (${unread} new)` : ""}
+            </Link>
+            <Link href="/new" className={`${primaryButtonClass} px-4 py-2`}>
+              New portfolio
+            </Link>
+          </div>
         </div>
 
         {problem && (
@@ -205,7 +220,21 @@ export function Dashboard() {
                       {item.status === "published" ? "Published" : "Draft"}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-zinc-500">Edited {when(item.updatedAt)}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    Edited {when(item.updatedAt)}
+                    {item.status === "published" && ` · ${views[item.id] ?? 0} visits in 30 days`}
+                  </p>
+                  {item.status === "published" && item.slug && (
+                    <a
+                      href={`/p/${item.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      dir="ltr"
+                      className="mt-1 block truncate text-xs text-blue-700 underline dark:text-blue-400"
+                    >
+                      /p/{item.slug}
+                    </a>
+                  )}
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     <Link href={`/editor/${item.id}`} className={primaryButtonClass}>
                       Edit

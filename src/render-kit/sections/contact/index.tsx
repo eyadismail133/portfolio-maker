@@ -65,25 +65,40 @@ const WithForm: VariantComponent<Content> = (props) => {
       <div className="pk-contact__grid">
         <form
           className="pk-form"
-          action={content.email ? `mailto:${content.email}` : undefined}
+          data-pk-contact={ctx.formAction ? "" : undefined}
+          action={ctx.formAction ?? (content.email ? `mailto:${content.email}` : undefined)}
           method="post"
-          encType="text/plain"
+          encType={ctx.formAction ? undefined : "text/plain"}
         >
+          {ctx.formAction && (
+            // Left empty by people; filled in by spam robots, whose messages are then dropped.
+            <label className="pk-visually-hidden" aria-hidden="true">
+              Website
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+          )}
           <label>
             <span>{ctx.ui("name")}</span>
-            <input type="text" name="name" autoComplete="name" required />
+            <input type="text" name="name" autoComplete="name" maxLength={120} required />
           </label>
           <label>
             <span>{ctx.ui("email")}</span>
-            <input type="email" name="email" autoComplete="email" required />
+            <input type="email" name="email" autoComplete="email" maxLength={200} required />
           </label>
           <label>
             <span>{ctx.ui("message")}</span>
-            <textarea name="message" rows={5} required />
+            <textarea name="message" rows={5} maxLength={5000} required />
           </label>
           <button type="submit" className="pk-btn pk-btn--primary">
             {ctx.ui("send")}
           </button>
+          <p
+            className="pk-form__status"
+            role="status"
+            data-pk-sending={ctx.ui("sending")}
+            data-pk-sent={ctx.ui("sent")}
+            data-pk-failed={ctx.ui("sendFailed")}
+          />
         </form>
         <div className="pk-contact__info">
           <dl className="pk-facts pk-facts--stacked">

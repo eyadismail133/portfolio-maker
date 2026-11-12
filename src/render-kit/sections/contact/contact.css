@@ -71,3 +71,12 @@
   font-size: 0.875rem;
   font-weight: 400;
 }
+.pk-form__status:empty {
+  display: none;
+}
+.pk-form__status {
+  font-weight: 600;
+}
+.pk-form__status[data-pk-state="error"] {
+  color: var(--pk-accent);
+}

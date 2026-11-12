@@ -15,10 +15,16 @@ type Props = {
   lang?: Lang;
   /** Set to false when the page loads the fonts itself, as the HTML export does. */
   fontLink?: boolean;
+  /** Address of the page in each language, for the language switch in the navigation bar. */
+  languageHrefs?: Partial<Record<Lang, string>>;
+  /** Where the contact form posts on a published page. */
+  formAction?: string;
 };
 
+const LANGUAGE_NAMES: Record<Lang, string> = { en: "English", ar: "العربية" };
+
 /** Turns a portfolio document into the page. The same code runs in previews, published pages and exports. */
-export function Renderer({ doc, lang, fontLink = true }: Props) {
+export function Renderer({ doc, lang, fontLink = true, languageHrefs, formAction }: Props) {
   const language = lang && doc.meta.languages.includes(lang) ? lang : doc.meta.languages[0];
   const visible = doc.sections.flatMap((section) => {
     const def = getSection(section.type);
@@ -31,6 +37,13 @@ export function Renderer({ doc, lang, fontLink = true }: Props) {
     t: (value) => pickText(value, language),
     ui: (key) => uiText(key, language),
     languages: doc.meta.languages,
+    languageLinks: doc.meta.languages.flatMap((other) => {
+      const href = languageHrefs?.[other];
+      return other !== language && href
+        ? [{ lang: other, label: LANGUAGE_NAMES[other], href }]
+        : [];
+    }),
+    formAction,
     nav: visible.flatMap(({ section, def }) => {
       const label = def.navLabel ? pickText(def.navLabel(section.content), language) : "";
       return label ? [{ id: section.id, label }] : [];

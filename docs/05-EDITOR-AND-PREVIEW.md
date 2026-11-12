@@ -84,13 +84,12 @@ The editor and the frame talk with four messages: `pk:ready` and `pk:select` fro
 - Show a media library of the user's uploaded images to reuse.
 - Sample images come from a bundled set of free-license pictures; mark them as samples so the publish check can warn about them.
 
-## Publish menu
+## Publish and download (as built)
 
-- **Publish:** choose link name, run the checklist, go live. Later changes need "Update" to go live.
-- **Checklist before publishing** (warnings, not blockers): sample text still present, sample images still present, images missing alt text, empty sections, no contact method, page title not set.
-- **Download HTML:** zip file as described in `03-ARCHITECTURE.md`.
-- **Share:** copy link, QR code.
-- **Unpublish.**
+- **Publish** (saved portfolios): a dialog with the link name, a live check that it is free, and a checklist of warnings: sample text still present, empty sections, images without a description, no contact method, missing or sample page title, missing translations. Warnings never block publishing.
+- After publishing: the link, Copy link, Open the page, a QR code, and Take offline. When the editor has changes visitors do not see, the dialog says so and offers "Update the live page".
+- **Download HTML** (also without an account): a zip that works as a plain website.
+- **Version history** in the Settings tab: every publish saves a version; people can save one by hand with a name and restore any of the newest 30. Restoring is a normal change, so Undo brings the page back.
 
 ## Done means
 - A person who has never seen the editor can change the hero text, swap the design, reorder two sections and publish without help.

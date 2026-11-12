@@ -99,3 +99,14 @@
     justify-content: center;
   }
 }
+.pk-nav__lang {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding-block: 10px;
+  color: var(--pk-muted);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.pk-nav__lang:hover {
+  color: var(--pk-text);
+}

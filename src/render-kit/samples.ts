@@ -74,7 +74,7 @@ export const RECIPES: Record<SampleKind, string[]> = {
 export const PERSONAL_RECIPE = RECIPES.personal;
 
 /** Text for the shared sections when the sample is about the company instead of a person. */
-const COMPANY_CONTENT: Record<string, Record<string, unknown>> = {
+export const COMPANY_CONTENT: Record<string, Record<string, unknown>> = {
   navbar: {
     brand: L("Marsa", "مرسى"),
     cta: { label: L("Book a demo", "احجز عرضاً"), href: "#contact" },

@@ -20,6 +20,11 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
     ...content.links.map((l) => ({ label: ctx.t(l.label), href: l.href })).filter((l) => l.label),
   ];
   const cta = ctx.t(content.cta?.label);
+  const switches = ctx.languageLinks.map((l) => (
+    <a key={l.lang} className="pk-nav__lang" href={l.href} lang={l.lang} hrefLang={l.lang}>
+      {l.label}
+    </a>
+  ));
   const items = links.map((l, i) => (
     <li key={i}>
       <a {...linkProps(l.href)}>{l.label}</a>
@@ -31,6 +36,7 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
         {brand}
       </a>
       {links.length > 0 && <ul className="pk-nav__links">{items}</ul>}
+      {switches}
       {cta && content.cta && (
         <a
           className="pk-btn pk-btn--primary pk-btn--small pk-nav__cta"

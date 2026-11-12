@@ -12,7 +12,10 @@ import {
 import { friendlyError, getPortfolio, isOffline, savePortfolio } from "@/lib/portfolios";
 import { uploadImage } from "@/lib/upload";
 import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
+import { downloadHtml } from "@/lib/export-download";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
+import { PublishDialog } from "./PublishDialog";
+import { VersionsPanel } from "./VersionsPanel";
 import type { FromPreview, ToPreview } from "./PreviewFrame";
 import { SectionEditor } from "./SectionEditor";
 import { useEditor, type Device } from "./store";
@@ -57,6 +60,8 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   const [title, setTitle] = useState("");
   const [savedRevision, setSavedRevision] = useState(0);
   const [status, setStatus] = useState<SaveStatus>("saved");
+  const [publishing, setPublishing] = useState(false);
+  const [exporting, setExporting] = useState("");
   const frame = useRef<HTMLIFrameElement>(null);
   const frameReady = useRef(false);
   const titleRef = useRef("");
@@ -275,6 +280,24 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         ? "Could not save in this browser"
         : STATUS_TEXT[status];
 
+  const download = async () => {
+    setExporting("Preparing the download…");
+    try {
+      const fileName = (title || doc.meta.title || "portfolio")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      const { missingImages } = await downloadHtml(doc, fileName);
+      setExporting(
+        missingImages > 0
+          ? `Downloaded. ${missingImages} image(s) still load from the internet.`
+          : "",
+      );
+    } catch {
+      setExporting("The download could not be prepared. Try again.");
+    }
+  };
+
   return (
     <div className="flex h-dvh flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
@@ -304,6 +327,11 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         >
           {statusText}
         </span>
+        {exporting && (
+          <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
+            {exporting}
+          </span>
+        )}
         {status === "conflict" && (
           <button type="button" className={buttonClass} onClick={() => window.location.reload()}>
             Reload the latest version
@@ -338,6 +366,23 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               />
             ))}
           </span>
+          <button
+            type="button"
+            className={buttonClass}
+            disabled={exporting === "Preparing the download…"}
+            onClick={download}
+          >
+            Download HTML
+          </button>
+          {portfolioId && (
+            <button
+              type="button"
+              className={primaryButtonClass}
+              onClick={() => setPublishing(true)}
+            >
+              Publish
+            </button>
+          )}
           {!portfolioId && (
             <>
               <select
@@ -376,7 +421,12 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             {tab === "sections" && <SectionsPanel doc={doc} onPick={pick} />}
             {tab === "design" && <DesignPanel doc={doc} />}
-            {tab === "settings" && <SettingsPanel doc={doc} />}
+            {tab === "settings" && (
+              <div className="grid gap-8">
+                <SettingsPanel doc={doc} />
+                {portfolioId && <VersionsPanel portfolioId={portfolioId} />}
+              </div>
+            )}
           </div>
         </aside>
 
@@ -389,6 +439,16 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             style={{ width: WIDTHS[device], maxWidth: "100%" }}
           />
         </main>
+
+        {publishing && portfolioId && (
+          <PublishDialog
+            portfolioId={portfolioId}
+            doc={doc}
+            title={title}
+            beforePublish={flush}
+            onClose={() => setPublishing(false)}
+          />
+        )}
 
         {selected && (
           <aside className="w-[340px] shrink-0 border-s border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

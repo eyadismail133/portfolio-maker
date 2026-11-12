@@ -407,3 +407,61 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Added by page-script.ts. Without the script none of this applies. */
+.pk-section.pk-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+.pk-section.pk-reveal.pk-in {
+  opacity: 1;
+  transform: none;
+}
+.pk-lightbox {
+  margin: auto;
+  max-width: min(1200px, 94vw);
+  max-height: 94vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: visible;
+}
+.pk-lightbox::backdrop {
+  background: rgb(0 0 0 / 0.86);
+}
+.pk-lightbox figure {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+.pk-lightbox img {
+  max-width: 100%;
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--pk-radius);
+}
+.pk-lightbox figcaption {
+  font-size: 0.9375rem;
+  text-align: center;
+}
+.pk-lightbox__close {
+  position: fixed;
+  inset-block-start: 16px;
+  inset-inline-end: 16px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.pk-lightbox__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
