@@ -57,22 +57,28 @@ The core. No login, no editor yet; work with JSON files.
 **Result:** full editing works locally without an account. Open `/editor`.
 
 ## Phase 3 - Accounts and saving (1 week)
-Can start in parallel with Phase 2.
-- [ ] Database tables and row security from `03-ARCHITECTURE.md`
-- [ ] Sign up, log in, Google, password reset, protected routes
-- [ ] Dashboard: list, create, rename, duplicate, delete
-- [ ] Autosave to database with saved indicator and offline copy
-- [ ] Image upload: resize, WebP, crop tool, media library
+- [x] Database tables and row security (`supabase/migrations/0001_init.sql`)
+- [x] Sign up, log in, Google, password reset, protected routes
+- [x] Dashboard: list, create, rename, duplicate, delete
+- [x] Autosave to database with saved indicator, offline copy and "changed elsewhere" check
+- [x] Image upload: resize, WebP
+- [ ] Run the setup in `docs/07-SUPABASE-SETUP.md` and test with the real Supabase project (needs the owner's dashboard)
+- [ ] Image crop tool
+- [ ] Media library to reuse uploaded images
+- [ ] Account settings page (name, change password, delete account)
 
 **Result:** users keep their work.
 
 ## Phase 4 - Onboarding and ideas (1 week)
-- [ ] Question screens (8 steps) with progress, back, skip
-- [ ] Recipes for each user type and goal
-- [ ] Sample content sets for at least 10 fields, in English and Arabic
-- [ ] Idea generator: answers in, 6 documents out
-- [ ] Ideas screen with live mini previews, "6 more", "start blank"
-- [ ] Save answers
+- [x] Question screens (8 steps) with progress, back, skip
+- [x] Recipes for each user type and goal
+- [x] Sample content for 10 fields, in English and Arabic (hero, about, skills, services)
+- [x] Idea generator: answers in, 6 documents out
+- [x] Ideas screen with live mini previews, "6 more", "start blank"
+- [x] Save answers
+- [x] Try without an account: the chosen idea waits in the browser and is saved after login
+- [ ] Field-specific sample text for the business sections too (case study, team, pricing, FAQ and others still show the clinic-software example)
+- [ ] Photo or logo upload in the last question
 
 **Result:** the full main idea works: login, questions, ideas, edit.
 

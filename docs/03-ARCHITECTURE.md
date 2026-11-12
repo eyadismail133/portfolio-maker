@@ -173,6 +173,18 @@ Security: row level security on every table. A user can read and write only thei
 
 Keeping `doc` and `published_doc` separate means editing never changes the live page until the user clicks Publish again.
 
+## Accounts and saving (as built)
+
+- Pages talk to Supabase from the browser (`src/lib/portfolios.ts`, `src/lib/upload.ts`); row level security in the database is what protects the data. The only server code is `src/proxy.ts`, which refreshes the session and guards private pages, and `/auth/callback`, which finishes Google sign-in and email links.
+- Private pages are `/dashboard` and `/editor/[id]`. `/editor` without an id stays open: it edits a draft kept in the browser.
+- A save sends the document only if the server still has the version this tab loaded (`updated_at` is compared). If not, the editor stops saving and offers to reload, so two tabs cannot overwrite each other.
+- Every change is first copied to the browser (`src/lib/local-drafts.ts`). If the tab closes or the connection drops before the save, the copy is used on the next visit, as long as the server version has not moved on.
+- A portfolio chosen before logging in waits in the browser and is saved to the account when the dashboard opens.
+
+## Starter ideas (as built)
+
+`src/recommend/` turns onboarding answers into documents with no AI: `recipes.ts` picks the sections from who the page is for and its goal, then adjusts them to the material the person has ready; `generate.ts` picks design looks from the chosen styles, colors and mode, and builds six documents, five in the chosen styles and one surprise; `content.ts` holds sample text for ten fields. The same answers and seed always give the same six ideas.
+
 ## Export and publish
 - **Publish:** copy `doc` to `published_doc`, set the slug. `/p/[slug]` renders it on the server with caching.
 - **Download:** the server renders the document to static HTML, collects only the CSS for the sections and family in use, downloads the images, and returns a zip: `index.html`, `styles.css`, `images/`, and a tiny optional `script.js` (mobile menu, animations, language switch). The zip must open correctly by double-clicking `index.html` with no internet, except for web fonts.
