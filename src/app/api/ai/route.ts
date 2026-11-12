@@ -11,6 +11,9 @@ const requestSchema = z.object({
   context: z.string().max(300),
 });
 
+/** Free Gemini models that answered well in English and Arabic (checked November 2026). */
+const DEFAULT_MODELS = "gemini-3.1-flash-lite,gemini-flash-lite-latest";
+
 /** Settings for any model service that speaks the OpenAI chat format (Gemini, Groq, OpenRouter, ...). */
 function settings() {
   const key = process.env.AI_API_KEY;
@@ -20,7 +23,11 @@ function settings() {
     baseUrl: (
       process.env.AI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai"
     ).replace(/\/$/, ""),
-    model: process.env.AI_MODEL || "gemini-2.5-flash",
+    /** Tried in order: when one is overloaded or slow, the next one answers. */
+    models: (process.env.AI_MODEL || DEFAULT_MODELS)
+      .split(",")
+      .map((m) => m.trim())
+      .filter(Boolean),
   };
 }
 
@@ -46,25 +53,31 @@ export async function POST(request: NextRequest) {
   if (left === -1) return fail("pro", 403);
   if (left === -2) return fail("limit", 429);
 
-  try {
-    const response = await fetch(`${ai.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: { authorization: `Bearer ${ai.key}`, "content-type": "application/json" },
-      body: JSON.stringify({
-        model: ai.model,
-        messages: buildMessages(parsed.data),
-        temperature: parsed.data.action === "translate" ? 0.2 : 0.6,
-        max_tokens: 900,
-      }),
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (response.status === 429) return fail("busy", 503);
-    if (!response.ok) return fail("model", 502);
-    const body = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = cleanAnswer(body.choices?.[0]?.message?.content ?? "");
-    if (!text) return fail("model", 502);
-    return NextResponse.json({ text, left });
-  } catch {
-    return fail("model", 502);
+  let lastProblem = "model";
+  for (const model of ai.models) {
+    try {
+      const response = await fetch(`${ai.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${ai.key}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: buildMessages(parsed.data),
+          temperature: parsed.data.action === "translate" ? 0.2 : 0.6,
+          max_tokens: 900,
+        }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (response.status === 429 || response.status === 503) {
+        lastProblem = "busy";
+        continue;
+      }
+      if (!response.ok) continue;
+      const body = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+      const text = cleanAnswer(body.choices?.[0]?.message?.content ?? "");
+      if (text) return NextResponse.json({ text, left });
+    } catch {
+      lastProblem = "busy";
+    }
   }
+  return fail(lastProblem, lastProblem === "busy" ? 503 : 502);
 }
