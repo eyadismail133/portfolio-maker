@@ -29,7 +29,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] One-step family switch that keeps content (`themes/apply.ts`)
 - [x] Remaining version 1 sections (27 more): all 39 version 1 sections exist, each with at least 2 layouts
 - [x] Section extras that need a small script: gallery lightbox, counting numbers in `stats`, sending the contact form without leaving the page (`render-kit/page-script.ts`)
-- [ ] Newsletter form: send sign-ups to the inbox too (today it posts to the address the owner enters)
+- [x] Newsletter form: send sign-ups to the inbox too (migration 0006; CSV download in the inbox)
 - [x] 24 palettes and 15 font pairs
 - [x] Visual check: `npm run visual` opens every section in every family, both languages, phone and desktop; it fails on sideways scrolling or empty sections and saves screenshots
 - [ ] Compare screenshots against saved good ones automatically (today a person looks at them)
@@ -104,14 +104,14 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Visitor statistics: visits in the last 30 days on each dashboard card
 - [x] Scroll animations: the "lively" animation setting fades sections in; numbers count up
 - [x] Version history: saved on every publish and by hand, newest 30 kept, restore is undoable
-- [ ] 6 more design families
-- [ ] Remaining "later" sections
+- [x] 6 more design families (playful, editorial, brutalist, glass, gradient, classic CV)
+- [x] Remaining "later" sections (publications, before and after, careers, booking)
 - [x] Edit text directly in the preview (double-click plain text; marked-up text opens in the form)
 - [ ] CV / LinkedIn import to fill data
 - [x] AI writing help for Pro accounts: first draft, improve, shorten, translate between English and Arabic; free model (Google Gemini by default, any OpenAI-format service), 50 uses a day
 - [x] Add the AI key in `.env.local` (Vercel: owner)
 - [ ] PDF CV download from the same data
-- [ ] Dark/light switch for visitors
+- [x] Dark/light switch for visitors
 - [ ] Email the owner when a message arrives
 - [ ] App interface in Arabic
 

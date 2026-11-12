@@ -1,0 +1,78 @@
+/* Playful: friendly and fun. Pills everywhere, bright tinted blocks, a little bounce when things appear. */
+.pk-root[data-pk-family="playful"] {
+  --pk-heading-weight: 800;
+  --pk-heading-tracking: -0.02em;
+  --pk-heading-leading: 1.1;
+  --pk-btn-weight: 700;
+}
+.pk-root[data-pk-family="playful"] .pk-section {
+  --pk-card-bg: color-mix(in srgb, var(--pk-primary) 8%, var(--pk-bg));
+  --pk-card-border: 2px solid color-mix(in srgb, var(--pk-primary) 22%, var(--pk-bg));
+  --pk-tag-bg: color-mix(in srgb, var(--pk-accent) 18%, var(--pk-bg));
+  --pk-tag-border: 0 solid transparent;
+  --pk-btn-shadow: 0 4px 0 color-mix(in srgb, var(--pk-primary) 55%, var(--pk-text));
+}
+.pk-root[data-pk-family="playful"] :is(.pk-btn, .pk-tags li, .pk-hero__title) {
+  border-radius: 999px;
+}
+.pk-root[data-pk-family="playful"] .pk-card {
+  border-radius: max(var(--pk-radius), 22px);
+}
+.pk-root[data-pk-family="playful"] .pk-card:nth-child(3n + 2) {
+  --pk-card-bg: color-mix(in srgb, var(--pk-accent) 12%, var(--pk-bg));
+  --pk-card-border: 2px solid color-mix(in srgb, var(--pk-accent) 28%, var(--pk-bg));
+}
+.pk-root[data-pk-family="playful"] .pk-btn {
+  transition:
+    translate 0.15s,
+    box-shadow 0.15s;
+}
+.pk-root[data-pk-family="playful"] .pk-btn:hover {
+  translate: 0 -2px;
+}
+.pk-root[data-pk-family="playful"] .pk-btn:active {
+  translate: 0 3px;
+  box-shadow: none;
+}
+.pk-root[data-pk-family="playful"] .pk-hero__title {
+  display: inline-block;
+  background: var(--pk-tag-bg);
+  padding: 6px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.pk-root[data-pk-family="playful"] .pk-hero__image {
+  border-radius: 40% 40% 40% 40% / 50% 50% 50% 50%;
+  border: 6px solid color-mix(in srgb, var(--pk-accent) 45%, var(--pk-bg));
+}
+.pk-root[data-pk-family="playful"] .pk-media--empty {
+  background: color-mix(in srgb, var(--pk-accent) 30%, var(--pk-bg));
+  color: var(--pk-text);
+  border-radius: 28px;
+}
+.pk-root[data-pk-family="playful"] :is(.pk-rail__head, .pk-stack__head) .pk-h2::after {
+  content: "";
+  display: block;
+  inline-size: 56px;
+  block-size: 8px;
+  margin-block-start: 14px;
+  border-radius: 999px;
+  background: var(--pk-accent);
+}
+.pk-root[data-pk-family="playful"] .pk-history .pk-entry::before {
+  border: 3px solid var(--pk-bg);
+  background: var(--pk-accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pk-root[data-pk-family="playful"] .pk-reveal.pk-in {
+    animation: pk-playful-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+@keyframes pk-playful-pop {
+  from {
+    scale: 0.96;
+  }
+  to {
+    scale: 1;
+  }
+}

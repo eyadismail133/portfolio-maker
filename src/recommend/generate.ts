@@ -21,31 +21,31 @@ export const LOOKS: Record<StyleId, [Look, Look]> = {
   ],
   bold: [
     { name: "Big and bold", family: "bold" },
-    { name: "Poster", family: "bold", fonts: "expressive", radius: "small" },
+    { name: "Raw brutalist", family: "brutalist" },
   ],
   elegant: [
     { name: "Quiet elegance", family: "elegant" },
     { name: "Classic serif", family: "elegant", fonts: "classic" },
   ],
   playful: [
-    { name: "Friendly and round", family: "creative", fonts: "soft", radius: "pill" },
+    { name: "Friendly and round", family: "playful" },
     { name: "Bright and playful", family: "creative", fonts: "friendly", radius: "large" },
   ],
   tech: [
     { name: "Dark terminal", family: "tech" },
-    { name: "Sharp product", family: "tech", fonts: "modern", radius: "large" },
+    { name: "Frosted glass", family: "glass" },
   ],
   editorial: [
-    { name: "Magazine", family: "minimal", fonts: "bookish", radius: "none" },
+    { name: "Magazine", family: "editorial" },
     { name: "Editorial serif", family: "elegant", fonts: "caslon" },
   ],
   corporate: [
     { name: "Trusted business", family: "corporate" },
-    { name: "Modern corporate", family: "corporate", fonts: "modern", radius: "small" },
+    { name: "Classic CV", family: "classic-cv" },
   ],
   creative: [
     { name: "Studio", family: "creative" },
-    { name: "Art school", family: "creative", fonts: "expressive" },
+    { name: "Bright gradient", family: "gradient" },
   ],
 };
 

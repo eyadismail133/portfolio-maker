@@ -23,7 +23,7 @@ This is the catalog. A portfolio is rich when it has 8 to 14 sections; recipes i
 | `awards` | Prize, year, organization | list, cards | yes |
 | `interests` | Hobbies with icons | icon row, tags | yes |
 | `cv-download` | Button to download CV file | banner, inline | yes |
-| `publications` | Articles, papers, talks with links | list | later |
+| `publications` | Articles, papers, talks with links | list, cards | added |
 
 ### Work
 | Type | What it shows | Variants | V1 |
@@ -32,7 +32,7 @@ This is the catalog. A portfolio is rich when it has 8 to 14 sections; recipes i
 | `case-study` | One project in depth: challenge, solution, result, images | long form, side by side | yes |
 | `gallery` | Images with lightbox | grid, masonry, slider | yes |
 | `video` | YouTube, Vimeo or uploaded clip | single, grid | yes |
-| `before-after` | Two images with a slider | single | later |
+| `before-after` | Two images with a slider (side by side without the page script) | slider, side by side | added |
 
 ### Business (company, startup, freelancer)
 | Type | What it shows | Variants | V1 |
@@ -48,7 +48,7 @@ This is the catalog. A portfolio is rich when it has 8 to 14 sections; recipes i
 | `press` | "As seen in" with quotes and logos | logos, quote cards | yes |
 | `partners` | Partner or investor logos with names | grid | yes |
 | `mission-values` | Mission, vision, values | three cards, large statement | yes |
-| `careers` | Open jobs with apply link | list | later |
+| `careers` | Open jobs with apply link | list, cards | added |
 
 ### Trust and conversion
 | Type | What it shows | Variants | V1 |
@@ -59,7 +59,7 @@ This is the catalog. A portfolio is rich when it has 8 to 14 sections; recipes i
 | `newsletter` | Email sign-up or waitlist | inline, card | yes |
 | `contact` | Form, email, phone, address, social links | form + info, form only, info cards | yes |
 | `map` | Google Map of location | full width, with address card | yes |
-| `booking` | Calendly embed to book a call | embed | later |
+| `booking` | Calendly embed to book a call; any other https booking link becomes a button | calendar in page, button | added |
 | `social-links` | Social profiles | icon row, cards | yes |
 
 ### Free blocks
@@ -106,7 +106,7 @@ A family sets the feeling of the whole page: shapes, spacing, type scale, decora
 | `gradient` | Energetic, startup | Mesh gradients, soft glow, large radius | Startups, apps |
 | `classic-cv` | Like a printed CV | Sidebar with photo, compact, formal | Job seekers, academics |
 
-Version 1 ships 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creative`), the other 6 follow in Phase 6.
+Version 1 shipped 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creative`); the other 6 were added in Phase 6. `classic-cv` keeps the normal page flow (no fixed sidebar, so it still works at 360px and in the HTML export): its "sidebar" is the narrow heading column of each section, with a round photo in the hero and a compact print size. The onboarding styles now map to them: bold → brutalist, playful → playful, tech → glass, editorial → editorial, corporate → classic CV, creative → gradient, each as the second look of that style.
 
 ## Colors
 
@@ -126,3 +126,9 @@ Version 1 ships 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creative`
 - Left-to-right and right-to-left.
 - Keyboard and screen reader friendly: real headings, alt text, visible focus.
 - Animation respects the visitor's "reduce motion" setting.
+
+## Light and dark for visitors
+A page set to "both" follows the visitor's system setting. The page script adds a switch to the navbar (or a small floating button when there is no navbar); the choice is kept in the visitor's browser for that page and sets `data-pk-scheme` on `.pk-root`, which wins over the system setting. Without the script the page still follows the system.
+
+## Newsletter sign-ups
+When the newsletter section has no mailing list address, a published page sends sign-ups to `/api/contact?slug=…&kind=signup`, which stores them in `newsletter_signups` (migration 0006, one row per address and page, 30 an hour at most). The owner sees them under Messages and sign-ups and can download them as CSV. There is no plan limit on sign-ups. An exported HTML page has no inbox, so there the form only works with an address of the owner's own.

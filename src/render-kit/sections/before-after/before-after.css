@@ -1,0 +1,110 @@
+.pk-before-after__figure {
+  display: grid;
+  gap: 14px;
+}
+.pk-before-after__compare {
+  display: grid;
+  gap: clamp(12px, 2vw, 20px);
+}
+@media (min-width: 640px) {
+  .pk-before-after__compare {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.pk-before-after__pane {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--pk-radius);
+}
+img.pk-before-after__image {
+  display: block;
+}
+.pk-before-after__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0;
+}
+.pk-before-after__label {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  padding: 4px 10px;
+  border-radius: var(--pk-radius-control);
+  background: color-mix(in srgb, var(--pk-bg) 88%, transparent);
+  color: var(--pk-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* The script adds .pk-before-after__compare--live: the images stack and a handle shows the split. */
+.pk-before-after__compare--live {
+  --pk-split: 50%;
+  position: relative;
+  grid-template-columns: 1fr;
+  border-radius: var(--pk-radius);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.pk-before-after__compare--live .pk-before-after__pane {
+  grid-area: 1 / 1;
+  border-radius: 0;
+}
+.pk-before-after__compare--live .pk-before-after__pane + .pk-before-after__pane {
+  clip-path: inset(0 0 0 var(--pk-split));
+}
+[dir="rtl"] .pk-before-after__compare--live .pk-before-after__pane + .pk-before-after__pane {
+  clip-path: inset(0 var(--pk-split) 0 0);
+}
+.pk-before-after__compare--live
+  .pk-before-after__pane
+  + .pk-before-after__pane
+  .pk-before-after__label {
+  inset-inline-start: auto;
+  inset-inline-end: 12px;
+}
+.pk-before-after__compare--live::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--pk-split);
+  width: 3px;
+  margin-inline-start: -1.5px;
+  background: var(--pk-bg);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pk-text) 20%, transparent);
+  pointer-events: none;
+}
+.pk-before-after__range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+.pk-before-after__range:focus-visible + .pk-before-after__knob {
+  outline: 3px solid var(--pk-primary);
+  outline-offset: 2px;
+}
+.pk-before-after__knob {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--pk-split);
+  width: 44px;
+  height: 44px;
+  margin-block-start: -22px;
+  margin-inline-start: -22px;
+  border-radius: 50%;
+  background: var(--pk-bg);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--pk-text) 25%, transparent);
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+}
+.pk-before-after__knob::before {
+  content: "";
+  width: 16px;
+  height: 10px;
+  border-inline: 2px solid var(--pk-text);
+}

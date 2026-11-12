@@ -6,6 +6,12 @@
 @import "./families/tech.css";
 @import "./families/corporate.css";
 @import "./families/creative.css";
+@import "./families/playful.css";
+@import "./families/editorial.css";
+@import "./families/brutalist.css";
+@import "./families/glass.css";
+@import "./families/gradient.css";
+@import "./families/classic-cv.css";
 @import "../sections/navbar/navbar.css";
 @import "../sections/hero/hero.css";
 @import "../sections/about/about.css";
@@ -44,3 +50,7 @@
 @import "../sections/text/text.css";
 @import "../sections/timeline/timeline.css";
 @import "../sections/video/video.css";
+@import "../sections/publications/publications.css";
+@import "../sections/before-after/before-after.css";
+@import "../sections/careers/careers.css";
+@import "../sections/booking/booking.css";

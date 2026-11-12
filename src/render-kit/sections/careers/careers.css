@@ -1,0 +1,53 @@
+.pk-careers__list {
+  list-style: none;
+  display: grid;
+}
+.pk-careers__list li {
+  display: grid;
+  gap: 10px;
+  padding-block: 22px;
+  border-block-start: var(--pk-rule);
+}
+.pk-careers__list li:last-child {
+  border-block-end: var(--pk-rule);
+}
+.pk-careers__head {
+  display: grid;
+  gap: 2px;
+}
+.pk-careers__meta {
+  font-family: var(--pk-meta-font);
+  font-size: 0.875rem;
+  color: var(--pk-primary);
+}
+.pk-careers__apply {
+  justify-self: start;
+}
+.pk-careers__cards li {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.pk-careers__cards .pk-careers__apply {
+  margin-block-start: auto;
+}
+.pk-careers__note {
+  margin-block-start: 20px;
+}
+.pk-careers__empty {
+  padding: 24px;
+  border: var(--pk-rule);
+  border-radius: var(--pk-radius);
+  color: var(--pk-muted);
+}
+@media (min-width: 760px) {
+  .pk-careers__list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 24px;
+  }
+  .pk-careers__list .pk-careers__apply {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+}

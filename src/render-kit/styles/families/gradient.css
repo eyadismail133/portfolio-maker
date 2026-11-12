@@ -1,0 +1,67 @@
+/* Gradient: energetic, made for startups. A mesh of the brand colors on the hero and call to action, big soft corners. */
+.pk-root[data-pk-family="gradient"] {
+  --pk-heading-weight: 750;
+  --pk-heading-tracking: -0.035em;
+  --pk-display-scale: 1.1;
+  --pk-h2-scale: 1.12;
+}
+.pk-root[data-pk-family="gradient"] .pk-section {
+  --pk-card-border: 1px solid color-mix(in srgb, var(--pk-primary) 14%, transparent);
+  --pk-card-shadow: 0 18px 50px -20px color-mix(in srgb, var(--pk-primary) 45%, transparent);
+  --pk-tag-bg: color-mix(in srgb, var(--pk-primary) 10%, var(--pk-bg));
+  --pk-tag-border: 1px solid transparent;
+  --pk-btn-shadow: 0 10px 30px -8px color-mix(in srgb, var(--pk-primary) 70%, transparent);
+}
+.pk-root[data-pk-family="gradient"] .pk-hero[data-pk-bg="default"] {
+  background:
+    radial-gradient(
+      50% 70% at 0% 0%,
+      color-mix(in srgb, var(--pk-primary) 38%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 60% at 100% 10%,
+      color-mix(in srgb, var(--pk-accent) 34%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      60% 60% at 60% 100%,
+      color-mix(in srgb, var(--pk-primary) 18%, transparent),
+      transparent 70%
+    ),
+    var(--pk-bg);
+}
+.pk-root[data-pk-family="gradient"] .pk-hero__name {
+  background: linear-gradient(100deg, var(--pk-text) 30%, var(--pk-primary) 75%, var(--pk-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.pk-root[data-pk-family="gradient"] .pk-btn--primary {
+  background: linear-gradient(
+    110deg,
+    var(--pk-primary),
+    color-mix(in srgb, var(--pk-accent) 70%, var(--pk-primary))
+  );
+  border-color: transparent;
+}
+.pk-root[data-pk-family="gradient"] .pk-hero__image {
+  border-radius: calc(var(--pk-radius) * 2);
+  box-shadow: 0 40px 90px -30px color-mix(in srgb, var(--pk-primary) 60%, transparent);
+}
+.pk-root[data-pk-family="gradient"] .pk-card {
+  border-radius: calc(var(--pk-radius) * 1.5);
+}
+.pk-root[data-pk-family="gradient"] .pk-media--empty {
+  background: linear-gradient(135deg, var(--pk-primary), var(--pk-accent));
+  color: var(--pk-on-primary);
+}
+.pk-root[data-pk-family="gradient"] .pk-tags li {
+  border-radius: 999px;
+  color: var(--pk-primary);
+  font-weight: 600;
+}
+.pk-root[data-pk-family="gradient"] .pk-history .pk-entry::before {
+  border: 0;
+  background: linear-gradient(135deg, var(--pk-primary), var(--pk-accent));
+}

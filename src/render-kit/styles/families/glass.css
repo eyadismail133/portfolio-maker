@@ -1,0 +1,68 @@
+/* Glass: modern, soft depth. Color blooms behind the page; cards are frosted panes. */
+.pk-root[data-pk-family="glass"] {
+  --pk-heading-weight: 650;
+  --pk-heading-tracking: -0.03em;
+  background:
+    radial-gradient(
+      60% 50% at 10% 0%,
+      color-mix(in srgb, var(--pk-c-primary) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 45% at 95% 30%,
+      color-mix(in srgb, var(--pk-c-accent) 20%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 40% at 30% 85%,
+      color-mix(in srgb, var(--pk-c-primary) 14%, transparent),
+      transparent 70%
+    ),
+    var(--pk-c-bg);
+  background-attachment: fixed;
+}
+.pk-root[data-pk-family="glass"] .pk-section {
+  --pk-card-bg: color-mix(in srgb, var(--pk-surface) 55%, transparent);
+  --pk-card-border: 1px solid color-mix(in srgb, var(--pk-text) 12%, transparent);
+  --pk-card-shadow: 0 10px 40px color-mix(in srgb, var(--pk-text) 8%, transparent);
+  --pk-tag-bg: color-mix(in srgb, var(--pk-surface) 60%, transparent);
+  --pk-tag-border: 1px solid color-mix(in srgb, var(--pk-text) 12%, transparent);
+  --pk-btn-shadow: 0 8px 24px color-mix(in srgb, var(--pk-primary) 30%, transparent);
+}
+/* Default sections let the blooms through; colored sections stay solid. */
+.pk-root[data-pk-family="glass"] .pk-section[data-pk-bg="default"] {
+  background: transparent;
+}
+.pk-root[data-pk-family="glass"] .pk-card {
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+}
+.pk-root[data-pk-family="glass"] .pk-navbar[data-pk-bg="default"] {
+  background: color-mix(in srgb, var(--pk-c-bg) 60%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-block-end: 1px solid color-mix(in srgb, var(--pk-text) 8%, transparent);
+}
+.pk-root[data-pk-family="glass"] .pk-hero__image {
+  border: 1px solid color-mix(in srgb, var(--pk-text) 12%, transparent);
+  box-shadow: 0 30px 80px color-mix(in srgb, var(--pk-primary) 25%, transparent);
+}
+.pk-root[data-pk-family="glass"] .pk-media--empty {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--pk-primary) 24%, transparent),
+    color-mix(in srgb, var(--pk-accent) 24%, transparent)
+  );
+  color: var(--pk-text);
+}
+.pk-root[data-pk-family="glass"] .pk-tags li {
+  border-radius: 999px;
+}
+.pk-root[data-pk-family="glass"] .pk-footer {
+  border-block-start: 1px solid color-mix(in srgb, var(--pk-text) 8%, transparent);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pk-root[data-pk-family="glass"] .pk-section {
+    --pk-card-bg: var(--pk-surface);
+  }
+}

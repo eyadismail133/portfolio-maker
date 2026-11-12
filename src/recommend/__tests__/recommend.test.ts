@@ -75,7 +75,7 @@ describe("ideas", () => {
 
   test("chosen styles lead and exactly one idea is a surprise", () => {
     const ideas = generateIdeas(answers({ who: "professional", styles: ["tech", "elegant"] }));
-    const chosenFamilies = new Set(["tech", "elegant"]);
+    const chosenFamilies = new Set([...LOOKS.tech, ...LOOKS.elegant].map((look) => look.family));
     expect(ideas.slice(0, 5).every((i) => chosenFamilies.has(i.doc.theme.family))).toBe(true);
     expect(ideas[5].note).toMatch(/^Something different/);
   });

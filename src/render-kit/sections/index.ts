@@ -1,6 +1,9 @@
 import { registerSections, type AnySectionDefinition } from "../registry";
 import { about } from "./about";
 import { awards } from "./awards";
+import { beforeAfter } from "./before-after";
+import { booking } from "./booking";
+import { careers } from "./careers";
 import { caseStudy } from "./case-study";
 import { certificates } from "./certificates";
 import { contact } from "./contact";
@@ -27,6 +30,7 @@ import { press } from "./press";
 import { pricing } from "./pricing";
 import { problemSolution } from "./problem-solution";
 import { projects } from "./projects";
+import { publications } from "./publications";
 import { quote } from "./quote";
 import { services } from "./services";
 import { skills } from "./skills";
@@ -54,11 +58,13 @@ export const sections: AnySectionDefinition[] = [
   certificates,
   awards,
   interests,
+  publications,
   cvDownload,
   // Work
   projects,
   caseStudy,
   gallery,
+  beforeAfter,
   video,
   // Business
   services,
@@ -72,11 +78,13 @@ export const sections: AnySectionDefinition[] = [
   press,
   partners,
   missionValues,
+  careers,
   // Trust and conversion
   testimonials,
   faq,
   cta,
   newsletter,
+  booking,
   contact,
   map,
   socialLinks,

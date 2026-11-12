@@ -1,0 +1,84 @@
+/* Editorial: a magazine. Big serif titles, a running number on each section, hairline rules and columns of text. */
+.pk-root[data-pk-family="editorial"] {
+  --pk-heading-weight: 500;
+  --pk-heading-tracking: -0.02em;
+  --pk-heading-leading: 1.04;
+  --pk-display-scale: 1.15;
+  --pk-h2-scale: 1.3;
+  --pk-body-leading: 1.7;
+  counter-reset: pk-editorial;
+}
+.pk-root[data-pk-family="editorial"] .pk-section {
+  --pk-rule: 1px solid var(--pk-text);
+  --pk-card-bg: transparent;
+  --pk-card-border: 0 solid transparent;
+  --pk-tag-border: 0 solid transparent;
+}
+.pk-root[data-pk-family="editorial"] :is(.pk-card, .pk-btn, .pk-media, .pk-tags li) {
+  border-radius: 0;
+}
+.pk-root[data-pk-family="editorial"] .pk-card {
+  border-block-start: var(--pk-rule);
+  padding-inline: 0;
+}
+/* Each main section gets a number before its heading. */
+.pk-root[data-pk-family="editorial"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider, .pk-cta)
+  :is(.pk-rail__head, .pk-stack__head) {
+  counter-increment: pk-editorial;
+}
+.pk-root[data-pk-family="editorial"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider, .pk-cta)
+  :is(.pk-rail__head, .pk-stack__head)::before {
+  content: counter(pk-editorial, decimal-leading-zero);
+  display: block;
+  margin-block-end: 10px;
+  font-family: var(--pk-font-heading);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--pk-primary);
+}
+.pk-root[data-pk-family="editorial"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider)
+  > .pk-container
+  > :is(.pk-rail, .pk-stack) {
+  border-block-start: var(--pk-rule);
+  padding-block-start: 24px;
+}
+.pk-root[data-pk-family="editorial"] .pk-hero__name {
+  font-style: italic;
+}
+.pk-root[data-pk-family="editorial"] .pk-hero__title {
+  font-size: 0.9375rem;
+  letter-spacing: 0.04em;
+  border-block-end: var(--pk-rule);
+  display: inline-block;
+  padding-block-end: 6px;
+}
+.pk-root[data-pk-family="editorial"] .pk-tags li {
+  padding-inline: 0;
+  font-style: italic;
+}
+.pk-root[data-pk-family="editorial"] .pk-tags li + li::before {
+  content: "/";
+  margin-inline-end: 10px;
+  color: var(--pk-muted);
+}
+.pk-root[data-pk-family="editorial"] .pk-media--empty {
+  background: var(--pk-surface);
+  color: var(--pk-muted);
+  font-family: var(--pk-font-heading);
+  font-style: italic;
+}
+@media (min-width: 900px) {
+  .pk-root[data-pk-family="editorial"] .pk-prose--large {
+    columns: 2;
+    column-gap: var(--pk-gap);
+  }
+}
+.pk-root[data-pk-family="editorial"] .pk-navbar {
+  border-block-end: 3px double var(--pk-text);
+}
+.pk-root[data-pk-family="editorial"] .pk-footer {
+  border-block-start: 3px double var(--pk-text);
+}

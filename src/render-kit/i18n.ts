@@ -49,12 +49,47 @@ const UI = {
   openMap: { en: "Open in Google Maps", ar: "افتح في خرائط جوجل" },
   mission: { en: "Mission", ar: "رسالتنا" },
   vision: { en: "Vision", ar: "رؤيتنا" },
+  read: { en: "Read", ar: "اقرأ" },
+  watch: { en: "Watch", ar: "شاهد" },
+  before: { en: "Before", ar: "قبل" },
+  after: { en: "After", ar: "بعد" },
+  compare: { en: "Move to compare before and after", ar: "حرّك للمقارنة بين قبل وبعد" },
+  apply: { en: "Apply", ar: "قدّم الآن" },
+  noJobs: { en: "No open roles right now.", ar: "لا توجد وظائف متاحة حالياً." },
+  book: { en: "Book a time", ar: "احجز موعداً" },
+  addBooking: { en: "Add a Calendly link", ar: "أضف رابط Calendly" },
+  bookingTitle: { en: "Booking calendar", ar: "تقويم الحجز" },
+  darkMode: { en: "Dark mode", ar: "الوضع الداكن" },
+  signedUp: { en: "Thank you. You are signed up.", ar: "شكراً لك. تم تسجيلك." },
+  signupFailed: {
+    en: "The sign-up did not go through. Try again.",
+    ar: "لم يتم التسجيل. حاول مرة أخرى.",
+  },
 } as const;
 export type UiKey = keyof typeof UI;
 
 /** Built-in words the page needs, such as "Present" or "Send message". */
 export function uiText(key: UiKey, lang: Lang): string {
   return UI[key][lang];
+}
+
+/**
+ * A booking link that can be shown inside the page. Only Calendly is embedded; any other https
+ * link (Cal.com, Google Calendar and so on) is shown as a button instead.
+ */
+export function bookingEmbedUrl(url: string | undefined): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL((url ?? "").trim());
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== "https:") return null;
+  const host = parsed.hostname.replace(/^www\./, "");
+  if (host !== "calendly.com" || parsed.pathname.split("/").filter(Boolean).length === 0)
+    return null;
+  parsed.searchParams.set("hide_gdpr_banner", "1");
+  return `https://calendly.com${parsed.pathname}?${parsed.searchParams.toString()}`;
 }
 
 /** "2023-04" becomes "Apr 2023"; "2023" stays "2023". */

@@ -7,7 +7,10 @@ import { L } from "../shared";
 const schema = z.object({
   heading: textSchema,
   body: textSchema,
-  /** Address of the mailing list form (Mailchimp, Brevo, Formspree...). */
+  /**
+   * Address of the mailing list form (Mailchimp, Brevo, Formspree...). Empty: on a published
+   * page sign-ups go to the owner's inbox.
+   */
   action: z.string().default(""),
   buttonLabel: textSchema,
   note: textSchema,
@@ -16,13 +19,27 @@ type Content = z.output<typeof schema>;
 
 const make = (layout: "inline" | "card"): VariantComponent<Content> =>
   function Newsletter({ content, ctx }) {
+    // Without an address of their own, sign-ups go to the owner's inbox on a published page.
+    const own = safeFormAction(content.action);
+    const inbox = !own && ctx.formAction ? `${ctx.formAction}&kind=signup` : undefined;
     return (
       <div className={`pk-news pk-news--${layout} ${layout === "card" ? "pk-card" : ""}`}>
         <div>
           <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
           {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
         </div>
-        <form className="pk-news__form" action={safeFormAction(content.action)} method="post">
+        <form
+          className="pk-news__form"
+          action={own ?? inbox}
+          method="post"
+          data-pk-contact={inbox ? "" : undefined}
+        >
+          {inbox && (
+            <label className="pk-visually-hidden" aria-hidden="true">
+              Website
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+          )}
           <label>
             <span className="pk-visually-hidden">{ctx.ui("yourEmail")}</span>
             <input
@@ -37,6 +54,15 @@ const make = (layout: "inline" | "card"): VariantComponent<Content> =>
             {ctx.t(content.buttonLabel) || ctx.ui("subscribe")}
           </button>
           {ctx.t(content.note) && <p className="pk-news__note">{ctx.t(content.note)}</p>}
+          {inbox && (
+            <p
+              className="pk-form__status pk-news__status"
+              role="status"
+              data-pk-sending={ctx.ui("sending")}
+              data-pk-sent={ctx.ui("signedUp")}
+              data-pk-failed={ctx.ui("signupFailed")}
+            />
+          )}
         </form>
       </div>
     );
@@ -65,7 +91,11 @@ export const newsletter = defineSection({
   fields: [
     { key: "heading", label: "Heading", type: "text" },
     { key: "body", label: "Short text", type: "longtext" },
-    { key: "action", label: "Mailing list form address", type: "url" },
+    {
+      key: "action",
+      label: "Mailing list form address (empty: sign-ups go to your inbox)",
+      type: "url",
+    },
     { key: "buttonLabel", label: "Button text", type: "text" },
     { key: "note", label: "Small note under the form", type: "text" },
   ],

@@ -6,6 +6,10 @@
  * - Gallery: opens images large, with arrow keys and Escape.
  * - Numbers in the stats section count up once, when they come into view.
  * - "Lively" animation: sections fade in as they come into view.
+ * - Before and after (slider layout): the two images stack with a handle to drag. Without the
+ *   script they are shown side by side.
+ * - Pages set to "both" light and dark get a switch in the navbar. Without the script the page
+ *   follows the visitor's system setting.
  *
  * Kept as a plain string so the exported HTML can ship it as script.js unchanged.
  */
@@ -128,6 +132,52 @@ export const PAGE_SCRIPT = String.raw`(function () {
       el.textContent = format(0);
       requestAnimationFrame(step);
     });
+  }
+
+  // Before and after: one image with a handle
+  Array.prototype.forEach.call(root.querySelectorAll("[data-pk-compare]"), function (box) {
+    var range = document.createElement("input");
+    range.type = "range";
+    range.min = "0";
+    range.max = "100";
+    range.value = "50";
+    range.className = "pk-before-after__range";
+    range.setAttribute("aria-label", box.getAttribute("data-pk-compare-label") || "Compare");
+    var knob = document.createElement("span");
+    knob.className = "pk-before-after__knob";
+    knob.setAttribute("aria-hidden", "true");
+    var update = function () { box.style.setProperty("--pk-split", range.value + "%"); };
+    range.addEventListener("input", update);
+    box.appendChild(range);
+    box.appendChild(knob);
+    box.classList.add("pk-before-after__compare--live");
+    update();
+  });
+
+  // Light and dark switch, for pages that offer both
+  if (root.getAttribute("data-pk-mode") === "both") {
+    var key = "pk-scheme:" + location.pathname.replace(/\/(ar|en)\/?$/, "");
+    var stored = null;
+    try { stored = localStorage.getItem(key); } catch (e) {}
+    var systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var dark = stored ? stored === "dark" : systemDark;
+    var toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "pk-scheme-toggle";
+    toggle.setAttribute("aria-label", root.getAttribute("lang") === "ar" ? "الوضع الداكن" : "Dark mode");
+    var apply = function () {
+      root.setAttribute("data-pk-scheme", dark ? "dark" : "light");
+      toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    };
+    toggle.addEventListener("click", function () {
+      dark = !dark;
+      apply();
+      try { localStorage.setItem(key, dark ? "dark" : "light"); } catch (e) {}
+    });
+    var nav = root.querySelector(".pk-nav");
+    if (nav) nav.insertBefore(toggle, nav.querySelector(".pk-nav__cta, .pk-nav__menu"));
+    else { toggle.classList.add("pk-scheme-toggle--floating"); root.appendChild(toggle); }
+    apply();
   }
 
   // Lively: sections fade in

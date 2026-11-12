@@ -7,6 +7,7 @@ import {
   safeFormAction,
   safeHref,
   safeImageUrl,
+  bookingEmbedUrl,
   videoEmbedUrl,
 } from "../i18n";
 import { allSections, normalizeDoc } from "../registry";
@@ -41,10 +42,20 @@ describe("document", () => {
     }
   });
 
-  test("the plan's 39 version 1 sections all exist with unique types", () => {
+  test("all 43 planned sections exist with unique types", () => {
     const types = allSections().map((s) => s.type);
-    expect(types).toHaveLength(39);
-    expect(new Set(types).size).toBe(39);
+    expect(types).toHaveLength(43);
+    expect(new Set(types).size).toBe(43);
+  });
+
+  test("booking embeds only Calendly; other links become a button", () => {
+    expect(bookingEmbedUrl("https://calendly.com/sara/intro")).toBe(
+      "https://calendly.com/sara/intro?hide_gdpr_banner=1",
+    );
+    expect(bookingEmbedUrl("https://cal.com/sara/intro")).toBeNull();
+    expect(bookingEmbedUrl("http://calendly.com/sara")).toBeNull();
+    expect(bookingEmbedUrl("https://calendly.com/")).toBeNull();
+    expect(bookingEmbedUrl("javascript:alert(1)")).toBeNull();
   });
 
   test("embeds only accept known video sites and safe form addresses", () => {

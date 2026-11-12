@@ -73,6 +73,75 @@
   }
 }
 
+/* The visitor's own choice from the switch (page script) wins over the system setting. */
+.pk-root[data-pk-mode="both"][data-pk-scheme="dark"] {
+  --pk-c-bg: var(--pk-d-bg);
+  --pk-c-surface: var(--pk-d-surface);
+  --pk-c-text: var(--pk-d-text);
+  --pk-c-muted: var(--pk-d-muted);
+  --pk-c-primary: var(--pk-d-primary);
+  --pk-c-on-primary: var(--pk-d-on-primary);
+  --pk-c-accent: var(--pk-d-accent);
+  --pk-c-border: var(--pk-d-border);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  .pk-root[data-pk-mode="both"][data-pk-scheme="light"] {
+    --pk-c-bg: var(--pk-l-bg);
+    --pk-c-surface: var(--pk-l-surface);
+    --pk-c-text: var(--pk-l-text);
+    --pk-c-muted: var(--pk-l-muted);
+    --pk-c-primary: var(--pk-l-primary);
+    --pk-c-on-primary: var(--pk-l-on-primary);
+    --pk-c-accent: var(--pk-l-accent);
+    --pk-c-border: var(--pk-l-border);
+    color-scheme: light;
+  }
+}
+.pk-scheme-toggle {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--pk-border);
+  background: transparent;
+  color: var(--pk-text);
+  cursor: pointer;
+}
+.pk-scheme-toggle::before {
+  /* A moon in light mode, a sun in dark mode, drawn with one shadow. */
+  content: "";
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset -5px -3px 0 1px currentColor;
+}
+.pk-scheme-toggle[aria-pressed="true"]::before {
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  box-shadow:
+    0 -10px 0 -4px currentColor,
+    0 10px 0 -4px currentColor,
+    10px 0 0 -4px currentColor,
+    -10px 0 0 -4px currentColor;
+}
+.pk-scheme-toggle:focus-visible {
+  outline: 2px solid var(--pk-primary);
+  outline-offset: 2px;
+}
+.pk-scheme-toggle--floating {
+  position: fixed;
+  inset-block-end: 16px;
+  inset-inline-end: 16px;
+  z-index: 20;
+  background: var(--pk-c-bg);
+  color: var(--pk-c-text);
+  border-color: var(--pk-c-border);
+}
+
 /* Arabic joins its letters, so it gets no tightening and more line height. */
 .pk-root[lang="ar"] {
   --pk-h-tracking: 0;

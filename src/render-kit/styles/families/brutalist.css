@@ -1,0 +1,76 @@
+/* Brutalist: raw and loud. Thick borders in the text color, hard offset shadows, flat colors, no softness. */
+.pk-root[data-pk-family="brutalist"] {
+  --pk-heading-weight: 800;
+  --pk-heading-tracking: -0.03em;
+  --pk-heading-leading: 1.02;
+  --pk-display-scale: 1.12;
+  --pk-h2-scale: 1.25;
+  --pk-btn-weight: 800;
+  --pk-meta-font: var(--pk-font-mono);
+}
+.pk-root[data-pk-family="brutalist"] .pk-section {
+  --pk-rule: 3px solid var(--pk-text);
+  --pk-card-bg: var(--pk-bg);
+  --pk-card-border: 3px solid var(--pk-text);
+  --pk-card-shadow: 6px 6px 0 var(--pk-text);
+  --pk-tag-bg: var(--pk-bg);
+  --pk-tag-border: 2px solid var(--pk-text);
+  --pk-btn-shadow: 4px 4px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="brutalist"][dir="rtl"] .pk-section {
+  --pk-card-shadow: -6px 6px 0 var(--pk-text);
+  --pk-btn-shadow: -4px 4px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="brutalist"] :is(.pk-card, .pk-btn, .pk-media, .pk-tags li, .pk-embed) {
+  border-radius: 0;
+}
+.pk-root[data-pk-family="brutalist"] .pk-btn {
+  border: 3px solid var(--pk-text);
+  transition:
+    translate 0.12s,
+    box-shadow 0.12s;
+}
+.pk-root[data-pk-family="brutalist"] .pk-btn:hover {
+  translate: 2px 2px;
+  box-shadow: 2px 2px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="brutalist"] .pk-media {
+  border: 3px solid var(--pk-text);
+}
+.pk-root[data-pk-family="brutalist"] .pk-media--empty {
+  background: var(--pk-accent);
+  color: var(--pk-bg);
+}
+.pk-root[data-pk-family="brutalist"] .pk-navbar {
+  border-block-end: var(--pk-rule);
+}
+.pk-root[data-pk-family="brutalist"] .pk-hero__title {
+  display: inline-block;
+  background: var(--pk-text);
+  color: var(--pk-bg);
+  padding: 4px 12px;
+  font-family: var(--pk-font-mono);
+  font-size: 0.9375rem;
+}
+.pk-root[data-pk-family="brutalist"] .pk-hero__image {
+  box-shadow: 10px 10px 0 var(--pk-primary);
+}
+.pk-root[data-pk-family="brutalist"][dir="rtl"] .pk-hero__image {
+  box-shadow: -10px 10px 0 var(--pk-primary);
+}
+.pk-root[data-pk-family="brutalist"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider)
+  + .pk-section:not(.pk-footer, .pk-divider) {
+  border-block-start: var(--pk-rule);
+}
+.pk-root[data-pk-family="brutalist"] .pk-history {
+  border-inline-start: 3px solid var(--pk-text);
+}
+.pk-root[data-pk-family="brutalist"] .pk-history .pk-entry::before {
+  border-radius: 0;
+  border: 3px solid var(--pk-text);
+  background: var(--pk-accent);
+}
+.pk-root[data-pk-family="brutalist"] .pk-footer {
+  border-block-start: var(--pk-rule);
+}

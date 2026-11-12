@@ -1,0 +1,70 @@
+/* Classic CV: like a printed CV. Narrow page, small formal headings in a left column, compact spacing, a round photo. */
+.pk-root[data-pk-family="classic-cv"] {
+  --pk-heading-weight: 700;
+  --pk-heading-tracking: 0;
+  --pk-heading-leading: 1.2;
+  --pk-display-scale: 0.72;
+  --pk-h2-scale: 0.6;
+  --pk-body-leading: 1.55;
+  --pk-container: 920px;
+  --pk-section-pad: calc(clamp(28px, 5vw, 48px) * var(--pk-space-scale, 1));
+  --pk-gap: clamp(16px, 3vw, 32px);
+  font-size: 1rem;
+}
+.pk-root[data-pk-family="classic-cv"] .pk-section {
+  --pk-rule: 1px solid var(--pk-border);
+  --pk-card-bg: transparent;
+  --pk-card-border: 0 solid transparent;
+  --pk-tag-border: 1px solid var(--pk-border);
+}
+.pk-root[data-pk-family="classic-cv"] .pk-card {
+  padding: 0;
+}
+.pk-root[data-pk-family="classic-cv"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider)
+  > .pk-container
+  > :is(.pk-rail, .pk-stack) {
+  border-block-start: var(--pk-rule);
+  padding-block-start: 20px;
+}
+.pk-root[data-pk-family="classic-cv"] :is(.pk-rail__head, .pk-stack__head) .pk-h2 {
+  color: var(--pk-primary);
+  letter-spacing: 0.06em;
+}
+.pk-root[data-pk-family="classic-cv"] :is(.pk-rail__head, .pk-stack__head) .pk-sub {
+  font-size: 0.9375rem;
+}
+@media (min-width: 760px) {
+  .pk-root[data-pk-family="classic-cv"] .pk-rail {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  }
+}
+.pk-root[data-pk-family="classic-cv"] .pk-hero__image,
+.pk-root[data-pk-family="classic-cv"] .pk-hero__avatar {
+  border-radius: 50%;
+  max-width: 200px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  justify-self: center;
+}
+.pk-root[data-pk-family="classic-cv"] .pk-hero__title {
+  color: var(--pk-primary);
+  font-weight: 600;
+}
+.pk-root[data-pk-family="classic-cv"] .pk-navbar {
+  border-block-end: var(--pk-rule);
+}
+.pk-root[data-pk-family="classic-cv"] .pk-tags li {
+  border-radius: 3px;
+  font-size: 0.875rem;
+}
+.pk-root[data-pk-family="classic-cv"] .pk-media--empty {
+  background: var(--pk-surface);
+  color: var(--pk-muted);
+}
+@media print {
+  .pk-root[data-pk-family="classic-cv"] {
+    --pk-section-pad: 14px;
+    font-size: 10.5pt;
+  }
+}
