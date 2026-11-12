@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "out-samples/**",
+    "screenshots/**",
   ]),
   {
     // Portfolio pages must work as plain exported HTML, so they use <img>, not next/image.

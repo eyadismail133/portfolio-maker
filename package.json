@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "format": "prettier --write .",
-    "samples": "tsx scripts/render-samples.tsx"
+    "samples": "tsx scripts/render-samples.tsx",
+    "visual": "tsx scripts/visual-check.tsx"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -29,6 +30,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "playwright": "1.63.0",
     "prettier": "^3.10.1",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",

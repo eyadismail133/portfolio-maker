@@ -173,6 +173,9 @@ describe("sections", () => {
 
 describe("theme", () => {
   test("every ready palette passes contrast in light and dark", () => {
+    expect(palettes).toHaveLength(24);
+    expect(new Set(palettes.map((p) => p.id)).size).toBe(24);
+    expect(fontPairs).toHaveLength(15);
     for (const p of palettes) {
       expect(contrastProblems(p.light), `${p.id} light`).toEqual([]);
       expect(contrastProblems(p.dark), `${p.id} dark`).toEqual([]);

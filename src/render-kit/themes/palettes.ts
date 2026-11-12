@@ -26,7 +26,7 @@ function preset(
   };
 }
 
-/** Ready palettes. The full set of 24 is a later Phase 1 task. */
+/** The 24 ready palettes. Every one is checked for readable contrast by the tests. */
 export const palettes: PalettePreset[] = [
   preset("cobalt", "Cobalt", "serious", "#1f4fd8", { background: "#ffffff", surface: "#f3f5f9" }),
   preset("pine", "Pine", "calm", "#1d6b4f"),
@@ -39,6 +39,22 @@ export const palettes: PalettePreset[] = [
   }),
   preset("berry", "Berry", "vivid", "#c2185b"),
   preset("saffron", "Saffron", "warm", "#8a5a00"),
+  preset("ocean", "Ocean", "fresh", "#0057b8"),
+  preset("sky", "Sky", "fresh", "#0284c7"),
+  preset("mint", "Mint", "fresh", "#0f9d7a"),
+  preset("sage", "Sage", "calm", "#55735a"),
+  preset("mist", "Mist", "calm", "#4f6d7a"),
+  preset("sand", "Sand", "calm", "#8a6a3b"),
+  preset("rose", "Rose", "warm", "#b83a5e"),
+  preset("clay", "Clay", "warm", "#9c5a3c"),
+  preset("sunset", "Sunset", "vivid", "#d9480f"),
+  preset("violet", "Violet", "vivid", "#6d28d9"),
+  preset("magenta", "Magenta", "vivid", "#a21caf"),
+  preset("navy", "Navy", "serious", "#1e2a5a"),
+  preset("ink", "Ink", "serious", "#111827", { background: "#ffffff", accent: "#2563eb" }),
+  preset("wine", "Wine", "luxury", "#7b1e3a"),
+  preset("royal", "Royal green", "luxury", "#14532d", { accent: "#a16207" }),
+  preset("onyx", "Onyx", "luxury", "#1c1917", { accent: "#a16207" }),
 ];
 
 export function getPalette(id: string): PalettePreset {

@@ -2,21 +2,15 @@
  * Writes sample portfolios as plain HTML files into ./out-samples, to check the render kit
  * without running the app. Run with: npm run samples
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { renderToHtml } from "../src/render-kit/export";
+import { renderKitCss } from "./bundle-css";
 import { createSampleDoc } from "../src/render-kit/samples";
 import type { Lang, PortfolioDoc } from "../src/render-kit/schema";
 import { families } from "../src/render-kit/themes/families";
 
-/** Joins a CSS file with everything it imports. */
-export function bundleCss(file: string): string {
-  return readFileSync(file, "utf8").replace(/@import\s+"([^"]+)";/g, (_, path: string) =>
-    bundleCss(resolve(dirname(file), path)),
-  );
-}
-
-const css = bundleCss(resolve("src/render-kit/styles/index.css"));
+const css = renderKitCss();
 const out = resolve("out-samples");
 mkdirSync(out, { recursive: true });
 

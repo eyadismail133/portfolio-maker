@@ -29,8 +29,9 @@ The core. No login, no editor yet; work with JSON files.
 - [x] One-step family switch that keeps content (`themes/apply.ts`)
 - [x] Remaining version 1 sections (27 more): all 39 version 1 sections exist, each with at least 2 layouts
 - [ ] Section extras that need a small script: gallery lightbox, counting numbers in `stats`, sending the newsletter and contact forms without leaving the page
-- [ ] 24 palettes and 15 font pairs (8 palettes and 10 pairs exist)
-- [ ] Visual tests: screenshot every section x family
+- [x] 24 palettes and 15 font pairs
+- [x] Visual check: `npm run visual` opens every section in every family, both languages, phone and desktop; it fails on sideways scrolling or empty sections and saves screenshots
+- [ ] Compare screenshots against saved good ones automatically (today a person looks at them)
 
 **Result:** any sample JSON becomes a beautiful page in 6 designs.
 

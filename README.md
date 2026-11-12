@@ -23,6 +23,7 @@ npm run dev                      (open http://localhost:3000)
 | `npm test` | Run tests |
 | `npm run format` | Format the code |
 | `npm run samples` | Write sample portfolios as plain HTML files into `out-samples/` |
+| `npm run visual` | Open every section in every design in a real browser, check the layout, save screenshots to `screenshots/` (first time: `npx playwright install chromium`) |
 
 ## How to use these files
 

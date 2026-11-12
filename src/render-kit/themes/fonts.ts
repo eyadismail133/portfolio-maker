@@ -12,7 +12,7 @@ export type FontPair = {
 const sans = "system-ui, -apple-system, 'Segoe UI', sans-serif";
 const serif = "Georgia, 'Times New Roman', serif";
 
-/** Font pairs. Every pair has an Arabic partner. Five more are a later Phase 1 task. */
+/** Font pairs. Every pair has an Arabic partner. */
 export const fontPairs: FontPair[] = [
   {
     id: "grotesk",
@@ -83,6 +83,41 @@ export const fontPairs: FontPair[] = [
     heading: { family: "Syne", weights: [700, 800], fallback: sans },
     body: { family: "DM Sans", weights: [400, 500, 600], fallback: sans },
     arabic: { family: "Rubik", weights: [400, 500, 700, 800], fallback: sans },
+  },
+  {
+    id: "classic",
+    name: "Playfair + Source Sans",
+    heading: { family: "Playfair Display", weights: [500, 700], fallback: serif },
+    body: { family: "Source Sans 3", weights: [400, 600], fallback: sans },
+    arabic: { family: "Noto Naskh Arabic", weights: [400, 500, 700], fallback: serif },
+  },
+  {
+    id: "modern",
+    name: "Sora + Inter",
+    heading: { family: "Sora", weights: [600, 700], fallback: sans },
+    body: { family: "Inter", weights: [400, 500, 600], fallback: sans },
+    arabic: { family: "Noto Sans Arabic", weights: [400, 500, 700], fallback: sans },
+  },
+  {
+    id: "soft",
+    name: "Nunito",
+    heading: { family: "Nunito", weights: [700, 800], fallback: sans },
+    body: { family: "Nunito", weights: [400, 600], fallback: sans },
+    arabic: { family: "Baloo Bhaijaan 2", weights: [400, 600, 800], fallback: sans },
+  },
+  {
+    id: "caslon",
+    name: "Libre Caslon + Work Sans",
+    heading: { family: "Libre Caslon Text", weights: [400, 700], fallback: serif },
+    body: { family: "Work Sans", weights: [400, 500, 600], fallback: sans },
+    arabic: { family: "Amiri", weights: [400, 700], fallback: serif },
+  },
+  {
+    id: "jakarta",
+    name: "Plus Jakarta Sans",
+    heading: { family: "Plus Jakarta Sans", weights: [600, 800], fallback: sans },
+    body: { family: "Plus Jakarta Sans", weights: [400, 500, 600], fallback: sans },
+    arabic: { family: "Tajawal", weights: [400, 500, 700, 800], fallback: sans },
   },
 ];
 
