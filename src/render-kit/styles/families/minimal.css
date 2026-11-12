@@ -1,0 +1,20 @@
+/* Minimal: calm, thin lines, lots of white space. */
+.pk-root[data-pk-family="minimal"] {
+  --pk-heading-weight: 700;
+}
+
+/* Two plain sections in a row are separated by a hairline instead of double padding. */
+.pk-root[data-pk-family="minimal"]
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer) {
+  padding-block-start: 0;
+}
+.pk-root[data-pk-family="minimal"]
+  .pk-section[data-pk-bg="default"]:not(.pk-navbar)
+  + .pk-section[data-pk-bg="default"]:not(.pk-footer)
+  > .pk-container::before {
+  content: "";
+  display: block;
+  border-block-start: var(--pk-rule);
+  margin-block-end: var(--pk-pad);
+}

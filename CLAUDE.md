@@ -17,6 +17,13 @@ Read `README.md` first, then the doc for the area you are touching. The plan liv
 - Images go through the upload helper (resize, convert to WebP). Never store an image as base64 in the document.
 - User text is always escaped when rendered. Rich text is sanitized. Published pages run no user-written scripts.
 
+## Render kit rules learned the hard way
+- Every class starts with `pk-`. The Renderer gives each section wrapper the classes `pk-<type>` and `pk-<type>--<variant>`, so never reuse those two names for elements inside the section (use `pk-<type>__list` and so on).
+- Colors used in section CSS are the section variables (`--pk-bg`, `--pk-text`, `--pk-primary`...), never `--pk-c-*` or `--pk-l-*`, so colored sections keep working. The one exception is the banner in `cta.css`.
+- A CSS variable that refers to a section color (for example `--pk-rule`) must be declared on `.pk-section`, not on `.pk-root`.
+- New section: add its folder, add it to `sections/index.ts`, add its CSS to `styles/index.css`. The tests then check it in every variant, in both languages, and with empty content.
+- Look at the result: `npm run samples` writes plain HTML files, and `/dev/render` shows the same pages with switches.
+
 ## When you finish a task
 - Run `npm run lint`, `npm run typecheck`, `npm test`.
 - Tick the task in `docs/06-ROADMAP.md`.

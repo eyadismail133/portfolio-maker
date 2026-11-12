@@ -2,7 +2,7 @@
 
 A website where anyone can build a rich portfolio landing page (personal profile, company, startup, freelancer, agency...) without design skills: log in, answer a few questions, pick a starting idea, fill in the data, adjust design and colors with a live preview, then publish or download as HTML.
 
-**Status:** Phase 0 is done except the Vercel deploy. Next is Phase 1 in `docs/06-ROADMAP.md`.
+**Status:** Phase 1 is in progress. The render kit works with the `minimal` design family and the first 12 sections; open `/dev/render` to try it. Remaining tasks are in `docs/06-ROADMAP.md`.
 
 ## Run it on your computer
 
@@ -22,6 +22,7 @@ npm run dev                      (open http://localhost:3000)
 | `npm run typecheck` | Check TypeScript types |
 | `npm test` | Run tests |
 | `npm run format` | Format the code |
+| `npm run samples` | Write sample portfolios as plain HTML files into `out-samples/` |
 
 ## How to use these files
 

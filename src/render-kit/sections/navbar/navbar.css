@@ -1,0 +1,101 @@
+.pk-navbar {
+  padding-block: 18px;
+}
+.pk-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px 28px;
+}
+.pk-nav__brand {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: 1.125rem;
+  letter-spacing: calc(var(--pk-heading-tracking) * 0.5);
+  margin-inline-end: auto;
+}
+.pk-nav__links {
+  display: none;
+  gap: 4px 26px;
+  flex-wrap: wrap;
+  font-size: 0.9375rem;
+}
+.pk-nav__links a,
+.pk-nav__menu a {
+  color: var(--pk-muted);
+  padding-block: 10px;
+  display: inline-block;
+}
+.pk-nav__links a:hover,
+.pk-nav__menu a:hover {
+  color: var(--pk-text);
+}
+.pk-nav__menu {
+  position: relative;
+}
+.pk-nav__menu summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 14px;
+  border: 1px solid var(--pk-border);
+  border-radius: var(--pk-radius-control);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.pk-nav__menu summary::-webkit-details-marker {
+  display: none;
+}
+.pk-nav__menu ul {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + 8px);
+  z-index: 10;
+  min-width: 220px;
+  padding: 8px 18px;
+  background: var(--pk-bg);
+  border: 1px solid var(--pk-border);
+  border-radius: var(--pk-radius);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--pk-text) 12%, transparent);
+}
+.pk-nav__menu a {
+  display: block;
+}
+.pk-nav__cta {
+  display: none;
+}
+@media (min-width: 480px) {
+  .pk-nav__cta {
+    display: inline-flex;
+  }
+}
+@media (min-width: 900px) {
+  .pk-nav__links {
+    display: flex;
+  }
+  .pk-nav__menu {
+    display: none;
+  }
+  .pk-navbar--centered .pk-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    row-gap: 6px;
+  }
+  .pk-navbar--centered .pk-nav__brand {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: 1.375rem;
+  }
+  .pk-navbar--centered .pk-nav__cta {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .pk-navbar--centered .pk-nav__links {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+  }
+}

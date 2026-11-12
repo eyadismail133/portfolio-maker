@@ -1,0 +1,18 @@
+.pk-about__grid {
+  display: grid;
+  gap: var(--pk-gap);
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .pk-about__grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+.pk-about__image {
+  aspect-ratio: 4 / 5;
+}
+@media (max-width: 639px) {
+  .pk-about__image {
+    aspect-ratio: 3 / 2;
+  }
+}

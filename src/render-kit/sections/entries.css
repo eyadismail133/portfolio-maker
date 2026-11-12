@@ -1,0 +1,68 @@
+/* Shared by work experience and education. */
+.pk-timeline {
+  border-inline-start: 1px solid var(--pk-border);
+  display: grid;
+  gap: 40px;
+}
+.pk-timeline .pk-entry {
+  position: relative;
+  padding-inline-start: clamp(20px, 3vw, 32px);
+}
+.pk-timeline .pk-entry::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -5px;
+  inset-block-start: 0.5em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pk-bg);
+  border: 2px solid var(--pk-primary);
+}
+.pk-entry__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 20px;
+}
+.pk-entry__dates {
+  color: var(--pk-muted);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pk-entry__place {
+  color: var(--pk-primary);
+  font-weight: 600;
+  margin-block-start: 2px;
+}
+.pk-entry__text {
+  margin-block-start: 12px;
+  max-width: 62ch;
+}
+.pk-entry__points {
+  margin-block-start: 12px;
+  display: grid;
+  gap: 6px;
+  max-width: 62ch;
+  color: var(--pk-muted);
+}
+.pk-entry__points li {
+  position: relative;
+  padding-inline-start: 18px;
+}
+.pk-entry__points li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px;
+  inset-block-start: 0.72em;
+  width: 8px;
+  height: 1.5px;
+  background: var(--pk-accent);
+}
+.pk-entry-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}

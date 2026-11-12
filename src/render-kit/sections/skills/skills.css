@@ -1,0 +1,51 @@
+.pk-skills__groups {
+  display: grid;
+  gap: 36px 48px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.pk-skills__bars {
+  margin-block-start: 14px;
+  display: grid;
+  gap: 14px;
+}
+.pk-skills__bars li {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9375rem;
+}
+.pk-meter {
+  display: block;
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(
+    to right,
+    var(--pk-primary) calc(var(--pk-level) * 100%),
+    var(--pk-border) calc(var(--pk-level) * 100%)
+  );
+}
+[dir="rtl"] .pk-meter {
+  background: linear-gradient(
+    to left,
+    var(--pk-primary) calc(var(--pk-level) * 100%),
+    var(--pk-border) calc(var(--pk-level) * 100%)
+  );
+}
+.pk-skills__rows {
+  display: grid;
+}
+.pk-skills__row {
+  display: grid;
+  gap: 12px 32px;
+  padding-block: 22px;
+  border-block-start: var(--pk-rule);
+}
+.pk-skills__row:first-child {
+  border: 0;
+  padding-block-start: 0;
+}
+@media (min-width: 640px) {
+  .pk-skills__row {
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: baseline;
+  }
+}

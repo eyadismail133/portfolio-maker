@@ -1,0 +1,50 @@
+.pk-quotes {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+.pk-quote {
+  display: grid;
+  gap: 24px;
+  align-content: space-between;
+}
+.pk-quote blockquote {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.pk-root[lang="ar"] .pk-quote blockquote {
+  line-height: 1.8;
+}
+.pk-quote figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+.pk-quote figcaption strong {
+  display: block;
+}
+.pk-quote__role {
+  color: var(--pk-muted);
+}
+.pk-quote__photo {
+  width: 44px;
+  flex: none;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.pk-quote--large {
+  max-width: 900px;
+}
+.pk-quote--large blockquote {
+  font-family: var(--pk-font-heading);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 1rem + 2.2vw, 2.5rem);
+  line-height: 1.25;
+  letter-spacing: var(--pk-heading-tracking);
+}
+.pk-root[lang="ar"] .pk-quote--large blockquote {
+  line-height: 1.6;
+}

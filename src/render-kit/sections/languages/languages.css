@@ -1,0 +1,37 @@
+.pk-langs {
+  display: grid;
+}
+.pk-langs li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 14px;
+  border-block-start: var(--pk-rule);
+}
+.pk-langs li:first-child {
+  border: 0;
+  padding-block-start: 0;
+}
+.pk-langs__name {
+  font-weight: 600;
+  margin-inline-end: auto;
+}
+.pk-langs__level {
+  color: var(--pk-muted);
+  font-size: 0.9375rem;
+  min-width: 7em;
+  text-align: end;
+}
+.pk-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.pk-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--pk-primary);
+}
+.pk-dots i[data-on] {
+  background: var(--pk-primary);
+}

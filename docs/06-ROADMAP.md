@@ -17,16 +17,17 @@ Tick tasks as they are finished. Each phase ends with something you can see work
 
 ## Phase 1 - Render kit (1.5 to 2 weeks)
 The core. No login, no editor yet; work with JSON files.
-- [ ] Zod schema and types for the portfolio document, with `schemaVersion` and migration helper
-- [ ] Section registry and `Renderer`
-- [ ] Theme system: CSS variables, palette builder from one brand color, contrast check
-- [ ] First design family: `minimal`
-- [ ] First 12 sections: navbar, hero, about, work-experience, education, skills, languages, projects, testimonials, contact, cta, footer (at least 2 variants each)
-- [ ] Right-to-left and Arabic fonts working
-- [ ] Demo page `/dev/render` that shows sample documents, with switches for family, palette, direction, screen size
+- [x] Zod schema and types for the portfolio document, with `schemaVersion` and migration helper
+- [x] Section registry and `Renderer`
+- [x] Theme system: CSS variables, palette builder from one brand color, contrast check
+- [x] First design family: `minimal`
+- [x] First 12 sections: navbar, hero, about, work-experience, education, skills, languages, projects, testimonials, contact, cta, footer (at least 2 variants each)
+- [x] Right-to-left layout and Arabic sample content
+- [ ] Check the Arabic web fonts in a real browser (they could not load in the build sandbox)
+- [x] Demo page `/dev/render` that shows sample documents, with switches for family, palette, direction, screen size
 - [ ] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
 - [ ] Remaining version 1 sections (27 more), in this order: business group, work group, trust group, free blocks
-- [ ] 24 palettes and 15 font pairs
+- [ ] 24 palettes and 15 font pairs (8 palettes and 6 pairs exist)
 - [ ] Visual tests: screenshot every section x family
 
 **Result:** any sample JSON becomes a beautiful page in 6 designs.

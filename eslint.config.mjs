@@ -12,7 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "out-samples/**",
   ]),
+  {
+    // Portfolio pages must work as plain exported HTML, so they use <img>, not next/image.
+    files: ["src/render-kit/**"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
 ]);
 
 export default eslintConfig;

@@ -37,26 +37,33 @@ src/
     editor/[id]/
     preview/[id]/         the page loaded inside the editor's preview frame
     p/[slug]/             published portfolios
+    dev/render/           render kit demo with switches (frame/ is the bare page)
     api/                  export, publish, upload, form submissions
   components/             app interface components (Tailwind)
   editor/                 editor store, panels, field components
   render-kit/
-    schema/               Zod schemas, types, migrations
+    schema/               primitives.ts, document.ts, migrate.ts
     sections/             one folder per section type
+      index.ts            list of all sections
+      shared.tsx          heading layouts, image placeholder, buttons
       hero/
-        index.ts          registry entry: schema, defaults, variants, editor fields
-        HeroSplit.tsx
-        HeroCentered.tsx
+        index.tsx         schema, sample content, variants, editor fields
         hero.css
-    themes/               design families, palettes, font pairs
+    themes/               color.ts, palettes.ts, fonts.ts, families.ts, css-vars.ts
+    styles/               base.css, families/<family>.css, index.css (imports everything)
     Renderer.tsx          document in, page out
-    registry.ts           list of all sections
-    export.ts             document in, HTML + CSS + images out
+    registry.ts           section registry and normalizeDoc
+    samples.ts            builds sample documents from section sample content
+    export.tsx            document in, full HTML file out
+    i18n.ts               language helpers, built-in words, safe links
   recommend/              recipes and idea generator
   lib/                    supabase client, upload helper, utils
+scripts/render-samples.tsx   writes sample pages to out-samples/
 supabase/migrations/      database tables and security rules
 docs/
 ```
+
+Variants of a section live together in its `index.tsx`. Split a variant into its own file when the file gets long.
 
 ## The portfolio document
 
@@ -74,13 +81,14 @@ type PortfolioDoc = {
   };
   theme: {
     family: string;           // "minimal", "bold", ...
-    palette: {                // every color the page uses
+    palette: {                // light mode colors, each a hex value like #1f4fd8
       background: string; surface: string; text: string;
       mutedText: string; primary: string; onPrimary: string;
       accent: string; border: string;
     };
-    mode: "light" | "dark" | "both";
-    fonts: { heading: string; body: string };
+    paletteDark?: Palette;    // dark mode colors; built from the primary color when missing
+    mode: "light" | "dark" | "both";   // "both" follows the visitor's device
+    fonts: string;            // id of a font pair in themes/fonts.ts
     radius: "none" | "small" | "large" | "pill";
     spacing: "compact" | "normal" | "airy";
     animation: "none" | "subtle" | "lively";
@@ -95,8 +103,7 @@ type Section = {
   hidden: boolean;
   content: unknown;           // shape defined by that section's Zod schema
   style?: {                   // optional per-section overrides
-    background?: "default" | "surface" | "primary" | "image";
-    backgroundImage?: AssetRef;
+    background?: "default" | "surface" | "primary";   // "image" comes with uploads in Phase 3
     padding?: "small" | "normal" | "large";
   };
 };
@@ -110,6 +117,8 @@ Rules:
 - Switching a section's variant keeps its content, because all variants of a type share one content schema.
 - Switching design family changes `theme` and may change variants to that family's preferred ones. Content is untouched.
 - Every text field shown to visitors is `LocalizedText`.
+- Long text is plain text for now; line breaks become paragraphs. Rich text arrives with the editor and will need a schema migration.
+- Saved JSON always goes through `normalizeDoc` before rendering. It migrates old versions, checks the shape, fills defaults, repairs unknown variants, and drops sections it cannot read.
 
 ## How a section is defined
 
@@ -131,14 +140,13 @@ Adding a new section never requires changing the editor.
 
 ## How theming works
 
-The renderer writes the theme as CSS variables on the page root:
+The Renderer writes the theme as CSS variables in the `style` of the page root (`.pk-root`): light colors as `--pk-l-*`, dark colors as `--pk-d-*`, plus fonts, radius and spacing. `styles/base.css` picks the light or dark set from `data-pk-mode` and hands each section its working colors (`--pk-bg`, `--pk-text`, `--pk-primary`...). A colored section swaps those variables, and everything inside follows.
 
-```css
-[data-theme-family="minimal"] { --radius: 4px; --section-gap: 96px; ... }
-:root { --color-bg: #fff; --color-primary: #2456d6; --font-heading: "Sora"; ... }
-```
+Section CSS only uses these variables. A design family is a set of token values in `styles/families/<family>.css`, selected with `data-pk-family`, plus its special details.
 
-Section CSS only uses these variables. A design family is a set of variable values plus a small CSS file for its special details (for example heavy borders for "brutalist").
+Colors are repaired before use: `fixPalette` darkens or lightens any text color that does not reach WCAG AA contrast, so a hand-picked palette cannot produce unreadable text.
+
+All render-kit classes start with `pk-`, and `base.css` carries its own reset, so a page looks the same inside the app (with Tailwind loaded) and as an exported file.
 
 ## Database
 

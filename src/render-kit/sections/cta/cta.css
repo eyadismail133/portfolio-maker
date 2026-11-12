@@ -1,0 +1,28 @@
+.pk-cta__box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 40px;
+}
+.pk-cta__box .pk-h2 {
+  max-width: 22ch;
+}
+.pk-cta__box--banner {
+  --pk-text: var(--pk-c-on-primary);
+  --pk-muted: color-mix(in srgb, var(--pk-c-on-primary) 82%, var(--pk-c-primary));
+  background: var(--pk-c-primary);
+  color: var(--pk-text);
+  border-radius: var(--pk-radius);
+  padding: clamp(28px, 6vw, 64px);
+}
+.pk-cta__box--banner .pk-btn--primary {
+  background: var(--pk-c-on-primary);
+  color: var(--pk-c-primary);
+}
+.pk-cta__box--banner .pk-btn--primary:hover {
+  background: color-mix(in srgb, var(--pk-c-on-primary) 88%, var(--pk-c-primary));
+}
+.pk-cta__box--banner :focus-visible {
+  outline-color: var(--pk-c-on-primary);
+}
