@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { pickText } from "@/render-kit/i18n";
 import { allSections, getSection, type SectionCategory } from "@/render-kit/registry";
 import type { PortfolioDoc, Theme } from "@/render-kit/schema/document";
@@ -9,7 +9,11 @@ import { buildPalette } from "@/render-kit/themes/color";
 import { families } from "@/render-kit/themes/families";
 import { fontPairs } from "@/render-kit/themes/fonts";
 import { palettes } from "@/render-kit/themes/palettes";
+import { MiniPreview } from "@/components/MiniPreview";
+import { applyFamily } from "@/render-kit/themes/apply";
+import { contrastProblems } from "@/render-kit/themes/color";
 import { canMove } from "./doc-ops";
+import { FormFields } from "./fields";
 import { sectionName, useEditor } from "./store";
 import {
   IconButton,
@@ -214,6 +218,17 @@ function sameColors(a: Theme["palette"], b: Theme["palette"]) {
 
 /** Left panel, second tab: design family, colors, fonts and shape for the whole page. */
 export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
+  const lang = useEditor((s) => s.lang);
+  // Your own page in each design, top part only: navigation and the first two sections.
+  const familyPreviews = useMemo(() => {
+    const top = { ...doc, sections: doc.sections.filter((s) => !s.hidden).slice(0, 3) };
+    return Object.fromEntries(
+      families.map((f) => [
+        f.id,
+        applyFamily(top, f.id, { keepColors: doc.theme.family === f.id }),
+      ]),
+    );
+  }, [doc]);
   const { setTheme, setFamily } = useEditor.getState();
   const theme = doc.theme;
 
@@ -244,12 +259,18 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
               type="button"
               aria-pressed={theme.family === family.id}
               onClick={() => setFamily(family.id)}
-              className={`rounded-md border px-3 py-2.5 text-start focus-visible:outline-2 focus-visible:outline-blue-600 ${
+              className={`rounded-md border p-2 text-start focus-visible:outline-2 focus-visible:outline-blue-600 ${
                 theme.family === family.id
                   ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
                   : "border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
               }`}
             >
+              <MiniPreview
+                doc={familyPreviews[family.id]}
+                lang={lang}
+                aspect="aspect-[16/10]"
+                className="mb-2 rounded border border-zinc-200 dark:border-zinc-700"
+              />
               <span className="block text-sm font-medium">{family.name}</span>
               <span className="mt-0.5 block text-xs leading-snug text-zinc-500">
                 {family.feeling}
@@ -308,6 +329,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
             ["both", "Visitor's choice"],
           ]}
         />
+        <ColorEditor doc={doc} />
       </div>
 
       <div className="grid gap-1">
@@ -391,6 +413,26 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
           One or two sentences for search results and link previews.
         </p>
       </div>
+      <FormFields
+        fields={[
+          { key: "shareImage", label: "Picture shown when the link is shared", type: "image" },
+          { key: "favicon", label: "Small icon in the browser tab", type: "image" },
+        ]}
+        value={doc.meta as unknown as Record<string, unknown>}
+        path={["meta"]}
+        ctx={{
+          lang: languages[0],
+          languages,
+          isLocalized: () => false,
+          about: "the page settings",
+        }}
+        onChange={(next) =>
+          setMeta({
+            shareImage: next.shareImage as PortfolioDoc["meta"]["shareImage"],
+            favicon: next.favicon as PortfolioDoc["meta"]["favicon"],
+          })
+        }
+      />
       <fieldset className="grid gap-2">
         <legend className="mb-1 text-xs font-semibold">Languages</legend>
         {(Object.keys(LANGUAGE_NAMES) as Lang[]).map((lang) => (
@@ -432,5 +474,72 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
         )}
       </fieldset>
     </div>
+  );
+}
+
+const COLOR_NAMES: [keyof Theme["palette"], string][] = [
+  ["background", "Page background"],
+  ["surface", "Soft tint"],
+  ["text", "Text"],
+  ["mutedText", "Quiet text"],
+  ["primary", "Main color"],
+  ["onPrimary", "Text on main color"],
+  ["accent", "Accent"],
+  ["border", "Lines"],
+];
+
+/** Each color of the palette, editable by hand. Unreadable text colors are fixed on the page. */
+function ColorEditor({ doc }: { doc: PortfolioDoc }) {
+  const { setTheme } = useEditor.getState();
+  const theme = doc.theme;
+  const [which, setWhich] = useState<"light" | "dark">(theme.mode === "dark" ? "dark" : "light");
+  const palette =
+    which === "light"
+      ? theme.palette
+      : (theme.paletteDark ?? buildPalette(theme.palette.primary, "dark"));
+  const problems = contrastProblems(palette);
+  const change = (key: keyof Theme["palette"], value: string) =>
+    setTheme(
+      which === "light"
+        ? { palette: { ...palette, [key]: value } }
+        : { paletteDark: { ...palette, [key]: value } },
+      `color-${which}-${key}`,
+    );
+  return (
+    <details className="rounded-md border border-zinc-200 dark:border-zinc-800">
+      <summary className="cursor-pointer px-3 py-2 text-xs font-medium">Edit each color</summary>
+      <div className="grid gap-3 border-t border-zinc-200 p-3 dark:border-zinc-800">
+        {theme.mode !== "light" && (
+          <Segmented
+            label="Which colors"
+            value={which}
+            onChange={setWhich}
+            options={[
+              ["light", "Light"],
+              ["dark", "Dark"],
+            ]}
+          />
+        )}
+        <div className="grid grid-cols-2 gap-2">
+          {COLOR_NAMES.map(([key, name]) => (
+            <label key={key} className="flex items-center gap-2 text-xs">
+              <input
+                type="color"
+                value={palette[key]}
+                onChange={(e) => change(key, e.target.value)}
+                className="size-7 shrink-0 cursor-pointer rounded border border-zinc-300 bg-transparent p-0.5 dark:border-zinc-700"
+              />
+              {name}
+            </label>
+          ))}
+        </div>
+        {problems.length > 0 && (
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            Hard to read: {problems.join(", ")}. The page darkens or lightens these text colors so
+            everyone can read them.
+          </p>
+        )}
+      </div>
+    </details>
   );
 }

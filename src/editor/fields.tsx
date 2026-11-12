@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { pickText } from "@/render-kit/i18n";
 import type { FieldDef } from "@/render-kit/registry";
 import type { AssetRef, Lang, LocalizedText } from "@/render-kit/schema/primitives";
@@ -14,6 +14,7 @@ import {
   type Path,
 } from "./doc-ops";
 import { askAi } from "@/lib/ai/client";
+import { listMyImages } from "@/lib/upload";
 import type { AiAction } from "@/lib/ai/prompts";
 import { useEditor } from "./store";
 import { IconButton, Label, buttonClass, inputClass } from "./ui";
@@ -212,12 +213,46 @@ function LinkField(props: FieldProps) {
   );
 }
 
+/** Images the account uploaded before, to use again without uploading. */
+function ImageLibrary({ onPick }: { onPick: (asset: AssetRef) => void }) {
+  const [images, setImages] = useState<AssetRef[] | null>(null);
+  const [problem, setProblem] = useState("");
+  useEffect(() => {
+    listMyImages()
+      .then(setImages)
+      .catch(() => {
+        setImages([]);
+        setProblem("Your images could not be loaded.");
+      });
+  }, []);
+  if (images === null) return <p className="text-xs text-zinc-500">Loading your images…</p>;
+  if (images.length === 0)
+    return <p className="text-xs text-zinc-500">{problem || "No uploaded images yet."}</p>;
+  return (
+    <div className="grid max-h-56 grid-cols-4 gap-1.5 overflow-y-auto">
+      {images.map((image) => (
+        <button
+          key={image.assetId}
+          type="button"
+          onClick={() => onPick(image)}
+          className="aspect-square overflow-hidden rounded border border-zinc-200 hover:ring-2 hover:ring-blue-600 focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-700"
+          aria-label="Use this image"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- a small preview of an uploaded image */}
+          <img src={image.url} alt="" loading="lazy" className="size-full object-cover" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ImageField({ field, value, path, onChange }: FieldProps) {
   const id = useId();
   const asset = value as AssetRef | undefined;
   const uploader = useEditor((s) => s.uploader);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const update = (url: string, alt: string) =>
     onChange(
       url.trim()
@@ -273,12 +308,28 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
               }}
             />
           </label>
+          <button
+            type="button"
+            className={buttonClass}
+            onClick={() => setLibraryOpen((open) => !open)}
+            aria-expanded={libraryOpen}
+          >
+            My images
+          </button>
           {asset && (
             <button type="button" className={buttonClass} onClick={() => onChange(undefined)}>
               Remove
             </button>
           )}
         </div>
+      )}
+      {libraryOpen && (
+        <ImageLibrary
+          onPick={(picked) => {
+            onChange({ ...picked, alt: asset?.alt ?? "" });
+            setLibraryOpen(false);
+          }}
+        />
       )}
       {problem && (
         <p role="alert" className="text-xs text-red-600">

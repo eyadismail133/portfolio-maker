@@ -16,7 +16,10 @@ import { downloadHtml } from "@/lib/export-download";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
 import { PublishDialog } from "./PublishDialog";
 import { VersionsPanel } from "./VersionsPanel";
-import type { FromPreview, ToPreview } from "./PreviewFrame";
+import type { FromPreview, SectionAction, ToPreview } from "./PreviewFrame";
+import { canMove } from "./doc-ops";
+import { getSection } from "@/render-kit/registry";
+import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { SectionEditor } from "./SectionEditor";
 import { useEditor, type Device } from "./store";
 import { IconButton, Segmented, buttonClass, inputClass, primaryButtonClass } from "./ui";
@@ -25,6 +28,17 @@ const LOCAL_SAVE_DELAY_MS = 600;
 const REMOTE_SAVE_DELAY_MS = 1500;
 const RETRY_MS = 15000;
 const WIDTHS: Record<Device, string> = { desktop: "100%", tablet: "820px", phone: "390px" };
+
+/** Which section toolbar buttons work for the selected section. */
+function toolsFor(doc: PortfolioDoc, id: string | null) {
+  const section = id ? doc.sections.find((s) => s.id === id) : undefined;
+  if (!section) return { up: false, down: false, duplicate: false };
+  return {
+    up: canMove(doc, section.id, -1),
+    down: canMove(doc, section.id, 1),
+    duplicate: !getSection(section.type)?.pinned,
+  };
+}
 
 type LeftTab = "sections" | "design" | "settings";
 type SaveStatus = "saved" | "offline" | "conflict" | "failed";
@@ -62,6 +76,8 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   const [status, setStatus] = useState<SaveStatus>("saved");
   const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState("");
+  const [notice, setNotice] = useState("");
+  const [panelOpen, setPanelOpen] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
   const frameReady = useRef(false);
   const titleRef = useRef("");
@@ -111,14 +127,44 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
     };
   }, [portfolioId, load]);
 
+  const sendRef = useRef<(message: ToPreview) => void>(() => undefined);
   const send = useCallback((message: ToPreview) => {
     if (frameReady.current)
       frame.current?.contentWindow?.postMessage(message, window.location.origin);
   }, []);
 
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(""), 5000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  /** The section toolbar in the preview and the Delete and Ctrl+D keys. */
+  useEffect(() => {
+    sendRef.current = send;
+  }, [send]);
+
+  const runAction = useCallback((id: string, action: SectionAction) => {
+    const state = useEditor.getState();
+    if (action === "up") state.moveSection(id, -1);
+    if (action === "down") state.moveSection(id, 1);
+    if (action === "duplicate") state.duplicateSection(id);
+    if (action === "delete") {
+      state.removeSection(id);
+      setNotice("Section deleted. Press Ctrl+Z to bring it back.");
+      return;
+    }
+    // Keep the moved or copied section in view, so its toolbar stays at hand.
+    const shown = useEditor.getState().selectedId ?? id;
+    window.setTimeout(
+      () => sendRef.current({ type: "pk:scroll", id: shown, block: "nearest" }),
+      50,
+    );
+  }, []);
+
   // Keep the preview showing the current document.
   useEffect(() => {
-    if (doc) send({ type: "pk:state", doc, lang, selectedId });
+    if (doc) send({ type: "pk:state", doc, lang, selectedId, tools: toolsFor(doc, selectedId) });
   }, [doc, lang, selectedId, send]);
 
   useEffect(() => {
@@ -128,19 +174,26 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
       if (event.data?.type === "pk:ready") {
         frameReady.current = true;
         const state = useEditor.getState();
-        if (state.doc)
+        if (state.doc) {
           send({
             type: "pk:state",
             doc: state.doc,
             lang: state.lang,
             selectedId: state.selectedId,
+            tools: toolsFor(state.doc, state.selectedId),
           });
+        }
       }
       if (event.data?.type === "pk:select") select(event.data.id);
+      if (event.data?.type === "pk:action") runAction(event.data.id, event.data.action);
+      if (event.data?.type === "pk:key") {
+        const { key, ctrl, shift } = event.data;
+        window.dispatchEvent(new KeyboardEvent("keydown", { key, ctrlKey: ctrl, shiftKey: shift }));
+      }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [select, send]);
+  }, [select, send, runAction]);
 
   /** Sends the current document to the server. Only one save runs at a time. */
   const flush = useCallback(async () => {
@@ -213,8 +266,28 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      const typing = (event.target as HTMLElement | null)?.closest?.(
+        "input, textarea, select, [contenteditable]",
+      );
+      const selected = useEditor.getState().selectedId;
+      if (
+        (event.key === "Delete" || event.key === "Backspace") &&
+        !typing &&
+        selected &&
+        !event.ctrlKey &&
+        !event.metaKey
+      ) {
+        event.preventDefault();
+        runAction(selected, "delete");
+        return;
+      }
       if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
       const key = event.key.toLowerCase();
+      if (key === "d" && selected && !typing) {
+        event.preventDefault();
+        runAction(selected, "duplicate");
+        return;
+      }
       if (key === "z") {
         event.preventDefault();
         if (event.shiftKey) redo();
@@ -229,7 +302,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [undo, redo, flush]);
+  }, [undo, redo, flush, runAction]);
 
   if (opening.state === "problem") {
     return (
@@ -307,7 +380,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
 
   return (
     <div className="flex h-dvh flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+      <header className="flex items-center gap-x-3 gap-y-2 overflow-x-auto border-b border-zinc-200 bg-white px-3 py-2 lg:flex-wrap lg:overflow-visible dark:border-zinc-800 dark:bg-zinc-900 [&>*]:shrink-0">
         <Link
           href={portfolioId ? "/dashboard" : "/"}
           className="rounded px-1 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-blue-600"
@@ -324,6 +397,16 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             onChange={(e) => rename(e.target.value)}
           />
         )}
+        <button
+          type="button"
+          className={`${buttonClass} lg:hidden`}
+          onClick={() => {
+            select(null);
+            setPanelOpen(true);
+          }}
+        >
+          Sections and design
+        </button>
         <span className="flex">
           <IconButton icon="undo" label="Undo (Ctrl+Z)" disabled={!canUndo} onClick={undo} />
           <IconButton icon="redo" label="Redo (Ctrl+Shift+Z)" disabled={!canRedo} onClick={redo} />
@@ -350,12 +433,17 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             )}
           </span>
         )}
+        {notice && (
+          <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
+            {notice}
+          </span>
+        )}
         {status === "conflict" && (
           <button type="button" className={buttonClass} onClick={() => window.location.reload()}>
             Reload the latest version
           </button>
         )}
-        <span className="ms-auto flex flex-wrap items-center gap-3">
+        <span className="ms-auto flex items-center gap-3 lg:flex-wrap">
           {doc.meta.languages.length > 1 && (
             <span className="w-40">
               <Segmented
@@ -368,7 +456,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               />
             </span>
           )}
-          <span className="flex" role="group" aria-label="Screen size">
+          <span className="hidden lg:flex" role="group" aria-label="Screen size">
             {(["desktop", "tablet", "phone"] as const).map((d) => (
               <IconButton
                 key={d}
@@ -423,7 +511,17 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <aside className="flex w-80 shrink-0 flex-col border-e border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        {panelOpen && (
+          <button
+            type="button"
+            aria-label="Close the panel"
+            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            onClick={() => setPanelOpen(false)}
+          />
+        )}
+        <aside
+          className={`${panelOpen ? "fixed inset-y-0 start-0 z-40 flex shadow-2xl" : "hidden"} w-[min(20rem,88vw)] shrink-0 flex-col border-e border-zinc-200 bg-white lg:static lg:z-auto lg:flex lg:w-80 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900`}
+        >
           <div className="border-b border-zinc-200 p-3 dark:border-zinc-800">
             <Segmented
               label="Panel"
@@ -437,7 +535,15 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             />
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
-            {tab === "sections" && <SectionsPanel doc={doc} onPick={pick} />}
+            {tab === "sections" && (
+              <SectionsPanel
+                doc={doc}
+                onPick={(id) => {
+                  pick(id);
+                  setPanelOpen(false);
+                }}
+              />
+            )}
             {tab === "design" && <DesignPanel doc={doc} />}
             {tab === "settings" && (
               <div className="grid gap-8">
@@ -469,7 +575,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         )}
 
         {selected && (
-          <aside className="w-[340px] shrink-0 border-s border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+          <aside className="fixed inset-x-0 bottom-0 z-40 h-[70dvh] rounded-t-xl border-t border-zinc-200 bg-white shadow-2xl lg:static lg:h-auto lg:w-[340px] lg:shrink-0 lg:rounded-none lg:border-s lg:border-t-0 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900">
             <SectionEditor key={selected.id} section={selected} />
           </aside>
         )}

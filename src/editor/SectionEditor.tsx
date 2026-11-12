@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { getSection, type AnySectionDefinition } from "@/render-kit/registry";
 import type { Section } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
+import { MiniPreview } from "@/components/MiniPreview";
 import { setAt, type Path } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
 import { useEditor } from "./store";
@@ -29,6 +30,7 @@ export function SectionEditor({ section }: { section: Section }) {
   const [tab, setTab] = useState<Tab>("content");
   const lang = useEditor((s) => s.lang);
   const title = useEditor((s) => s.doc?.meta.title ?? "");
+  const doc = useEditor((s) => s.doc);
   const languages = useEditor((s) => s.doc?.meta.languages ?? ONLY_ENGLISH);
   const { updateContent, setVariant, setSectionStyle, select } = useEditor.getState();
   const def = getSection(section.type);
@@ -92,6 +94,12 @@ export function SectionEditor({ section }: { section: Section }) {
                     : "border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
                 }`}
               >
+                <MiniPreview
+                  doc={{ ...doc!, sections: [{ ...section, variant: id, hidden: false }] }}
+                  lang={lang}
+                  aspect="aspect-[16/9]"
+                  className="mb-2 rounded border border-zinc-200 dark:border-zinc-700"
+                />
                 {variant.name}
               </button>
             ))}

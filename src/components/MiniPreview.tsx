@@ -14,10 +14,13 @@ export function MiniPreview({
   doc,
   lang,
   className = "",
+  aspect = "aspect-[16/11]",
 }: {
   doc: PortfolioDoc;
   lang?: Lang;
   className?: string;
+  /** Tailwind aspect class of the visible window. */
+  aspect?: string;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
@@ -35,7 +38,7 @@ export function MiniPreview({
   return (
     <div
       ref={box}
-      className={`relative aspect-[16/11] overflow-hidden bg-white ${className}`}
+      className={`relative ${aspect} overflow-hidden bg-white ${className}`}
       aria-hidden="true"
       inert
     >
