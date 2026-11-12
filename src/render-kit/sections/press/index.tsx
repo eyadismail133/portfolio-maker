@@ -29,7 +29,7 @@ const Quotes: VariantComponent<Content> = ({ content, ctx }) => (
     <ul className="pk-grid pk-press__quotes">
       {content.items.map((item, i) => (
         <li key={i} className="pk-card">
-          <blockquote>{ctx.t(item.quote)}</blockquote>
+          <blockquote>{ctx.rich(item.quote)}</blockquote>
           <p className="pk-press__outlet">{ctx.t(item.outlet)}</p>
           {item.url && (
             <a className="pk-link" {...linkProps(item.url)}>

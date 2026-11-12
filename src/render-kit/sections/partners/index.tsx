@@ -36,7 +36,7 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
       {content.items.map((item, i) => (
         <li key={i} className="pk-card">
           <Mark item={item} name={ctx.t(item.name)} />
-          {ctx.t(item.description) && <p className="pk-muted">{ctx.t(item.description)}</p>}
+          {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>
       ))}
     </ul>
@@ -49,7 +49,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
       {content.items.map((item, i) => (
         <li key={i}>
           <Mark item={item} name={ctx.t(item.name)} />
-          {ctx.t(item.description) && <p className="pk-muted">{ctx.t(item.description)}</p>}
+          {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>
       ))}
     </ul>

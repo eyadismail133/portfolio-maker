@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { safeHref, safeImageUrl } from "../i18n";
+import { RichBlocks } from "../rich-text";
 import type { SectionContext } from "../registry";
 import type { AssetRef, Link, LocalizedText } from "../schema/primitives";
 
@@ -49,13 +50,10 @@ export function Stack({ heading, subheading, ctx, children }: HeadProps) {
 
 /** Text with line breaks kept as paragraphs. */
 export function Paragraphs({ text, className = "pk-prose" }: { text: string; className?: string }) {
-  const parts = text.split(/\n+/).filter((p) => p.trim());
-  if (parts.length === 0) return null;
+  if (!text.trim()) return null;
   return (
     <div className={className}>
-      {parts.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
+      <RichBlocks text={text} />
     </div>
   );
 }

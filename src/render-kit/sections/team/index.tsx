@@ -31,7 +31,7 @@ const make = (layout: "grid" | "list"): VariantComponent<Content> =>
               <div>
                 <h3 className="pk-h3">{ctx.t(member.name)}</h3>
                 <p className="pk-team__role">{ctx.t(member.role)}</p>
-                {ctx.t(member.bio) && <p className="pk-muted">{ctx.t(member.bio)}</p>}
+                {ctx.t(member.bio) && <p className="pk-muted">{ctx.rich(member.bio)}</p>}
                 {member.links.length > 0 && (
                   <p className="pk-team__links">
                     {member.links.map((link, l) => (

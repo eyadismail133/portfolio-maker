@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { pickText } from "@/render-kit/i18n";
 import type { FieldDef } from "@/render-kit/registry";
 import type { AssetRef, Lang, LocalizedText } from "@/render-kit/schema/primitives";
@@ -16,6 +16,8 @@ import {
 import { askAi } from "@/lib/ai/client";
 import { listMyImages } from "@/lib/upload";
 import type { AiAction } from "@/lib/ai/prompts";
+import { CropDialog } from "./CropDialog";
+import { link, toggleList, wrap, type Edit, type Selection } from "./format";
 import { useEditor } from "./store";
 import { IconButton, Label, buttonClass, inputClass } from "./ui";
 
@@ -124,8 +126,73 @@ function AiBar(props: {
   );
 }
 
+/** Bold, italic, link and list buttons for a long text. The marks stay readable as plain text. */
+function FormatBar({
+  area,
+  text,
+  onEdit,
+}: {
+  area: React.RefObject<HTMLTextAreaElement | null>;
+  text: string;
+  onEdit: (next: string) => void;
+}) {
+  const apply = (change: (sel: Selection) => Edit) => {
+    const el = area.current;
+    if (!el) return;
+    const result = change({ text, start: el.selectionStart, end: el.selectionEnd });
+    onEdit(result.text);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(result.start, result.end);
+    });
+  };
+  const button =
+    "inline-flex h-6 min-w-6 items-center justify-center rounded px-1 text-xs text-zinc-700 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-zinc-300 dark:hover:bg-zinc-800";
+  return (
+    <div role="toolbar" aria-label="Formatting" className="flex gap-0.5">
+      <button
+        type="button"
+        title="Bold"
+        aria-label="Bold"
+        className={`${button} font-bold`}
+        onClick={() => apply((s) => wrap(s, "**", "**", "bold text"))}
+      >
+        B
+      </button>
+      <button
+        type="button"
+        title="Italic"
+        aria-label="Italic"
+        className={`${button} italic`}
+        onClick={() => apply((s) => wrap(s, "*", "*", "italic text"))}
+      >
+        I
+      </button>
+      <button
+        type="button"
+        title="Link"
+        aria-label="Link"
+        className={`${button} underline`}
+        onClick={() => apply((s) => link(s, "link text"))}
+      >
+        Link
+      </button>
+      <button
+        type="button"
+        title="List"
+        aria-label="List"
+        className={button}
+        onClick={() => apply(toggleList)}
+      >
+        • List
+      </button>
+    </div>
+  );
+}
+
 function TextField({ field, value, path, ctx, onChange }: FieldProps) {
   const id = useId();
+  const area = useRef<HTMLTextAreaElement>(null);
   const localized = ctx.isLocalized(path);
   const text = localized ? readLocalized(value as LocalizedText, ctx.lang) : String(value ?? "");
   const hint = localized ? otherLanguageText(value as LocalizedText, ctx.lang) : "";
@@ -147,7 +214,10 @@ function TextField({ field, value, path, ctx, onChange }: FieldProps) {
     <div className="grid gap-1">
       <Label htmlFor={id}>{field.label}</Label>
       {field.type === "longtext" ? (
-        <textarea {...shared} rows={4} onChange={(e) => write(e.target.value)} />
+        <>
+          <FormatBar area={area} text={text} onEdit={(next) => write(next, null)} />
+          <textarea ref={area} {...shared} rows={4} onChange={(e) => write(e.target.value)} />
+        </>
       ) : (
         <input {...shared} type="text" onChange={(e) => write(e.target.value)} />
       )}
@@ -253,6 +323,7 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [cropping, setCropping] = useState<File | null>(null);
   const update = (url: string, alt: string) =>
     onChange(
       url.trim()
@@ -303,8 +374,12 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
               className="sr-only"
               disabled={busy}
               onChange={(e) => {
-                void upload(e.target.files?.[0]);
+                const chosen = e.target.files?.[0];
                 e.target.value = "";
+                // GIFs keep their animation, so they skip cropping.
+                if (chosen && chosen.type.startsWith("image/") && chosen.type !== "image/gif")
+                  setCropping(chosen);
+                else void upload(chosen);
               }}
             />
           </label>
@@ -322,6 +397,16 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
             </button>
           )}
         </div>
+      )}
+      {cropping && (
+        <CropDialog
+          file={cropping}
+          onCancel={() => setCropping(null)}
+          onDone={(file) => {
+            setCropping(null);
+            void upload(file);
+          }}
+        />
       )}
       {libraryOpen && (
         <ImageLibrary

@@ -1,4 +1,5 @@
-import { getSection } from "@/render-kit/registry";
+import { getSection, type AnySectionDefinition } from "@/render-kit/registry";
+import { plainText } from "@/render-kit/rich-text";
 import type { PortfolioDoc, Section } from "@/render-kit/schema/document";
 import type { Lang, LocalizedText } from "@/render-kit/schema/primitives";
 
@@ -198,4 +199,79 @@ export function setLanguages(doc: PortfolioDoc, languages: Lang[]): PortfolioDoc
   const unique = [...new Set(languages)];
   if (unique.length === 0) return doc;
   return { ...doc, meta: { ...doc.meta, languages: unique } };
+}
+
+const localizedCache = new Map<string, boolean>();
+
+/** Finds out from the section's schema whether a text keeps one value per language. */
+export function isLocalizedIn(def: AnySectionDefinition, content: unknown, path: Path): boolean {
+  const key = `${def.type}:${path.map((p) => (typeof p === "number" ? "*" : p)).join(".")}`;
+  const known = localizedCache.get(key);
+  if (known !== undefined) return known;
+  const result = def.schema.safeParse(setAt(content, path, { en: "x", ar: "x" })).success;
+  localizedCache.set(key, result);
+  return result;
+}
+
+const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
+
+/**
+ * Finds the text in a section's content that shows on the page as `shown`, for editing it in
+ * place. Texts with bold, italic or link marks are skipped: those are edited in the form, so the
+ * marks are not lost.
+ */
+export function findTextPath(content: unknown, lang: Lang, shown: string): Path | null {
+  const wanted = normalize(shown);
+  if (!wanted) return null;
+  const walk = (value: unknown, path: Path): Path | null => {
+    if (typeof value === "string") {
+      return normalize(value) === wanted ? path : null;
+    }
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i += 1) {
+        const found = walk(value[i], [...path, i]);
+        if (found) return found;
+      }
+      return null;
+    }
+    if (value && typeof value === "object") {
+      const record = value as Record<string, unknown>;
+      const keys = Object.keys(record);
+      // A text with one value per language.
+      if (keys.length > 0 && keys.every((k) => k === "en" || k === "ar")) {
+        const raw =
+          readLocalized(record as LocalizedText, lang) || (lang === "en" ? record.ar : record.en);
+        return typeof raw === "string" && normalize(raw) === wanted ? path : null;
+      }
+      for (const key of keys) {
+        if (key === "url" || key === "href" || key === "assetId") continue;
+        const found = walk(record[key], [...path, key]);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  const path = walk(content, []);
+  if (!path) return null;
+  const raw = getAt(content, path);
+  const text = typeof raw === "string" ? raw : readLocalized(raw as LocalizedText, lang);
+  return plainText(text) === text ? path : null;
+}
+
+/** Writes text typed in the preview back into the section, in the language being edited. */
+export function setTextAt(
+  doc: PortfolioDoc,
+  id: string,
+  path: Path,
+  text: string,
+  lang: Lang,
+): PortfolioDoc | null {
+  const section = doc.sections.find((s) => s.id === id);
+  const def = section && getSection(section.type);
+  if (!section || !def) return null;
+  const current = getAt(section.content, path);
+  const next = isLocalizedIn(def, section.content, path)
+    ? writeLocalized(current as LocalizedText, lang, text, doc.meta.languages)
+    : text;
+  return setContent(doc, id, setAt(section.content, path, next));
 }

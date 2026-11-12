@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { z } from "zod";
 import type { UiKey } from "./i18n";
 import { migrateDoc } from "./schema/migrate";
@@ -11,6 +11,8 @@ export type SectionContext = {
   dir: "ltr" | "rtl";
   /** Text in the page language. */
   t: (value: LocalizedText | undefined) => string;
+  /** A long text in the page language, with its bold, italic and link marks shown. */
+  rich: (value: LocalizedText | undefined) => ReactNode;
   /** Built-in words such as "Present". */
   ui: (key: UiKey) => string;
   /** Visible sections a navbar can link to. */

@@ -20,7 +20,7 @@ const make = (layout: "inline" | "card"): VariantComponent<Content> =>
       <div className={`pk-news pk-news--${layout} ${layout === "card" ? "pk-card" : ""}`}>
         <div>
           <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.t(content.body)}</p>}
+          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
         </div>
         <form className="pk-news__form" action={safeFormAction(content.action)} method="post">
           <label>

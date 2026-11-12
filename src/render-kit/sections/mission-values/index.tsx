@@ -24,7 +24,7 @@ function Values({ content, ctx }: SectionProps<Content>) {
         <li key={i} className="pk-card">
           <Icon name={value.icon} />
           <h3 className="pk-h3">{ctx.t(value.title)}</h3>
-          <p className="pk-muted">{ctx.t(value.description)}</p>
+          <p className="pk-muted">{ctx.rich(value.description)}</p>
         </li>
       ))}
     </ul>
@@ -44,13 +44,13 @@ const Cards: VariantComponent<Content> = (props) => {
         {ctx.t(content.mission) && (
           <div>
             <h3 className="pk-h3">{ctx.ui("mission")}</h3>
-            <p>{ctx.t(content.mission)}</p>
+            <p>{ctx.rich(content.mission)}</p>
           </div>
         )}
         {ctx.t(content.vision) && (
           <div>
             <h3 className="pk-h3">{ctx.ui("vision")}</h3>
-            <p>{ctx.t(content.vision)}</p>
+            <p>{ctx.rich(content.vision)}</p>
           </div>
         )}
       </div>
@@ -64,8 +64,8 @@ const Statement: VariantComponent<Content> = (props) => {
   return (
     <div className="pk-mv__statement">
       {ctx.t(content.heading) && <h2 className="pk-h3 pk-muted">{ctx.t(content.heading)}</h2>}
-      <p className="pk-mv__big">{ctx.t(content.mission)}</p>
-      {ctx.t(content.vision) && <p className="pk-sub">{ctx.t(content.vision)}</p>}
+      <p className="pk-mv__big">{ctx.rich(content.mission)}</p>
+      {ctx.t(content.vision) && <p className="pk-sub">{ctx.rich(content.vision)}</p>}
       <Values {...props} />
     </div>
   );

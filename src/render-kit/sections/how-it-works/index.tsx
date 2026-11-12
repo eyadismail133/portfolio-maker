@@ -22,7 +22,7 @@ const make = (layout: "horizontal" | "vertical"): VariantComponent<Content> =>
               </span>
               <div>
                 <h3 className="pk-h3">{ctx.t(step.title)}</h3>
-                <p className="pk-muted">{ctx.t(step.description)}</p>
+                <p className="pk-muted">{ctx.rich(step.description)}</p>
               </div>
             </li>
           ))}

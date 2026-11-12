@@ -52,7 +52,7 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - The editor sends the document to the frame with `postMessage` on every change; the frame re-renders only what changed. Target: change visible in under 100 ms.
 - In the frame, sections show an outline on hover and a small toolbar when selected (move up, move down, duplicate, delete). Clicking a section selects it and scrolls the left list to it; selecting in the list scrolls the preview to it.
 - "Preview" button in the top bar opens the page in a new tab without editing outlines.
-- Version 2: click any text in the preview to edit it in place.
+- Double-click any plain text in the preview to edit it in place (Enter or clicking away saves, Escape cancels). The frame sends `pk:edit` with the element's original and new text; the editor finds the one field holding that text in the selected section and changes it through `setTextAt`, so it is one undo step. Text with rich-text marks, or text that appears twice, sends `pk:note` and is edited in the form instead.
 
 ## State, saving, undo
 
@@ -104,3 +104,7 @@ The editor and the frame talk with messages: `pk:ready`, `pk:select`, `pk:action
 - A person who has never seen the editor can change the hero text, swap the design, reorder two sections and publish without help.
 - No action loses data on refresh.
 - The preview and the published page look the same.
+
+## Rich text and cropping
+- **Rich text** stays a plain string in the document, so no HTML is ever stored. Long text fields understand `**bold**`, `*italic*`, `[text](https://…)` and lines starting with `- ` as a list. The renderer (`render-kit/rich-text.tsx`) turns these into React elements, so all text is escaped; links go through `safeHref` and external ones get `rel="noopener noreferrer nofollow"`. A small format bar (B, I, Link, List) above each long text field inserts the marks around the selection.
+- **Crop:** choosing an image (not a GIF) opens a crop dialog first: Original, Square, 4:5, 4:3, 3:2 or 16:9, zoom 1–3x, drag or arrow keys to move. The cropped image then goes through the normal upload helper (resize, WebP).

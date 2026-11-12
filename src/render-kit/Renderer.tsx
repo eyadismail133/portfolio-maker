@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { dirOf, pickText, uiText } from "./i18n";
 import { getSection, type SectionContext } from "./registry";
+import { RichInline } from "./rich-text";
 import type { PortfolioDoc } from "./schema/document";
 import type { Lang } from "./schema/primitives";
 import "./sections";
@@ -35,6 +36,7 @@ export function Renderer({ doc, lang, fontLink = true, languageHrefs, formAction
     lang: language,
     dir: dirOf(language),
     t: (value) => pickText(value, language),
+    rich: (value) => <RichInline text={pickText(value, language)} />,
     ui: (key) => uiText(key, language),
     languages: doc.meta.languages,
     languageLinks: doc.meta.languages.flatMap((other) => {

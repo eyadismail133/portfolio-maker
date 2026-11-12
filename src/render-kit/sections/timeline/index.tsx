@@ -22,7 +22,9 @@ const make = (layout: "vertical" | "horizontal"): VariantComponent<Content> =>
               <p className="pk-milestones__date">{ctx.t(item.date)}</p>
               <div>
                 <h3 className="pk-h3">{ctx.t(item.title)}</h3>
-                {ctx.t(item.description) && <p className="pk-muted">{ctx.t(item.description)}</p>}
+                {ctx.t(item.description) && (
+                  <p className="pk-muted">{ctx.rich(item.description)}</p>
+                )}
               </div>
             </li>
           ))}

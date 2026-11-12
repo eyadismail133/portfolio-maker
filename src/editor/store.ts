@@ -38,6 +38,8 @@ type EditorState = {
   setDevice: (device: Device) => void;
 
   updateContent: (id: string, content: unknown, group?: string) => void;
+  /** Text typed directly in the preview. */
+  setTextAt: (id: string, path: (string | number)[], text: string) => void;
   addSection: (type: string, variant?: string) => void;
   removeSection: (id: string) => void;
   duplicateSection: (id: string) => void;
@@ -132,6 +134,7 @@ export const useEditor = create<EditorState>((set, get) => {
     setDevice: (device) => set({ device }),
 
     updateContent: (id, content, group) => change((doc) => ops.setContent(doc, id, content), group),
+    setTextAt: (id, path, text) => change((doc) => ops.setTextAt(doc, id, path, text, get().lang)),
 
     addSection: (type, variant) => {
       const { doc, selectedId, commit } = get();

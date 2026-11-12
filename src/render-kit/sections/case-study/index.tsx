@@ -26,7 +26,7 @@ function Head({ content, ctx }: SectionProps<Content>) {
   return (
     <header className="pk-case__head">
       <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-      {ctx.t(content.summary) && <p className="pk-case__summary">{ctx.t(content.summary)}</p>}
+      {ctx.t(content.summary) && <p className="pk-case__summary">{ctx.rich(content.summary)}</p>}
       {meta.length > 0 && (
         <dl className="pk-facts">
           {meta.map(([label, value]) => (

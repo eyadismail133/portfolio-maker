@@ -15,7 +15,7 @@ const make = (layout: "banner" | "inline"): VariantComponent<Content> =>
       <div className={`pk-cv pk-cv--${layout} ${layout === "banner" ? "pk-card" : ""}`}>
         <div>
           <h2 className={layout === "banner" ? "pk-h2" : "pk-h3"}>{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.t(content.body)}</p>}
+          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
         </div>
         {label && content.file && (
           <a

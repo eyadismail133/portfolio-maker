@@ -24,7 +24,7 @@ function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: stri
   return (
     <figure className={className}>
       <blockquote>
-        <p>{ctx.t(item.quote)}</p>
+        <p>{ctx.rich(item.quote)}</p>
       </blockquote>
       <figcaption>
         <Media asset={item.photo} label={ctx.t(item.name)} className="pk-testi__photo" />

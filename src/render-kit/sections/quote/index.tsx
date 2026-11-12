@@ -13,7 +13,7 @@ const make = (layout: "simple" | "boxed"): VariantComponent<Content> =>
         className={`pk-bigquote pk-bigquote--${layout} ${layout === "boxed" ? "pk-card" : ""}`}
       >
         <blockquote>
-          <p>{ctx.t(content.quote)}</p>
+          <p>{ctx.rich(content.quote)}</p>
         </blockquote>
         {ctx.t(content.author) && (
           <figcaption>

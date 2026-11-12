@@ -5,6 +5,7 @@ import { Renderer } from "@/render-kit/Renderer";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import "@/render-kit/styles/index.css";
+import { findTextPath } from "./doc-ops";
 import "./preview.css";
 
 export type SectionAction = "up" | "down" | "duplicate" | "delete";
@@ -24,7 +25,9 @@ export type FromPreview =
   | { type: "pk:ready" }
   | { type: "pk:select"; id: string }
   | { type: "pk:action"; id: string; action: SectionAction }
-  | { type: "pk:key"; key: string; ctrl: boolean; shift: boolean };
+  | { type: "pk:key"; key: string; ctrl: boolean; shift: boolean }
+  | { type: "pk:edit"; id: string; path: (string | number)[]; text: string }
+  | { type: "pk:note"; text: string };
 
 const TOOL_LABELS: Record<SectionAction, string> = {
   up: "Move up",
@@ -62,7 +65,9 @@ export function PreviewFrame() {
     };
     // Shortcuts pressed while the preview has focus still reach the editor.
     const onKey = (event: KeyboardEvent) => {
-      const editing = (event.target as HTMLElement).closest("input, textarea, select");
+      const editing = (event.target as HTMLElement).closest(
+        "input, textarea, select, [contenteditable]",
+      );
       if (editing) return;
       const ctrl = event.ctrlKey || event.metaKey;
       if (ctrl || event.key === "Delete" || event.key === "Backspace") {
@@ -122,8 +127,62 @@ export function PreviewFrame() {
   const tools: SectionAction[] = ["up", "down", "duplicate", "delete"];
   const enabled = (action: SectionAction) => action === "delete" || state.tools[action];
 
+  /** Double-click a text to type over it. Enter or clicking away keeps it; Escape cancels. */
+  const onDoubleClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target.closest(".pk-editor-toolbar")) return;
+    const section = target.closest<HTMLElement>(".pk-section");
+    const content = state.doc.sections.find((s) => s.id === section?.id)?.content;
+    if (!section || content === undefined) return;
+    // The smallest element holding the text that was clicked.
+    const el =
+      target.closest<HTMLElement>(
+        "h1, h2, h3, h4, p, li, dt, dd, a, span, strong, em, blockquote, figcaption, summary, label > span",
+      ) ?? target;
+    const original = el.innerText;
+    const path = findTextPath(content, state.lang, original);
+    if (!path) {
+      send({ type: "pk:note", text: "Edit this text in the form on the right." });
+      return;
+    }
+    event.preventDefault();
+    el.setAttribute("contenteditable", "plaintext-only");
+    el.setAttribute("data-pk-editing", "");
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    let cancelled = false;
+    const finish = () => {
+      el.removeEventListener("blur", finish);
+      el.removeEventListener("keydown", onKey);
+      el.removeAttribute("contenteditable");
+      el.removeAttribute("data-pk-editing");
+      const text = el.innerText.replace(/\n$/, "");
+      if (cancelled) el.innerText = original;
+      else if (text !== original) send({ type: "pk:edit", id: section.id, path, text });
+    };
+    const onKey = (e: KeyboardEvent) => {
+      e.stopPropagation();
+      if (e.key === "Escape") {
+        cancelled = true;
+        el.blur();
+      } else if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        el.blur();
+      }
+    };
+    el.addEventListener("blur", finish);
+    el.addEventListener("keydown", onKey);
+  };
+
   return (
-    <div onClickCapture={onClick} onSubmitCapture={(event) => event.preventDefault()}>
+    <div
+      onClickCapture={onClick}
+      onDoubleClick={onDoubleClick}
+      onSubmitCapture={(event) => event.preventDefault()}
+    >
       <Renderer doc={state.doc} lang={state.lang} />
       {selectedId && toolbarTop !== null && (
         <div

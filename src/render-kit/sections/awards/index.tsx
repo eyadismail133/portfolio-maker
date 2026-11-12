@@ -33,7 +33,9 @@ const make = (layout: "list" | "cards"): VariantComponent<Content> =>
                 {ctx.t(item.organization) && (
                   <p className="pk-awards__org">{ctx.t(item.organization)}</p>
                 )}
-                {ctx.t(item.description) && <p className="pk-muted">{ctx.t(item.description)}</p>}
+                {ctx.t(item.description) && (
+                  <p className="pk-muted">{ctx.rich(item.description)}</p>
+                )}
               </div>
             </li>
           ))}

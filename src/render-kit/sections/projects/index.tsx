@@ -38,7 +38,9 @@ function Project({
           <h3 className="pk-h3">{title}</h3>
           {item.year && <span className="pk-project__year">{item.year}</span>}
         </div>
-        {ctx.t(item.description) && <p className="pk-project__text">{ctx.t(item.description)}</p>}
+        {ctx.t(item.description) && (
+          <p className="pk-project__text">{ctx.rich(item.description)}</p>
+        )}
         {tags.length > 0 && (
           <ul className="pk-tags pk-tags--small">
             {tags.map((tag, i) => (

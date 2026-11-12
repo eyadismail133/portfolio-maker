@@ -27,7 +27,7 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
         <li key={i}>
           <Icon name={item.icon} />
           <h3 className="pk-h3">{ctx.t(item.title)}</h3>
-          <p className="pk-muted">{ctx.t(item.description)}</p>
+          <p className="pk-muted">{ctx.rich(item.description)}</p>
         </li>
       ))}
     </ul>
@@ -42,7 +42,7 @@ const Rows: VariantComponent<Content> = ({ content, ctx }) => (
           <Media asset={item.image} label={ctx.t(item.title)} className="pk-features__image" />
           <div>
             <h3 className="pk-h3">{ctx.t(item.title)}</h3>
-            <p className="pk-muted">{ctx.t(item.description)}</p>
+            <p className="pk-muted">{ctx.rich(item.description)}</p>
           </div>
         </li>
       ))}

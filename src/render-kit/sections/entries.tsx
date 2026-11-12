@@ -1,3 +1,4 @@
+import { RichInline } from "../rich-text";
 import { formatRange } from "../i18n";
 import type { SectionContext } from "../registry";
 
@@ -26,7 +27,11 @@ function EntryBody({ entry, ctx }: { entry: Entry; ctx: SectionContext }) {
           {[entry.place, entry.location].filter(Boolean).join(", ")}
         </p>
       )}
-      {entry.body && <p className="pk-entry__text">{entry.body}</p>}
+      {entry.body && (
+        <p className="pk-entry__text">
+          <RichInline text={entry.body} />
+        </p>
+      )}
       {entry.points.length > 0 && (
         <ul className="pk-entry__points">
           {entry.points.map((point, i) => (

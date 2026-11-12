@@ -31,7 +31,7 @@ const Columns: VariantComponent<Content> = ({ content, ctx }) => (
       {content.items.map((item, i) => (
         <div key={i}>
           <dt className="pk-h3">{ctx.t(item.question)}</dt>
-          <dd className="pk-muted">{ctx.t(item.answer)}</dd>
+          <dd className="pk-muted">{ctx.rich(item.answer)}</dd>
         </div>
       ))}
     </dl>

@@ -186,6 +186,10 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
       }
       if (event.data?.type === "pk:select") select(event.data.id);
       if (event.data?.type === "pk:action") runAction(event.data.id, event.data.action);
+      if (event.data?.type === "pk:edit") {
+        useEditor.getState().setTextAt(event.data.id, event.data.path, event.data.text);
+      }
+      if (event.data?.type === "pk:note") setNotice(event.data.text);
       if (event.data?.type === "pk:key") {
         const { key, ctrl, shift } = event.data;
         window.dispatchEvent(new KeyboardEvent("keydown", { key, ctrlKey: ctrl, shiftKey: shift }));

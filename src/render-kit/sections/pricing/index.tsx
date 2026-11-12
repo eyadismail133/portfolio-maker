@@ -32,7 +32,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
           <p className="pk-plan__price">
             <strong>{ctx.t(plan.price)}</strong> <span>{ctx.t(plan.period)}</span>
           </p>
-          {ctx.t(plan.description) && <p className="pk-muted">{ctx.t(plan.description)}</p>}
+          {ctx.t(plan.description) && <p className="pk-muted">{ctx.rich(plan.description)}</p>}
           <ul className="pk-points">
             {plan.features.map((feature, f) => (
               <li key={f}>{ctx.t(feature)}</li>
@@ -55,7 +55,7 @@ const Table: VariantComponent<Content> = ({ content, ctx }) => (
               {ctx.t(plan.name)}
               {plan.featured && <span className="pk-plan__badge">{ctx.ui("popular")}</span>}
             </h3>
-            {ctx.t(plan.description) && <p className="pk-muted">{ctx.t(plan.description)}</p>}
+            {ctx.t(plan.description) && <p className="pk-muted">{ctx.rich(plan.description)}</p>}
           </div>
           <p className="pk-muted">
             {plan.features

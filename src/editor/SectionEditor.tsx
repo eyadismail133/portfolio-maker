@@ -1,28 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getSection, type AnySectionDefinition } from "@/render-kit/registry";
+import { getSection } from "@/render-kit/registry";
 import type { Section } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import { MiniPreview } from "@/components/MiniPreview";
-import { setAt, type Path } from "./doc-ops";
+import { isLocalizedIn } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
 import { useEditor } from "./store";
 import { IconButton, Label, PanelHeading, Segmented, inputClass } from "./ui";
 
 const ONLY_ENGLISH: Lang[] = ["en"];
-const localizedCache = new Map<string, boolean>();
-
-/** Finds out from the section's schema whether a text keeps one value per language. */
-function isLocalizedIn(def: AnySectionDefinition, content: unknown, path: Path): boolean {
-  const key = `${def.type}:${path.map((p) => (typeof p === "number" ? "*" : p)).join(".")}`;
-  const known = localizedCache.get(key);
-  if (known !== undefined) return known;
-  const result = def.schema.safeParse(setAt(content, path, { en: "x", ar: "x" })).success;
-  localizedCache.set(key, result);
-  return result;
-}
-
 type Tab = "content" | "layout" | "style";
 
 /** Right panel: edit the content, layout and style of the selected section. */

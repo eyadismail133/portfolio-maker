@@ -23,7 +23,7 @@ function Copy({ content, ctx }: Parameters<VariantComponent<Content>>[0]) {
     <div className="pk-hero__copy">
       {title && <p className="pk-hero__title">{title}</p>}
       <h1 className="pk-hero__name">{ctx.t(content.name)}</h1>
-      {intro && <p className="pk-hero__intro">{intro}</p>}
+      {intro && <p className="pk-hero__intro">{ctx.rich(content.intro)}</p>}
       <div className="pk-hero__actions">
         <ButtonLink link={content.primaryCta} ctx={ctx} />
         <ButtonLink link={content.secondaryCta} ctx={ctx} kind="ghost" />

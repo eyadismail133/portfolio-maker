@@ -465,3 +465,24 @@
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
+
+/* Marks inside long texts (rich-text.tsx). */
+.pk-root .pk-inline-link {
+  color: var(--pk-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.pk-root .pk-rich-list {
+  list-style: disc;
+  padding-inline-start: 1.25em;
+  display: grid;
+  gap: 0.35em;
+}
+.pk-root .pk-rich-list + p,
+.pk-root p + .pk-rich-list {
+  margin-block-start: 0.75em;
+}
+.pk-root strong {
+  font-weight: 700;
+}

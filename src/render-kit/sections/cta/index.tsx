@@ -12,7 +12,7 @@ const make = (layout: "banner" | "minimal"): VariantComponent<Content> =>
       <div className={`pk-cta__box pk-cta__box--${layout}`}>
         <div>
           <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.t(content.body)}</p>}
+          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
         </div>
         <ButtonLink link={content.button} ctx={ctx} />
       </div>

@@ -27,7 +27,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
         <li key={i} className="pk-card">
           <Icon name={item.icon} />
           <h3 className="pk-h3">{ctx.t(item.title)}</h3>
-          <p className="pk-muted">{ctx.t(item.description)}</p>
+          <p className="pk-muted">{ctx.rich(item.description)}</p>
           {ctx.t(item.price) && <p className="pk-services__price">{ctx.t(item.price)}</p>}
         </li>
       ))}
@@ -42,7 +42,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
         <li key={i}>
           <div>
             <h3 className="pk-h3">{ctx.t(item.title)}</h3>
-            <p className="pk-muted">{ctx.t(item.description)}</p>
+            <p className="pk-muted">{ctx.rich(item.description)}</p>
           </div>
           {ctx.t(item.price) && <p className="pk-services__price">{ctx.t(item.price)}</p>}
         </li>
