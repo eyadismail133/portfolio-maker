@@ -2,7 +2,7 @@
 
 A website where anyone can build a rich portfolio landing page (personal profile, company, startup, freelancer, agency...) without design skills: log in, answer a few questions, pick a starting idea, fill in the data, adjust design and colors with a live preview, then publish or download as HTML.
 
-**Status:** Phase 0 code setup is done. Two account steps remain (Supabase project, Vercel deploy), then Phase 1 in `docs/06-ROADMAP.md`.
+**Status:** Phase 0 is done except the Vercel deploy. Next is Phase 1 in `docs/06-ROADMAP.md`.
 
 ## Run it on your computer
 

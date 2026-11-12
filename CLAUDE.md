@@ -25,4 +25,5 @@ Read `README.md` first, then the doc for the area you are touching. The plan liv
 ## Naming
 - Section types: lowercase with dashes (`hero`, `work-experience`). Variants: `hero.split`, `hero.centered`.
 - Components: PascalCase files. Everything else: kebab-case.
-- Commits: short, present tense, start with the area: `render-kit: add timeline section`.
+- Commits: short, present tense, start with the area: `render-kit: add timeline section`. The message describes the updates only: no mention of AI tools or assistants, no co-author or session lines.
+- Supabase helpers live in `src/lib/supabase` (`client.ts`, `server.ts`, `proxy.ts`). Next.js 16 names the middleware file `src/proxy.ts`.

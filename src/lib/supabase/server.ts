@@ -15,7 +15,7 @@ export async function createClient() {
             cookieStore.set(name, value, options);
           }
         } catch {
-          // Server components cannot set cookies; the session refresh in Phase 3 handles it.
+          // Server components cannot set cookies; src/proxy.ts refreshes the session instead.
         }
       },
     },

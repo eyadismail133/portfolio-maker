@@ -8,8 +8,10 @@ Tick tasks as they are finished. Each phase ends with something you can see work
 - [x] Supabase client code and `.env.example`
 - [x] Folder structure from `03-ARCHITECTURE.md`
 - [x] Local git repository with first commit
-- [ ] Create the Supabase project and fill in `.env.local` (needs the owner's Supabase account)
-- [ ] Push to GitHub and first deploy to Vercel (needs the owner's GitHub and Vercel accounts)
+- [x] Create the Supabase project and fill in `.env.local`
+- [x] Session refresh in `src/proxy.ts`
+- [x] Push to GitHub (`eyadismail133/portfolio-maker`)
+- [ ] First deploy to Vercel (needs the owner's Vercel account)
 
 **Result:** empty app online.
 
