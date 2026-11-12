@@ -9,6 +9,7 @@ import { normalizeDoc } from "@/render-kit/registry";
 import { createSampleDoc } from "@/render-kit/samples";
 import { renderKitCss } from "../../../scripts/bundle-css";
 import { publishChecks } from "../publish-checks";
+import { signupsCsv } from "../publishing";
 import { cleanSlugInput, RESERVED_SLUGS, slugProblem, suggestSlug } from "../slug";
 
 describe("link names", () => {
@@ -171,6 +172,39 @@ describe("HTML export", () => {
       'action="/api/contact?slug=mona"',
     );
     expect(renderToHtml(doc)).toContain('action="mailto:');
+  });
+
+  test("newsletter sign-ups go to the inbox unless the owner set a mailing list", () => {
+    const withNews = normalizeDoc(createSampleDoc({ sections: ["newsletter"], languages: ["en"] }));
+    const html = renderToHtml(withNews, { formAction: "/api/contact?slug=mona" });
+    expect(html).toContain('action="/api/contact?slug=mona&amp;kind=signup"');
+    expect(html).toContain("data-pk-contact");
+    const own = {
+      ...withNews,
+      sections: withNews.sections.map((s) =>
+        s.type === "newsletter"
+          ? { ...s, content: { ...(s.content as object), action: "https://list.example/sub" } }
+          : s,
+      ),
+    };
+    expect(renderToHtml(own, { formAction: "/api/contact?slug=mona" })).toContain(
+      'action="https://list.example/sub"',
+    );
+  });
+
+  test("sign-up CSV quotes cells and defuses formulas", () => {
+    const csv = signupsCsv(
+      [
+        { id: "1", portfolioId: "p", email: "=cmd@x.co", createdAt: "2026-11-01T10:00:00Z" },
+        { id: "2", portfolioId: "p", email: "a@b.co", createdAt: "2026-11-02T10:00:00Z" },
+      ],
+      { p: 'My "page"' },
+    );
+    expect(csv.split("\r\n")).toEqual([
+      "email,page,date",
+      `"'=cmd@x.co","My ""page""","2026-11-01"`,
+      `"a@b.co","My ""page""","2026-11-02"`,
+    ]);
   });
 
   test("file names per language", () => {

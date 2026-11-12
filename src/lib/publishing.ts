@@ -172,6 +172,41 @@ export async function deleteMessage(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export type Signup = { id: string; portfolioId: string; email: string; createdAt: string };
+
+/** Addresses left in the newsletter sections of the account's pages, newest first. */
+export async function listSignups(): Promise<Signup[]> {
+  const { data, error } = await createClient()
+    .from("newsletter_signups")
+    .select("id, portfolio_id, email, created_at")
+    .order("created_at", { ascending: false })
+    .limit(5000);
+  if (error) throw error;
+  return (data as Record<string, unknown>[]).map((row) => ({
+    id: String(row.id),
+    portfolioId: String(row.portfolio_id),
+    email: String(row.email),
+    createdAt: String(row.created_at),
+  }));
+}
+
+export async function deleteSignup(id: string): Promise<void> {
+  const { error } = await createClient().from("newsletter_signups").delete().eq("id", id);
+  if (error) throw error;
+}
+
+/** A spreadsheet-ready list of sign-ups. Cells that look like formulas are made plain text. */
+export function signupsCsv(signups: Signup[], titles: Record<string, string>): string {
+  const cell = (value: string) => {
+    const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
+  const rows = signups.map((s) =>
+    [s.email, titles[s.portfolioId] ?? "", s.createdAt.slice(0, 10)].map(cell).join(","),
+  );
+  return ["email,page,date", ...rows].join("\r\n");
+}
+
 /** Visits per portfolio over the last 30 days. */
 export async function viewCounts(): Promise<Record<string, number>> {
   const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().slice(0, 10);
