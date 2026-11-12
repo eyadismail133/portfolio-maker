@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { buttonClass, inputClass, Label, primaryButtonClass } from "@/editor/ui";
 import { clearDraft, clearPending, readDraft, readPending } from "@/lib/local-drafts";
+import { addStoredPicture } from "@/lib/picture-store";
 import {
   createPortfolio,
   deletePortfolio,
@@ -72,7 +73,8 @@ export function Dashboard() {
       const pending = readPending();
       if (pending) {
         try {
-          const id = await createPortfolio(pending.doc, pending.title || pending.doc.meta.title);
+          const doc = await addStoredPicture(pending.doc);
+          const id = await createPortfolio(doc, pending.title || pending.doc.meta.title);
           if (pending.answers) await saveOnboardingAnswers(pending.answers, id);
           clearPending();
           router.replace(`/editor/${id}`);

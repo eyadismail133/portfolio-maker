@@ -5,6 +5,7 @@ import type { LocalizedText } from "@/render-kit/schema/primitives";
 import { buildPalette } from "@/render-kit/themes/color";
 import { getFamily } from "@/render-kit/themes/families";
 import { getPalette, palettes } from "@/render-kit/themes/palettes";
+import { getBusiness } from "./business-content";
 import { getField } from "./content";
 import { recipeFor } from "./recipes";
 import { isOrganisation, STYLES, type Answers, type StyleId, type Who } from "./types";
@@ -95,6 +96,7 @@ const both = (text: string): LocalizedText => text;
 /** Puts the person's name, title and field text into the sample content. */
 function personalise(doc: PortfolioDoc, answers: Answers): PortfolioDoc {
   const pack = getField(answers.field);
+  const business = getBusiness(answers.field);
   const organisation = isOrganisation(answers.who);
   const name = answers.name.trim();
   const title = answers.title.trim();
@@ -138,6 +140,9 @@ function personalise(doc: PortfolioDoc, answers: Answers): PortfolioDoc {
         : c,
     services: (c) =>
       pack ? { ...c, items: pack.services.map((service) => ({ ...service, price: "" })) } : c,
+    "how-it-works": (c) => (business ? { ...c, steps: business.steps } : c),
+    faq: (c) => (business ? { ...c, items: business.faq } : c),
+    "case-study": (c) => (business ? { ...c, ...business.caseStudy, year: String(year - 1) } : c),
   };
 
   const sections = doc.sections.map((section) => {

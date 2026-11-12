@@ -53,7 +53,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Editor layout for phones and small tablets (panel slides in, section form as a bottom sheet)
 - [x] More keyboard shortcuts: Delete, Ctrl+D, Ctrl+S (also while the preview has focus)
 - [x] Share image and favicon in Settings (the link name is chosen in the Publish dialog)
-- [ ] Rich text (bold, italic, links, lists) in long text fields
+- [x] Rich text (bold, italic, links, lists) in long text fields: `**bold**`, `*italic*`, `[text](url)` and `- ` lists, with a format bar; stored as plain text, rendered escaped
 
 **Result:** full editing works locally without an account. Open `/editor`.
 
@@ -66,7 +66,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Run the setup in `docs/07-SUPABASE-SETUP.md` (done by the owner; checked on 13 November 2026, one permission fixed in `0003`)
 - [x] Run `0003` and `0004` (checked live on 13 November 2026)
 - [ ] Confirm the Site URL and Redirect URLs, and try a real sign-up
-- [ ] Image crop tool
+- [x] Image crop tool (ratios, zoom, drag or arrow keys; runs before upload)
 - [x] Media library to reuse uploaded images ("My images" on every image field)
 - [x] Account page: name, password, plan, storage used, payment history, delete account (`/account`)
 
@@ -80,8 +80,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Ideas screen with live mini previews, "6 more", "start blank"
 - [x] Save answers
 - [x] Try without an account: the chosen idea waits in the browser and is saved after login
-- [ ] Field-specific sample text for the business sections too (case study, team, pricing, FAQ and others still show the clinic-software example)
-- [ ] Photo or logo upload in the last question
+- [x] Field-specific sample text for the business sections: how it works, FAQ and case study for all ten fields (team, pricing and partners keep one general example that is clearly sample text)
+- [x] Photo or logo upload in the last question (kept in the browser until login, then uploaded and placed in the hero or navbar)
 
 **Result:** the full main idea works: login, questions, ideas, edit.
 
@@ -106,7 +106,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Version history: saved on every publish and by hand, newest 30 kept, restore is undoable
 - [ ] 6 more design families
 - [ ] Remaining "later" sections
-- [ ] Edit text directly in the preview
+- [x] Edit text directly in the preview (double-click plain text; marked-up text opens in the form)
 - [ ] CV / LinkedIn import to fill data
 - [x] AI writing help for Pro accounts: first draft, improve, shorten, translate between English and Arabic; free model (Google Gemini by default, any OpenAI-format service), 50 uses a day
 - [x] Add the AI key in `.env.local` (Vercel: owner)

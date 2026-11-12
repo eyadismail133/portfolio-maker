@@ -38,7 +38,7 @@ One question per screen, large clickable cards, never more than 8 steps. Every q
 | 5 | Colors? | Ready palettes, or "I have a brand color" (color picker), plus Light / Dark / Both | Palette |
 | 6 | What do you have ready? | Many: photos of me or team, project images, logo, testimonials, CV, video, client logos, numbers to show | Sections with images vs text-first sections |
 | 7 | Which language? | English / Arabic / Both | Direction, fonts, language switch |
-| 8 | Basics | Name (or company name), one-line title, optional photo or logo | Fills the hero so ideas look real |
+| 8 | Basics | Name (or company name), one-line title, optional photo or logo | Fills the hero so ideas look real. The photo or logo is kept in the browser (IndexedDB) until there is an account, then uploaded when the chosen idea is saved: a photo goes into the hero, a logo into the navbar |
 
 ## How ideas are generated (rules, no AI needed)
 

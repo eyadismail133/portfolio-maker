@@ -5,6 +5,7 @@ import { contrastProblems } from "@/render-kit/themes/color";
 import { families } from "@/render-kit/themes/families";
 import { getPalette } from "@/render-kit/themes/palettes";
 import { ICON_NAMES } from "@/render-kit/sections/icons";
+import { BUSINESS } from "../business-content";
 import { FIELDS } from "../content";
 import { blankStart, generateIdeas, LOOKS } from "../generate";
 import { recipeFor } from "../recipes";
@@ -142,6 +143,38 @@ describe("content and looks", () => {
     }
   });
 
+  test("every field has company text for steps, questions and a case study", () => {
+    for (const field of FIELDS) {
+      const pack = BUSINESS[field.id];
+      expect(pack, field.id).toBeDefined();
+      const texts = [
+        ...pack.steps.flatMap((s) => [s.title, s.description]),
+        ...pack.faq.flatMap((q) => [q.question, q.answer]),
+        ...Object.values(pack.caseStudy).filter((v) => !Array.isArray(v)),
+        ...pack.caseStudy.stats.map((s) => s.label),
+      ];
+      for (const value of texts) {
+        expect(text(value, "en"), field.id).not.toBe("");
+        expect(text(value, "ar"), field.id).not.toBe("");
+      }
+    }
+  });
+
+  test("company sections use the field's own text and still pass their schema", () => {
+    const ideas = generateIdeas(answers({ who: "company", field: "medicine", name: "Al Amal" }));
+    let checked = 0;
+    for (const idea of ideas) {
+      for (const section of idea.doc.sections) {
+        if (!["faq", "how-it-works", "case-study"].includes(section.type)) continue;
+        expect(getSection(section.type)!.schema.safeParse(section.content).success).toBe(true);
+        checked += 1;
+      }
+      const faq = content(idea.doc, "faq");
+      if (faq) expect(text((faq.items as { question: unknown }[])[0].question)).toMatch(/insurance/);
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
   test("every look points at a real family and real fonts", () => {
     for (const look of Object.values(LOOKS).flat()) {
       expect(
@@ -154,5 +187,19 @@ describe("content and looks", () => {
           look.name,
         ).toBe(true);
     }
+  });
+});
+
+describe("onboarding picture", () => {
+  const asset = { assetId: "a1", url: "https://x.test/a.webp", alt: "Sara", width: 800, height: 800 };
+
+  test("a photo goes into the hero and a logo into the navbar", async () => {
+    const { withPicture } = await import("../picture");
+    const [idea] = generateIdeas(answers({ name: "Sara" }));
+    const photo = withPicture(idea.doc, asset, "photo");
+    expect((content(photo, "hero").image as { url: string }).url).toBe(asset.url);
+    const logo = withPicture(idea.doc, asset, "logo");
+    expect((content(logo, "navbar").logo as { url: string }).url).toBe(asset.url);
+    expect(content(logo, "hero").image).toEqual(content(idea.doc, "hero").image);
   });
 });

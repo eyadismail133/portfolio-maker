@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { buttonClass, inputClass, Label, primaryButtonClass, Segmented } from "@/editor/ui";
 import { readAnswers, writeAnswers } from "@/lib/local-drafts";
+import { clearPicture, readPicture, writePicture } from "@/lib/picture-store";
 import { FIELDS } from "@/recommend/content";
 import { LOOKS } from "@/recommend/generate";
 import {
@@ -106,6 +107,82 @@ function Choice(props: {
         )}
       </span>
     </button>
+  );
+}
+
+/** An optional photo (people) or logo (organisations), kept in the browser until it is uploaded. */
+function PicturePicker({ organisation }: { organisation: boolean }) {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [problem, setProblem] = useState("");
+  const kind = organisation ? "logo" : "photo";
+
+  useEffect(() => {
+    let url: string | null = null;
+    readPicture().then((picture) => {
+      if (!picture) return;
+      url = URL.createObjectURL(picture.file);
+      setPreview(url);
+    });
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  const choose = async (file: File | undefined) => {
+    setProblem("");
+    if (!file) return;
+    if (!file.type.startsWith("image/"))
+      return setProblem("Choose an image file (JPG, PNG or WebP).");
+    if (file.size > 25 * 1024 * 1024) return setProblem("This file is larger than 25 MB.");
+    if (!(await writePicture({ file, name: file.name, kind })))
+      return setProblem("Your browser could not keep this file. Add it in the editor instead.");
+    setPreview((old) => {
+      if (old) URL.revokeObjectURL(old);
+      return URL.createObjectURL(file);
+    });
+  };
+
+  const remove = async () => {
+    await clearPicture();
+    setPreview((old) => {
+      if (old) URL.revokeObjectURL(old);
+      return null;
+    });
+  };
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="onboarding-picture">
+        {organisation ? "Your logo (optional)" : "Your photo (optional)"}
+      </Label>
+      <div className="flex items-center gap-3">
+        {preview && (
+          // eslint-disable-next-line @next/next/no-img-element -- a local preview, not a page image
+          <img
+            src={preview}
+            alt=""
+            className={`h-14 w-14 border border-zinc-200 bg-white object-cover dark:border-zinc-700 ${organisation ? "rounded-md object-contain" : "rounded-full"}`}
+          />
+        )}
+        <input
+          id="onboarding-picture"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="text-sm file:me-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-1.5 file:text-sm dark:file:border-zinc-700 dark:file:bg-zinc-900"
+          onChange={(e) => choose(e.target.files?.[0])}
+        />
+        {preview && (
+          <button type="button" className={buttonClass} onClick={remove}>
+            Remove
+          </button>
+        )}
+      </div>
+      {problem && (
+        <p role="alert" className="text-xs text-red-700 dark:text-red-400">
+          {problem}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -414,9 +491,10 @@ export function Onboarding() {
                   onChange={(e) => set({ title: e.target.value })}
                 />
               </div>
+              <PicturePicker organisation={organisation} />
               <p className="text-xs text-zinc-500">
-                These go straight into your starter ideas. You can add a photo or logo in the
-                editor.
+                These go straight into your starter ideas. The {organisation ? "logo" : "photo"} is
+                added when you open one; you can change it later in the editor.
               </p>
             </div>
           )}

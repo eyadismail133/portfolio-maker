@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { buttonClass, primaryButtonClass } from "@/editor/ui";
 import { readAnswers, writePending } from "@/lib/local-drafts";
+import { addStoredPicture } from "@/lib/picture-store";
 import { createPortfolio, friendlyError, saveOnboardingAnswers } from "@/lib/portfolios";
 import { createClient } from "@/lib/supabase/client";
 import { blankStart, generateIdeas } from "@/recommend/generate";
@@ -49,7 +50,7 @@ export function Ideas() {
         router.push("/signup");
         return;
       }
-      const id = await createPortfolio(doc, title);
+      const id = await createPortfolio(await addStoredPicture(doc), title);
       await saveOnboardingAnswers(answers, id);
       router.push(`/editor/${id}`);
     } catch (error) {
