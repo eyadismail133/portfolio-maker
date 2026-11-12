@@ -56,11 +56,27 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 
 ## State, saving, undo
 
-- One Zustand store holds the document. Every change goes through a named action (`updateContent`, `moveSection`, `setTheme`, ...). No component edits the document directly.
-- Undo/redo: keep a history of patches (Immer patches), 100 steps. Typing in one field is grouped into one step.
-- Autosave: 1.5 seconds after the last change, save to the database. Show "Saving..." then "Saved". Also keep a copy in the browser so nothing is lost if the connection drops.
-- If the same portfolio is open in two tabs, the newest save wins and the other tab shows "Updated elsewhere, reload".
-- Keyboard: Ctrl+Z, Ctrl+Shift+Z, Ctrl+S (save now), Delete (remove selected section, with confirm), Ctrl+D (duplicate).
+- One Zustand store (`src/editor/store.ts`) holds the document. Every change goes through a named action (`updateContent`, `moveSection`, `setTheme`, ...). No component edits the document directly.
+- The actions call pure functions in `src/editor/doc-ops.ts`, which return a new document and are easy to test.
+- Every content change is checked against the section's schema before it is accepted. The schema also fills in missing values, so a new list item starts complete, and a bad edit can never reach the page.
+- Undo/redo keeps the last 100 documents. Documents share everything that did not change, so this is cheap. Typing in one field is grouped into one step.
+- Text is stored per language only when the portfolio has two languages. The form asks the schema whether a text field keeps one value per language, so plain fields such as an email stay plain.
+- Until accounts exist (Phase 3), the draft is saved in the browser 0.6 seconds after the last change, with a "Saving…" then "Saved in this browser" status.
+- Later: autosave to the database with an offline copy, and "Updated elsewhere, reload" when the same portfolio is open in two tabs.
+- Keyboard: Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y today. Ctrl+S, Delete and Ctrl+D are still to do.
+
+## Code map
+
+| File | What it does |
+|---|---|
+| `src/editor/Editor.tsx` | Page layout, preview frame messaging, saving, keyboard |
+| `src/editor/panels.tsx` | Left panel: Sections, Design, Settings |
+| `src/editor/SectionEditor.tsx` | Right panel: Content, Layout, Style of the selected section |
+| `src/editor/fields.tsx` | One form control per field type; builds forms from a section's `fields` |
+| `src/editor/PreviewFrame.tsx` | The page inside the frame (`/preview`); renders what the editor sends, reports clicks |
+| `src/editor/store.ts`, `doc-ops.ts` | State and document changes |
+
+The editor and the frame talk with four messages: `pk:ready` and `pk:select` from the frame, `pk:state` and `pk:scroll` to it. Both sides ignore messages from any other origin.
 
 ## Images
 

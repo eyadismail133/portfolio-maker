@@ -1,0 +1,14 @@
+/* Editing helpers shown only inside the editor's preview frame. */
+.pk-root {
+  min-height: 100dvh;
+}
+.pk-section {
+  cursor: pointer;
+  outline-offset: -2px;
+}
+.pk-section:hover {
+  outline: 2px solid rgb(37 99 235 / 0.4);
+}
+.pk-section[data-pk-selected] {
+  outline: 2px solid #2563eb;
+}

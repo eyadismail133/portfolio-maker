@@ -2,7 +2,7 @@
 
 A website where anyone can build a rich portfolio landing page (personal profile, company, startup, freelancer, agency...) without design skills: log in, answer a few questions, pick a starting idea, fill in the data, adjust design and colors with a live preview, then publish or download as HTML.
 
-**Status:** Phase 1 is nearly done. The render kit has 6 design families and all 39 version 1 sections; open `/dev/render` to try it. Remaining tasks are in `docs/06-ROADMAP.md`.
+**Status:** Phase 1 is done except one font check, and the first version of the Phase 2 editor works at `/editor` (the draft is kept in the browser). Remaining tasks are in `docs/06-ROADMAP.md`.
 
 ## Run it on your computer
 

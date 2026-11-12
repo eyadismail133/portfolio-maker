@@ -24,6 +24,7 @@ export type VariantComponent<C> = (props: SectionProps<C>) => ReactElement | nul
 
 /** Tells the editor which form field to show for a piece of content. */
 export type FieldDef = {
+  /** Name of the content value. A dot reaches into a nested object: "problem.title". */
   key: string;
   label: string;
   type:

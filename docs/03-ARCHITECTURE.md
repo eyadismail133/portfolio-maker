@@ -8,9 +8,9 @@
 | App interface styling | Tailwind CSS | Fast to build dashboard and editor |
 | Portfolio styling | Plain CSS with CSS variables (the render kit) | Exported HTML stays clean and small |
 | Login, database, files | Supabase (Auth, Postgres, Storage) | Ready login, row security, image hosting |
-| Editor state | Zustand + Immer | Simple, good for undo/redo |
+| Editor state | Zustand | Simple; undo/redo keeps earlier documents |
 | Validation | Zod | One schema for forms, saving, and migrations |
-| Drag to reorder | dnd-kit | |
+| Drag to reorder | Browser drag and drop, plus move buttons | No extra library needed so far |
 | Rich text | Tiptap (bold, italic, link, list only) | |
 | Tests | Vitest + Playwright | |
 | Hosting | Vercel + Supabase | |

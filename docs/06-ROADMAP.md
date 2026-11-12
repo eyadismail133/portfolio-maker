@@ -36,18 +36,25 @@ The core. No login, no editor yet; work with JSON files.
 **Result:** any sample JSON becomes a beautiful page in 6 designs.
 
 ## Phase 2 - Editor and preview (2 weeks)
-- [ ] Editor store with actions, undo/redo
-- [ ] Editor layout, preview frame with `postMessage` sync
-- [ ] Sections tab: list, reorder, hide, duplicate, delete, add from library
-- [ ] Automatic forms from section `fields`, all field types
-- [ ] Variant picker
-- [ ] Design tab: family, palettes, brand color, fonts, shape, spacing, shuffle
-- [ ] Select section by clicking in preview, section toolbar
-- [ ] Device size switch
-- [ ] Settings tab
-- [ ] Save to browser storage for now
+- [x] Editor store with actions, undo/redo
+- [x] Editor layout, preview frame with `postMessage` sync
+- [x] Sections tab: list, reorder (drag or buttons), hide, duplicate, delete, add from library
+- [x] Automatic forms from section `fields`, all field types
+- [x] Variant picker
+- [x] Design tab: family, palettes, brand color, light/dark, fonts, corners, spacing, shuffle
+- [x] Select section by clicking in preview
+- [x] Device size switch
+- [x] Settings tab: page title, description, languages
+- [x] Save to browser storage for now
+- [ ] Section toolbar inside the preview (move, duplicate, delete)
+- [ ] Small pictures of each layout and each design family in the pickers
+- [ ] Editing each palette color by hand
+- [ ] Editor layout for phones and small tablets
+- [ ] More keyboard shortcuts: Delete, Ctrl+D, Ctrl+S
+- [ ] Share image, favicon and link name in Settings (need uploads and publishing)
+- [ ] Rich text (bold, italic, links, lists) in long text fields
 
-**Result:** full editing works locally without an account.
+**Result:** full editing works locally without an account. Open `/editor`.
 
 ## Phase 3 - Accounts and saving (1 week)
 Can start in parallel with Phase 2.
