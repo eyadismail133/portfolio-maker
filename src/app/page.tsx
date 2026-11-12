@@ -43,7 +43,7 @@ const FEATURES = [
   },
   {
     title: "Yours to keep",
-    text: "Download a clean HTML version of your page and host it anywhere you like.",
+    text: "With Pro, download a clean HTML version of your page and host it anywhere you like.",
   },
   {
     title: "39 sections, 6 designs",

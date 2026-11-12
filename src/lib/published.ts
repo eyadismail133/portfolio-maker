@@ -3,7 +3,12 @@ import { normalizeDoc } from "@/render-kit/registry";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { createPublicClient } from "@/lib/supabase/public";
 
-export type Published = { title: string; doc: PortfolioDoc; publishedAt: string };
+export type Published = {
+  title: string;
+  doc: PortfolioDoc;
+  publishedAt: string;
+  showBadge: boolean;
+};
 
 export const publishedTag = (slug: string) => `published:${slug}`;
 
@@ -17,10 +22,17 @@ export async function getPublished(slug: string): Promise<Published | null> {
     p_slug: slug,
   });
   if (error) throw new Error(error.message);
-  const row = (data as { title: string; doc: unknown; published_at: string }[] | null)?.[0];
+  const row = (
+    data as { title: string; doc: unknown; published_at: string; show_badge?: boolean }[] | null
+  )?.[0];
   if (!row) return null;
   try {
-    return { title: row.title, doc: normalizeDoc(row.doc), publishedAt: row.published_at };
+    return {
+      title: row.title,
+      doc: normalizeDoc(row.doc),
+      publishedAt: row.published_at,
+      showBadge: row.show_badge !== false,
+    };
   } catch {
     return null;
   }

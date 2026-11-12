@@ -10,10 +10,11 @@ import {
   deletePortfolio,
   duplicatePortfolio,
   friendlyError,
-  getMyPlan,
+  getMyAccount,
   listPortfolios,
   renamePortfolio,
   saveOnboardingAnswers,
+  type Account,
   type PortfolioSummary,
 } from "@/lib/portfolios";
 import { listMessages, viewCounts } from "@/lib/publishing";
@@ -47,7 +48,8 @@ export function Dashboard() {
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [views, setViews] = useState<Record<string, number>>({});
   const [unread, setUnread] = useState(0);
-  const [plan, setPlan] = useState<"free" | "pro" | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
+  const plan = account?.plan ?? null;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const refresh = useCallback(async () => {
@@ -86,8 +88,8 @@ export function Dashboard() {
       viewCounts()
         .then((counts) => !cancelled && setViews(counts))
         .catch(() => undefined);
-      getMyPlan()
-        .then((found) => !cancelled && setPlan(found))
+      getMyAccount()
+        .then((found) => !cancelled && setAccount(found))
         .catch(() => undefined);
       listMessages()
         .then((messages) => !cancelled && setUnread(messages.filter((m) => !m.isRead).length))
@@ -146,9 +148,19 @@ export function Dashboard() {
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${plan === "pro" ? "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"}`}
           >
-            {plan === "pro" ? "Pro" : "Free plan"}
+            {plan === "pro"
+              ? account?.proUntil
+                ? `Pro until ${new Date(account.proUntil).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}`
+                : "Pro"
+              : "Free plan"}
           </span>
         )}
+        <Link
+          href="/pro"
+          className="rounded-md px-2.5 py-1.5 text-sm font-medium text-violet-700 hover:bg-violet-50 dark:text-violet-300 dark:hover:bg-violet-950"
+        >
+          {plan === "pro" ? "Add Pro months" : "Go Pro"}
+        </Link>
         <button type="button" className={buttonClass} onClick={signOut}>
           Log out
         </button>

@@ -73,6 +73,7 @@ export async function publish(
     .eq("id", id);
   if (error) {
     if (error.code === "23505") throw new Error("taken");
+    if (/plan_limit_published/.test(error.message)) throw new Error("plan_limit_published");
     throw error;
   }
   await supabase.from("portfolio_versions").insert({ portfolio_id: id, doc, label: "Published" });
@@ -129,6 +130,8 @@ export async function loadVersion(versionId: string): Promise<PortfolioDoc> {
 
 export type Message = {
   id: string;
+  /** Arrived after the free monthly 50; readable after going Pro. */
+  locked: boolean;
   portfolioId: string;
   name: string;
   email: string;
@@ -140,12 +143,13 @@ export type Message = {
 export async function listMessages(): Promise<Message[]> {
   const { data, error } = await createClient()
     .from("form_submissions")
-    .select("id, portfolio_id, name, email, message, is_read, created_at")
+    .select("id, portfolio_id, name, email, message, is_read, locked, created_at")
     .order("created_at", { ascending: false })
     .limit(200);
   if (error) throw error;
   return (data as Record<string, unknown>[]).map((m) => ({
     id: String(m.id),
+    locked: m.locked === true,
     portfolioId: String(m.portfolio_id),
     name: String(m.name),
     email: String(m.email),

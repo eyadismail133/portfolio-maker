@@ -1,68 +1,47 @@
-# 08 - Plans and payments (proposal, needs the owner's decision)
+# 08 - Plans and payments
 
-Status: only one rule is built today: **AI writing is Pro only**. Everything else here is a proposal. When the owner decides, the chosen limits go into `src/lib/plans.ts` and the database.
+Decided on 13 November 2026 and built. Limits live in `src/lib/plans.ts` and are enforced by the database (`supabase/migrations/0004_plans_and_billing.sql`); a test fails if the two disagree.
 
-## Principles
-1. **Free must be good enough to publish a real portfolio.** People share free pages, and every shared page with the badge is advertising.
-2. **Charge for what costs us money or saves people real time:** AI, more pages, custom domains, removing the badge, the downloadable file.
-3. **Never hold content hostage.** If Pro ends, pages stay online on the free limits; nothing is deleted.
-
-## Proposed plans
+## Plans
 
 | | Free | Pro |
 |---|---|---|
-| Portfolios (drafts) | 3 | Unlimited |
-| Published portfolios | 1 | 10 |
+| Portfolios | 3 | Unlimited |
+| Published pages | 1 | 10 |
 | All 6 designs, 39 sections, 24 palettes | Yes | Yes |
 | Arabic and English | Yes | Yes |
-| Link | `/p/your-name` | `/p/your-name` + own domain (later) |
 | "Made with Portfolio Maker" badge | Shown | Removed |
-| Image uploads | 50 MB | 2 GB |
-| Contact form inbox | Yes, 50 messages a month | Unlimited |
-| Visits | Total for 30 days | Per day, sources, 12 months |
+| Image storage | 50 MB | 2 GB |
+| Contact form messages | 50 a month (later ones are kept, locked until Pro) | Unlimited |
+| Visits | Last 30 days | Last 30 days (per-day detail is a later task) |
 | Version history | Last 5 | Last 30 |
 | Download HTML | No | Yes |
 | AI writing | No | 50 uses a day |
-| PDF CV (later) | No | Yes |
-| Password-protected page (idea) | No | Yes |
+| Custom domain, PDF CV, password-protected page | Later | Later |
 
-A third plan can come later for agencies: many client portfolios, client hand-off, no branding anywhere.
+**Principle:** nothing is held hostage. When Pro ends the account is Free again: nothing is deleted, published pages stay online, and the free limits only stop new things (a 4th portfolio, a 2nd published page, more uploads).
 
-## Prices to consider
-Two price lists, because local and international buyers pay differently:
-- **Egypt (EGP):** about 150 EGP a month, or about 1,200 EGP a year (two months free). Also prepaid passes: 3 months, 6 months, 12 months.
-- **Everywhere else (USD):** about 5 USD a month or 48 USD a year.
-- **Students:** half price with a university email, or a free Pro year for graduation projects (good word of mouth).
-- **Launch offer:** first 500 accounts get Pro for life at the yearly price once.
+**Where limits are enforced:** portfolios, published pages, storage, versions, messages, badge and AI are enforced by the database and cannot be bypassed. Download HTML is built in the browser, so its Pro check is in the app only; someone technical could get around it. Locked messages are hidden by the app; their owner could read them through the API. Both are acceptable for now.
 
-Prices are a guess to start the discussion; test them with the first real users.
+## Price and how people pay
+- **250 EGP or 6 USD a month**, bought as prepaid months: 1, 3, 6 or 12. Straight multiples, no discount yet; change `MONTHLY_PRICE` or add a yearly discount in `src/lib/plans.ts` (and the `months` list in the migration if new lengths are added).
+- **Nothing renews by itself.** This works with every Paymob method: cards, mobile wallets, kiosks. Auto-renewing card subscriptions can come later.
+- Buying more months while Pro adds them after the current end date.
+- Pro can also be given by hand in the SQL editor with no end date (see `docs/07-SUPABASE-SETUP.md`).
 
-## The Egypt-specific point
-Many people in Egypt pay with **mobile wallets (Vodafone Cash and others), Fawry kiosks or InstaPay**, not cards. Those methods do not renew by themselves. So offer two ways to buy Pro:
-- **Subscription** (renews automatically): cards only.
-- **Prepaid pass** (3, 6 or 12 months, no renewal): cards, wallets and kiosks. Send a reminder email 7 days before it ends.
+## Payment flow (Paymob)
+1. `/pro` shows the table, months and currency. "Pay" calls `/api/billing/checkout`.
+2. The server works out the price itself, records a pending payment, and creates a Paymob **intention** (`POST /v1/intention/`) with the payment's id as `special_reference`. It sends the person to Paymob's unified checkout.
+3. Paymob calls `/api/billing/paymob` when the payment finishes. The server checks the **HMAC signature** (SHA-512 over Paymob's listed fields, with the HMAC secret). Only then does the database function `apply_paid_payment` mark the payment paid and add the months, and only if the amount and currency match the order exactly. A second call for the same payment changes nothing.
+4. Paymob sends the person back to `/pro/done`, which waits for step 3 and shows the result.
 
-## Payment providers
+The browser never decides that a payment succeeded; only a signed callback from Paymob can.
 
-| Provider | Good for | Notes |
-|---|---|---|
-| **Paymob** (Egyptian) | Egyptian customers in EGP | Cards (including Meeza), mobile wallets, kiosk payments, installments. Has a subscriptions API for recurring card payments. Needs Egyptian business papers to open an account. |
-| **Lemon Squeezy** (merchant of record) | International customers in USD | Handles sales tax and VAT worldwide for you; cards and PayPal. Lists Egypt for bank payouts. Fees are higher than a plain gateway (check its current pricing). |
-| **Paddle** (merchant of record) | International, larger scale | Like Lemon Squeezy; Egypt is not on its excluded list. Stricter approval. |
-| **Stripe** | Not an option for now | Stripe does not open accounts for businesses based in Egypt. |
+The Paymob addresses (`https://accept.paymob.com/v1/intention/` and the `https://eg.checkout.paymob.com/` checkout) come from Paymob's documentation and can be changed with `PAYMOB_API_URL` and `PAYMOB_CHECKOUT_URL` if Paymob gives you different ones. They have not been tried against Paymob itself yet; the first test with Paymob's test keys will confirm them.
 
-**Recommendation:** start with **Paymob** for Egypt (subscription for cards, prepaid passes for wallets and kiosks). Add **Lemon Squeezy** when international sales matter. Build the code so the provider is a detail: one subscriptions table, one webhook per provider.
-
-## How it would be built (after the decision)
-1. **Database (new migration):** a `subscriptions` table: account, provider, provider reference, plan, status, `current_period_end`. The account's plan is "pro" while `current_period_end` is in the future. People still cannot change their own plan.
-2. **Checkout:** a "Go Pro" page with the two price lists. The server creates a checkout with the provider and sends the person there.
-3. **Webhooks:** `/api/billing/paymob` (and later `/api/billing/lemonsqueezy`) checks the provider's signature, then records the payment with a server-only Supabase key. Payments are only trusted from webhooks, never from the browser.
-4. **Account page:** current plan, renewal or end date, receipts, cancel.
-5. **Enforce limits** from the table above in `src/lib/plans.ts` and in the database functions (publishing, uploads, AI).
-6. **Emails:** receipt, renewal reminder, pass ending soon.
-
-## Decisions needed from the owner
-1. The Free and Pro limits (accept, change or remove rows above).
-2. Prices in EGP and USD, and whether to offer prepaid passes.
-3. Payment provider to start with (recommended: Paymob), and whether the business papers it needs are ready.
-4. Whether to add an agency plan later.
+## Not built yet
+- Auto-renewing card subscriptions (Paymob subscriptions API).
+- An account page with payment history and receipts (payments are already stored and readable by their owner).
+- Emails: receipt, "Pro ends in 7 days".
+- Per-day visit charts for Pro.
+- International buyers through a merchant of record (Lemon Squeezy) if USD through Paymob is not enough.

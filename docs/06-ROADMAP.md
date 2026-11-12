@@ -64,7 +64,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Autosave to database with saved indicator, offline copy and "changed elsewhere" check
 - [x] Image upload: resize, WebP
 - [x] Run the setup in `docs/07-SUPABASE-SETUP.md` (done by the owner; checked on 13 November 2026, one permission fixed in `0003`)
-- [ ] Run `0003_ai_and_permissions.sql`, confirm the Site URL and Redirect URLs, and try a real sign-up
+- [ ] Run `0003` and `0004`, confirm the Site URL and Redirect URLs, and try a real sign-up
 - [ ] Image crop tool
 - [ ] Media library to reuse uploaded images
 - [ ] Account settings page (name, change password, delete account)
@@ -108,19 +108,24 @@ The core. No login, no editor yet; work with JSON files.
 - [ ] Edit text directly in the preview
 - [ ] CV / LinkedIn import to fill data
 - [x] AI writing help for Pro accounts: first draft, improve, shorten, translate between English and Arabic; free model (Google Gemini by default, any OpenAI-format service), 50 uses a day
-- [ ] Add the AI key in Vercel and `.env.local`
+- [x] Add the AI key in `.env.local` (Vercel: owner)
 - [ ] PDF CV download from the same data
 - [ ] Dark/light switch for visitors
 - [ ] Email the owner when a message arrives
 - [ ] App interface in Arabic
 
 ## Phase 7 - Launch and business
-- [ ] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`)
-- [ ] Payments: subscriptions table, checkout, provider webhooks, account page (Paymob first is recommended)
-- [ ] Enforce the Free and Pro limits
+- [x] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`): 250 EGP or 6 USD a month, prepaid months, Paymob
+- [x] Payments: payments table, Paymob checkout, signed webhook, Go Pro page and result page (`0004_plans_and_billing.sql`)
+- [x] Enforce the Free and Pro limits (database first, friendly messages in the app)
+- [x] Remove badge for paid plan
+- [x] Database tests: every migration runs in a real Postgres in `npm test` (`supabase/__tests__`)
+- [ ] Run `0004`, add Paymob and Supabase secret keys, test with Paymob test keys on Vercel
+- [ ] Account page: payment history, receipts
+- [ ] Emails: receipt, Pro ending soon
+- [ ] Auto-renewing card subscriptions (optional)
 - [ ] Custom domains
-- [ ] Remove badge for paid plan
-- [ ] Terms, privacy policy, report abuse link on published pages
+- [ ] Terms, privacy policy, refund policy, report abuse link on published pages (needed before taking money)
 - [ ] Error monitoring and backups
 - [ ] Template gallery page for SEO
 

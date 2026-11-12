@@ -109,6 +109,14 @@ function AiBar(props: {
       {note && (
         <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
           {note}
+          {plan !== "pro" && (
+            <>
+              {" "}
+              <a href="/pro" className="font-medium text-violet-700 underline dark:text-violet-300">
+                See Pro
+              </a>
+            </>
+          )}
         </span>
       )}
     </div>

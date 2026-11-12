@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { buttonClass } from "@/editor/ui";
-import { friendlyError, listPortfolios } from "@/lib/portfolios";
+import { friendlyError, getMyAccount, listPortfolios } from "@/lib/portfolios";
 import { deleteMessage, listMessages, setMessageRead, type Message } from "@/lib/publishing";
 
 /** Messages sent through the contact forms of the account's published portfolios. */
@@ -11,10 +11,16 @@ export function Inbox() {
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [titles, setTitles] = useState<Record<string, string>>({});
   const [problem, setProblem] = useState("");
+  const [plan, setPlan] = useState<"free" | "pro" | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      const [list, portfolios] = await Promise.all([listMessages(), listPortfolios()]);
+      const [list, portfolios, account] = await Promise.all([
+        listMessages(),
+        listPortfolios(),
+        getMyAccount(),
+      ]);
+      setPlan(account?.plan ?? null);
       setMessages(list);
       setTitles(Object.fromEntries(portfolios.map((p) => [p.id, p.title])));
       setProblem("");
@@ -66,62 +72,81 @@ export function Inbox() {
           </p>
         ) : (
           <ul className="mt-6 grid gap-3">
-            {messages.map((m) => (
-              <li
-                key={m.id}
-                className={`rounded-xl border bg-white p-4 dark:bg-zinc-900 ${m.isRead ? "border-zinc-200 dark:border-zinc-800" : "border-blue-300 dark:border-blue-800"}`}
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-sm font-semibold" dir="auto">
-                    {!m.isRead && (
-                      <span
-                        className="me-2 inline-block size-2 rounded-full bg-blue-600"
-                        aria-label="New"
-                      />
-                    )}
-                    {m.name}{" "}
-                    <a
-                      href={`mailto:${m.email}`}
-                      dir="ltr"
-                      className="font-normal text-blue-700 underline dark:text-blue-400"
-                    >
-                      {m.email}
-                    </a>
+            {messages.map((m) =>
+              m.locked && plan !== "pro" ? (
+                <li
+                  key={m.id}
+                  className="rounded-xl border border-violet-300 bg-violet-50 p-4 text-sm dark:border-violet-900 dark:bg-violet-950"
+                >
+                  <p className="font-semibold">A new message is waiting</p>
+                  <p className="mt-1 text-zinc-700 dark:text-zinc-300">
+                    It arrived after this month&apos;s 50 free messages. Go Pro to read it and every
+                    message after it.
                   </p>
-                  <span className="text-xs text-zinc-500">
-                    {new Date(m.createdAt).toLocaleString(undefined, {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                    {titles[m.portfolioId] && ` · ${titles[m.portfolioId]}`}
-                  </span>
-                </div>
-                <p className="mt-2 whitespace-pre-line text-sm" dir="auto">
-                  {m.message}
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <a href={`mailto:${m.email}`} className={buttonClass}>
-                    Reply by email
-                  </a>
-                  <button
-                    type="button"
-                    className={buttonClass}
-                    onClick={() => act(() => setMessageRead(m.id, !m.isRead))}
+                  <Link
+                    href="/pro"
+                    className="mt-3 inline-block font-medium text-violet-700 underline dark:text-violet-300"
                   >
-                    {m.isRead ? "Mark as new" : "Mark as read"}
-                  </button>
-                  <button
-                    type="button"
-                    className={buttonClass}
-                    onClick={() => act(() => deleteMessage(m.id))}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
+                    See Pro
+                  </Link>
+                </li>
+              ) : (
+                <li
+                  key={m.id}
+                  className={`rounded-xl border bg-white p-4 dark:bg-zinc-900 ${m.isRead ? "border-zinc-200 dark:border-zinc-800" : "border-blue-300 dark:border-blue-800"}`}
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-sm font-semibold" dir="auto">
+                      {!m.isRead && (
+                        <span
+                          className="me-2 inline-block size-2 rounded-full bg-blue-600"
+                          aria-label="New"
+                        />
+                      )}
+                      {m.name}{" "}
+                      <a
+                        href={`mailto:${m.email}`}
+                        dir="ltr"
+                        className="font-normal text-blue-700 underline dark:text-blue-400"
+                      >
+                        {m.email}
+                      </a>
+                    </p>
+                    <span className="text-xs text-zinc-500">
+                      {new Date(m.createdAt).toLocaleString(undefined, {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      {titles[m.portfolioId] && ` · ${titles[m.portfolioId]}`}
+                    </span>
+                  </div>
+                  <p className="mt-2 whitespace-pre-line text-sm" dir="auto">
+                    {m.message}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <a href={`mailto:${m.email}`} className={buttonClass}>
+                      Reply by email
+                    </a>
+                    <button
+                      type="button"
+                      className={buttonClass}
+                      onClick={() => act(() => setMessageRead(m.id, !m.isRead))}
+                    >
+                      {m.isRead ? "Mark as new" : "Mark as read"}
+                    </button>
+                    <button
+                      type="button"
+                      className={buttonClass}
+                      onClick={() => act(() => deleteMessage(m.id))}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ),
+            )}
           </ul>
         )}
       </main>

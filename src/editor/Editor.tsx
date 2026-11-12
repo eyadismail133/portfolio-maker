@@ -284,6 +284,10 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         : STATUS_TEXT[status];
 
   const download = async () => {
+    if (useEditor.getState().plan !== "pro") {
+      setExporting("Downloading the HTML is part of Pro.");
+      return;
+    }
     setExporting("Preparing the download…");
     try {
       const fileName = (title || doc.meta.title || "portfolio")
@@ -333,6 +337,17 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         {exporting && (
           <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
             {exporting}
+            {exporting.endsWith("part of Pro.") && (
+              <>
+                {" "}
+                <Link
+                  href="/pro"
+                  className="font-medium text-violet-700 underline dark:text-violet-300"
+                >
+                  See Pro
+                </Link>
+              </>
+            )}
           </span>
         )}
         {status === "conflict" && (

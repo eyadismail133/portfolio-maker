@@ -89,7 +89,11 @@ export function PublishDialog(props: {
       setState({ status: "published", slug, publishedAt, changedSincePublish: false });
       setAvailability("mine");
     } catch (error) {
-      if (error instanceof Error && error.message === "taken") {
+      if (error instanceof Error && error.message === "plan_limit_published") {
+        setProblem(
+          "Free accounts can publish 1 page. Take your other page offline, or go Pro to publish up to 10.",
+        );
+      } else if (error instanceof Error && error.message === "taken") {
         setAvailability("taken");
         setProblem("Someone else is already using this link name. Choose another.");
       } else setProblem(friendlyError(error));
@@ -262,6 +266,14 @@ export function PublishDialog(props: {
             className="rounded-md border border-red-300 bg-red-50 p-2.5 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
           >
             {problem}
+            {problem.includes("go Pro") && (
+              <>
+                {" "}
+                <a href="/pro" className="font-medium underline">
+                  See Pro
+                </a>
+              </>
+            )}
           </p>
         )}
       </div>

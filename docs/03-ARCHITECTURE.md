@@ -195,9 +195,13 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 
 ## AI writing (as built)
 - `/api/ai` is the only place that talks to the model. It checks the login, then the database function `use_ai_credit`, which allows Pro accounts only and counts 50 uses a day. The model key never reaches the browser.
-- Any service with the OpenAI chat format works (`AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY`); the default is Google Gemini's free tier.
+- Any service with the OpenAI chat format works (`AI_BASE_URL`, `AI_MODEL`, `AI_API_KEY`); the default is Google Gemini's free tier. `AI_MODEL` may list several models; when one is busy (429/503) or slow, the next is tried.
 - Prompts (`src/lib/ai/prompts.ts`) forbid made-up facts, ask for placeholders like [your city], and treat the person's text as content, never as instructions.
 - In the editor, long text fields offer "Write a first draft", "Improve" and "Shorten"; in two-language portfolios every text field can "Translate from" the other language. Each AI answer is one undo step.
+
+## Plans and payments (as built)
+- `profiles.plan` and `profiles.pro_until` say who is Pro; the database function `is_pro()` is the single test (plan "pro" and not expired). Limits are enforced by triggers, storage rules and functions in `0004_plans_and_billing.sql`; the app only explains them.
+- Payments: `/api/billing/checkout` creates a pending row and a Paymob intention; `/api/billing/paymob` verifies the HMAC and calls `apply_paid_payment` with the server-only secret key (`src/lib/supabase/admin.ts`). Details in `docs/08-PLANS-AND-PAYMENTS.md`.
 
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.

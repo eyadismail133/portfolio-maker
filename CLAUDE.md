@@ -36,4 +36,7 @@ Read `README.md` first, then the doc for the area you are touching. The plan liv
 - Components: PascalCase files. Everything else: kebab-case.
 - Commits: short, present tense, start with the area: `render-kit: add timeline section`. The message describes the updates only: no mention of AI tools or assistants, no co-author or session lines.
 - Database changes go in a new numbered file in `supabase/migrations/`; never edit a migration that was already run. Every table needs row level security.
+- `supabase/__tests__/database.test.ts` runs all migrations in a real Postgres (PGlite) and checks the rules as visitor, account and server. Add a check there for every new rule or limit.
+- Plan limits live in two places that must agree: `src/lib/plans.ts` and the newest migration; a test compares them. The database is what enforces them.
+- Payments are trusted only from a Paymob callback with a valid HMAC. Never grant Pro from the browser.
 - Supabase helpers live in `src/lib/supabase` (`client.ts`, `server.ts`, `proxy.ts`). Next.js 16 names the middleware file `src/proxy.ts`.

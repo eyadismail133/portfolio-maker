@@ -1,5 +1,6 @@
 import { normalizeDoc } from "@/render-kit/registry";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
+import { effectivePlan, type Plan } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/client";
 
 /** Reading and writing the signed-in account's portfolios. Runs in the browser; the database's row security does the guarding. */
@@ -44,6 +45,12 @@ export function friendlyError(error: unknown): string {
     return "No connection. Check your internet and try again.";
   if (/relation .* does not exist|could not find the table|schema cache/i.test(message)) {
     return "The database is not set up yet. Run supabase/migrations/0001_init.sql in the Supabase SQL editor.";
+  }
+  if (/plan_limit_portfolios/.test(message)) {
+    return "Free accounts can have 3 portfolios. Delete one, or go Pro for unlimited portfolios.";
+  }
+  if (/plan_limit_published/.test(message)) {
+    return "Free accounts can publish 1 page. Take the other one offline, or go Pro to publish up to 10.";
   }
   if (/row-level security|permission denied|jwt/i.test(message))
     return "You are signed out. Log in again.";
@@ -145,15 +152,27 @@ export function isOffline(error: unknown): boolean {
   return /failed to fetch|network|load failed|fetch failed/i.test(message);
 }
 
-/** The plan of the signed-in account, or null when nobody is signed in or it cannot be read. */
-export async function getMyPlan(): Promise<"free" | "pro" | null> {
+export type Account = { plan: Plan; proUntil: string | null; email: string };
+
+/** The signed-in account's plan in force, or null when nobody is signed in. */
+export async function getMyAccount(): Promise<Account | null> {
   const supabase = createClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
   const { data } = await supabase
     .from("profiles")
-    .select("plan")
+    .select("plan, pro_until")
     .eq("id", auth.user.id)
     .maybeSingle();
-  return (data as { plan?: string } | null)?.plan === "pro" ? "pro" : "free";
+  const row = data as { plan?: string; pro_until?: string | null } | null;
+  return {
+    plan: effectivePlan(row?.plan, row?.pro_until),
+    proUntil: row?.pro_until ?? null,
+    email: auth.user.email ?? "",
+  };
+}
+
+/** The plan in force for the signed-in account, or null when nobody is signed in. */
+export async function getMyPlan(): Promise<Plan | null> {
+  return (await getMyAccount())?.plan ?? null;
 }

@@ -2,7 +2,7 @@
 
 A website where anyone can build a rich portfolio landing page (personal profile, company, startup, freelancer, agency...) without design skills: log in, answer a few questions, pick a starting idea, fill in the data, adjust design and colors with a live preview, then publish or download as HTML.
 
-**Status:** Phases 1 to 5 are built, plus Phase 6 inbox, visits, version history and AI writing for Pro accounts. Next: run migration 0003, add the AI key, and decide plans and payments (`docs/08-PLANS-AND-PAYMENTS.md`). Open tasks are in `docs/06-ROADMAP.md`.
+**Status:** Phases 1 to 5 are built, Phase 6 inbox, visits, versions and AI writing, and Phase 7 plans with Paymob payments. Next: run migrations 0003 and 0004, add the Paymob and Supabase secret keys (`docs/07-SUPABASE-SETUP.md`). Open tasks are in `docs/06-ROADMAP.md`.
 
 ## Run it on your computer
 
@@ -38,7 +38,7 @@ npm run dev                      (open http://localhost:3000)
 | `docs/05-EDITOR-AND-PREVIEW.md` | The editor, live preview, export and publish | Building the editor |
 | `docs/06-ROADMAP.md` | Phases and task checklists | Picking the next task; tick tasks when done |
 | `docs/07-SUPABASE-SETUP.md` | One-time setup in the Supabase dashboard | Before using login, saving or uploads |
-| `docs/08-PLANS-AND-PAYMENTS.md` | Free vs Pro, prices, payment providers (proposal) | Before building payments |
+| `docs/08-PLANS-AND-PAYMENTS.md` | Free vs Pro limits, prices, how Paymob payments work | Before changing plans or payments |
 
 ## The idea in one picture
 

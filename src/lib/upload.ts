@@ -62,7 +62,15 @@ export async function uploadImage(file: File, portfolioId?: string): Promise<Ass
   const stored = await supabase.storage
     .from(IMAGE_BUCKET)
     .upload(path, converted.blob, { contentType: "image/webp", cacheControl: "31536000" });
-  if (stored.error) throw new Error(`Upload failed: ${stored.error.message}`);
+  if (stored.error) {
+    // The only rule that can refuse an upload to the account's own folder is the storage limit.
+    if (/row-level security|policy|unauthorized|403/i.test(stored.error.message)) {
+      throw new Error(
+        "Your image storage is full: 50 MB on Free, 2 GB on Pro. Remove unused images, or go Pro.",
+      );
+    }
+    throw new Error(`Upload failed: ${stored.error.message}`);
+  }
 
   await supabase.from("assets").insert({
     id,
