@@ -81,7 +81,11 @@ describe("document operations", () => {
     const style = (d: typeof doc, id: string) => d.sections.find((s) => s.id === id)!.style;
     let next = ops.setSectionStyle(doc, "about", { background: "gradient", color: "#112233" });
     next = ops.setSectionStyle(next, "about", { width: "wide", color: undefined });
-    expect(style(next, "about")).toEqual({ background: "gradient", padding: "normal", width: "wide" });
+    expect(style(next, "about")).toEqual({
+      background: "gradient",
+      padding: "normal",
+      width: "wide",
+    });
 
     const copied = ops.applyStyleToAll(next, "about");
     expect(style(copied, "skills")).toEqual(style(next, "about"));

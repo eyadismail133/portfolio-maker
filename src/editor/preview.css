@@ -10,8 +10,15 @@
 .pk-section:hover {
   outline: 2px solid rgb(37 99 235 / 0.45);
 }
+/* The selected section gets its frame from .pk-editor-outline, which a shaped edge cannot cut. */
 .pk-section[data-pk-selected] {
-  outline: 2px solid #2563eb;
+  outline: none;
+}
+.pk-editor-outline {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 2px #2563eb;
 }
 /* The small toolbar on the selected section. Not part of the portfolio: fixed colors on purpose. */
 .pk-editor-toolbar {

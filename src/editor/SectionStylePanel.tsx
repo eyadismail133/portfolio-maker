@@ -82,7 +82,12 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function ColorInput(props: { id: string; label: string; value: string; onChange: (v: string) => void }) {
+function ColorInput(props: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="flex items-center gap-2.5">
       <input
@@ -187,7 +192,9 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
               value={{ image: style?.image }}
               path={[]}
               ctx={ctx}
-              onChange={(next) => set({ image: (next.image ?? undefined) as SectionStyle["image"] })}
+              onChange={(next) =>
+                set({ image: (next.image ?? undefined) as SectionStyle["image"] })
+              }
             />
             <div className="grid gap-1.5">
               <Label>Layer over the picture</Label>
@@ -206,7 +213,9 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
           </>
         )}
         {["custom", "gradient", "image", "accent"].includes(background) && (
-          <p className="text-xs text-zinc-500">Text color is chosen for you, so it stays easy to read.</p>
+          <p className="text-xs text-zinc-500">
+            Text color is chosen for you, so it stays easy to read.
+          </p>
         )}
       </Group>
 
@@ -215,7 +224,9 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
           <div className="grid grid-cols-2 gap-3">
             {(["edgeTop", "edgeBottom"] as const).map((key) => (
               <div key={key} className="grid gap-1.5">
-                <Label htmlFor={`style-${key}`}>{key === "edgeTop" ? "Top edge" : "Bottom edge"}</Label>
+                <Label htmlFor={`style-${key}`}>
+                  {key === "edgeTop" ? "Top edge" : "Bottom edge"}
+                </Label>
                 <select
                   id={`style-${key}`}
                   className={inputClass}

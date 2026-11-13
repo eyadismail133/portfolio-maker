@@ -5,6 +5,7 @@ import { Renderer } from "@/render-kit/Renderer";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import "@/render-kit/styles/index.css";
+import { rootFontSize } from "@/render-kit/themes/css-vars";
 import { findTextPath } from "./doc-ops";
 import "./preview.css";
 
@@ -51,6 +52,9 @@ function send(message: FromPreview) {
 export function PreviewFrame() {
   const [state, setState] = useState<Extract<ToPreview, { type: "pk:state" }> | null>(null);
   const [toolbarTop, setToolbarTop] = useState<number | null>(null);
+  // Drawn over the page instead of on the section: a shaped section is cut by a mask, which
+  // would cut its own outline too.
+  const [outline, setOutline] = useState<DOMRect | null>(null);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<ToPreview>) => {
@@ -85,10 +89,25 @@ export function PreviewFrame() {
   }, []);
 
   const selectedId = state?.selectedId ?? null;
+  const fontSize = state ? rootFontSize(state.doc.theme) : null;
+
+  // The page text size lives on <html>, as on the published page.
+  useEffect(() => {
+    document.documentElement.style.fontSize = fontSize ?? "";
+  }, [fontSize]);
 
   /** Keeps the toolbar at the top of the selected section, or at the top of the screen when it scrolls past. */
   const place = useCallback(() => {
     const el = selectedId ? document.getElementById(selectedId) : null;
+    const next = el ? el.getBoundingClientRect() : null;
+    // Only a real change re-renders: this runs after every render.
+    setOutline((old) =>
+      old &&
+      next &&
+      ["top", "left", "width", "height"].every((k) => old[k as "top"] === next[k as "top"])
+        ? old
+        : next,
+    );
     if (!el) return setToolbarTop(null);
     const box = el.getBoundingClientRect();
     if (box.bottom < 48 || box.top > window.innerHeight) return setToolbarTop(null);
@@ -107,7 +126,11 @@ export function PreviewFrame() {
   useEffect(() => {
     window.addEventListener("scroll", place, { passive: true });
     window.addEventListener("resize", place);
+    // Images that finish loading move the sections below them.
+    const observer = new ResizeObserver(() => place());
+    observer.observe(document.body);
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", place);
       window.removeEventListener("resize", place);
     };
@@ -184,6 +207,18 @@ export function PreviewFrame() {
       onSubmitCapture={(event) => event.preventDefault()}
     >
       <Renderer doc={state.doc} lang={state.lang} />
+      {selectedId && outline && (
+        <div
+          className="pk-editor-outline"
+          aria-hidden="true"
+          style={{
+            top: outline.top,
+            left: outline.left,
+            width: outline.width,
+            height: outline.height,
+          }}
+        />
+      )}
       {selectedId && toolbarTop !== null && (
         <div
           className="pk-editor-toolbar"

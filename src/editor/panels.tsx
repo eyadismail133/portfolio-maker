@@ -4,9 +4,10 @@ import { useMemo, useRef, useState } from "react";
 import { MiniPreview } from "@/components/MiniPreview";
 import { pickText } from "@/render-kit/i18n";
 import { allSections, getSection, type SectionCategory } from "@/render-kit/registry";
-import type { PortfolioDoc, Theme } from "@/render-kit/schema/document";
+import { PERSONAL_THEME_KEYS, type PortfolioDoc, type Theme } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import { applyFamily } from "@/render-kit/themes/apply";
+import { randomTouches, varyLayouts } from "@/render-kit/themes/variety";
 import { buildPalette, contrastProblems } from "@/render-kit/themes/color";
 import { families } from "@/render-kit/themes/families";
 import { fontPairs } from "@/render-kit/themes/fonts";
@@ -231,15 +232,30 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
   const { setTheme, setFamily } = useEditor.getState();
   const theme = doc.theme;
 
+  /** A new random look in one Undo step: colors, fonts, corners, touches and some layouts. */
   const shuffle = () => {
-    const pick = <T,>(items: readonly T[]) => items[Math.floor(Math.random() * items.length)];
+    const next = Math.random;
+    const pick = <T,>(items: readonly T[]) => items[Math.floor(next() * items.length)];
     const palette = pick(palettes);
-    setTheme({
-      palette: palette.light,
-      paletteDark: palette.dark,
-      fonts: pick(fontPairs).id,
-      radius: pick(["none", "small", "large", "pill"] as const),
-    });
+    const theme = { ...doc.theme };
+    for (const key of PERSONAL_THEME_KEYS) delete theme[key];
+    useEditor.getState().commit(
+      varyLayouts(
+        {
+          ...doc,
+          theme: {
+            ...theme,
+            palette: palette.light,
+            paletteDark: palette.dark,
+            fonts: pick(fontPairs).id,
+            radius: pick(["none", "small", "large", "pill"] as const),
+            ...randomTouches(next),
+          },
+        },
+        next,
+        0.4,
+      ),
+    );
   };
 
   return (
@@ -248,7 +264,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
         <div className="flex items-center justify-between">
           <PanelHeading>Design</PanelHeading>
           <button type="button" className={buttonClass} onClick={shuffle}>
-            <UiIcon name="shuffle" size={14} /> Shuffle colors and fonts
+            <UiIcon name="shuffle" size={14} /> Shuffle the look
           </button>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
@@ -335,13 +351,15 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
         <ColorEditor doc={doc} />
       </div>
 
-      <div className="grid gap-1.5">
+      <div className="grid gap-2.5">
         <PanelHeading>Fonts</PanelHeading>
         <select
           aria-label="Fonts"
-          className={`${inputClass} mt-0.5`}
+          className={inputClass}
           value={theme.fonts}
-          onChange={(e) => setTheme({ fonts: e.target.value })}
+          onChange={(e) =>
+            setTheme({ fonts: e.target.value, headingFont: undefined, bodyFont: undefined })
+          }
         >
           {fontPairs.map((pair) => (
             <option key={pair.id} value={pair.id}>
@@ -349,6 +367,119 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
             </option>
           ))}
         </select>
+        <div className="grid grid-cols-2 gap-2.5">
+          {(
+            [
+              ["headingFont", "Headings", "heading"],
+              ["bodyFont", "Text", "body"],
+            ] as const
+          ).map(([key, name, face]) => (
+            <div key={key} className="grid gap-1">
+              <Label htmlFor={`font-${key}`}>{name}</Label>
+              <select
+                id={`font-${key}`}
+                className={inputClass}
+                value={theme[key] ?? ""}
+                onChange={(e) => setTheme({ [key]: e.target.value || undefined })}
+              >
+                <option value="">From the pair</option>
+                {[...new Map(fontPairs.map((pair) => [pair[face].family, pair])).values()].map(
+                  (pair) => (
+                    <option key={pair.id} value={pair.id} data-no-translate>
+                      {pair[face].family}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+          ))}
+        </div>
+        <ThemeChoice
+          label="Text size"
+          value={theme.textSize}
+          onChange={(textSize) => setTheme({ textSize })}
+          options={[
+            ["small", "Small"],
+            ["large", "Large"],
+          ]}
+        />
+        <ThemeChoice
+          label="Heading size"
+          value={theme.headingSize}
+          onChange={(headingSize) => setTheme({ headingSize })}
+          options={[
+            ["small", "Small"],
+            ["large", "Large"],
+          ]}
+        />
+        <ThemeChoice
+          label="Heading weight"
+          value={theme.headingWeight}
+          onChange={(headingWeight) => setTheme({ headingWeight })}
+          options={[
+            ["light", "Light"],
+            ["bold", "Bold"],
+          ]}
+        />
+        <ThemeChoice
+          label="Heading letters"
+          value={theme.headingCase}
+          onChange={(headingCase) => setTheme({ headingCase })}
+          designName="Normal"
+          options={[["upper", "CAPITALS"]]}
+        />
+      </div>
+
+      <div className="grid gap-2.5">
+        <PanelHeading>Shapes and decoration</PanelHeading>
+        <ThemeChoice
+          label="Photo shape"
+          value={theme.imageShape}
+          onChange={(imageShape) => setTheme({ imageShape })}
+          options={[
+            ["square", "Square"],
+            ["rounded", "Rounded"],
+            ["circle", "Circle"],
+            ["arch", "Arch"],
+            ["blob", "Blob"],
+            ["tilted", "Tilted"],
+          ]}
+        />
+        <ThemeChoice
+          label="Buttons"
+          value={theme.buttons}
+          onChange={(buttons) => setTheme({ buttons })}
+          options={[
+            ["solid", "Solid"],
+            ["outline", "Outline"],
+            ["soft", "Soft"],
+            ["underline", "Underline"],
+          ]}
+        />
+        <ThemeChoice
+          label="Section headings"
+          value={theme.headingDeco}
+          onChange={(headingDeco) => setTheme({ headingDeco })}
+          options={[
+            ["none", "Plain"],
+            ["underline", "Underline"],
+            ["marker", "Marker"],
+            ["number", "Numbered"],
+            ["line", "Line"],
+          ]}
+        />
+        <ThemeChoice
+          label="Background pattern"
+          value={theme.pattern}
+          onChange={(pattern) => setTheme({ pattern })}
+          options={[
+            ["dots", "Dots"],
+            ["grid", "Grid"],
+            ["lines", "Lines"],
+            ["glow", "Glow"],
+            ["noise", "Grain"],
+          ]}
+        />
       </div>
 
       <div className="grid gap-2">
@@ -568,5 +699,47 @@ function ColorEditor({ doc }: { doc: PortfolioDoc }) {
         )}
       </div>
     </details>
+  );
+}
+
+/**
+ * One page-wide choice as a row of small buttons. The first button is always the design's own
+ * look ("Design"), which stores nothing.
+ */
+function ThemeChoice<T extends string>(props: {
+  label: string;
+  value: T | undefined;
+  options: readonly (readonly [T, string])[];
+  onChange: (value: T | undefined) => void;
+  designName?: string;
+}) {
+  const options: (readonly [string, string])[] = [
+    ["", props.designName ?? "Design"],
+    ...props.options,
+  ];
+  return (
+    <div className="grid gap-1.5">
+      <Label>{props.label}</Label>
+      <div role="group" aria-label={props.label} className="flex flex-wrap gap-1.5">
+        {options.map(([value, name]) => {
+          const active = (props.value ?? "") === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => props.onChange((value || undefined) as T | undefined)}
+              className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
+                active
+                  ? "border-blue-600 bg-blue-50 text-blue-950 ring-1 ring-blue-600 dark:bg-blue-950/70 dark:text-blue-100"
+                  : "border-zinc-200/80 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/70"
+              }`}
+            >
+              {name}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
