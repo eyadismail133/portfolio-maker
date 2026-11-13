@@ -51,6 +51,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   const next = safeNext(params.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(
@@ -231,17 +232,27 @@ export function AuthForm({ mode }: { mode: Mode }) {
                       </Link>
                     )}
                   </div>
-                  <input
-                    id="auth-password"
-                    type="password"
-                    required
-                    minLength={mode === "login" ? undefined : 8}
-                    dir="ltr"
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    className={inputClass}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div className="relative">
+                    <input
+                      id="auth-password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      minLength={mode === "login" ? undefined : 8}
+                      dir="ltr"
+                      autoComplete={mode === "login" ? "current-password" : "new-password"}
+                      className={`${inputClass} pe-14`}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 end-0 px-3 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword((v) => !v)}
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
                   {mode === "signup" && (
                     <p className="text-xs text-zinc-500">At least 8 characters.</p>
                   )}

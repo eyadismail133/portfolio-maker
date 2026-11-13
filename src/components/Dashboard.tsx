@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { spring, staggerDelay } from "@/lib/motion";
 import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 import { BrandMark, buttonClass, inputClass, Label, primaryButtonClass, UiIcon } from "@/editor/ui";
@@ -21,6 +21,7 @@ import {
   type Account,
   type PortfolioSummary,
 } from "@/lib/portfolios";
+import { publishChecks } from "@/lib/publish-checks";
 import { listMessages, viewCounts } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { MiniPreview } from "./MiniPreview";
@@ -35,6 +36,194 @@ function when(iso: string): string {
     month: "short",
     year: "numeric",
   });
+}
+
+/** True when the document holds an image the owner uploaded (the samples have none). */
+function hasImage(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasImage);
+  if (typeof value !== "object" || value === null) return false;
+  const record = value as Record<string, unknown>;
+  if (typeof record.assetId === "string" && typeof record.url === "string") return true;
+  return Object.values(record).some(hasImage);
+}
+
+const CHECKLIST_KEY = "pm-checklist-hidden";
+
+/** First steps for a new account. Each one ticks itself from the account's real state. */
+function GettingStarted(props: { items: PortfolioSummary[]; views: Record<string, number> }) {
+  const [hidden, setHidden] = useState(true);
+  useEffect(() => {
+    let stored = false;
+    try {
+      stored = window.localStorage.getItem(CHECKLIST_KEY) === "1";
+    } catch {
+      stored = false;
+    }
+    Promise.resolve().then(() => setHidden(stored));
+  }, []);
+  const main =
+    props.items.find((item) => item.status === "published" && item.doc) ??
+    props.items.find((item) => item.doc);
+  if (!main?.doc || hidden) return null;
+  const live = props.items.find((item) => item.status === "published" && item.slug);
+  const visited = props.items.some((item) => (props.views[item.id] ?? 0) > 0);
+  const steps = [
+    {
+      label: "Replace the sample text with your own",
+      done: !publishChecks(main.doc).some((check) => check.id === "sample-text"),
+      href: `/editor/${main.id}`,
+    },
+    { label: "Add your photo or logo", done: hasImage(main.doc), href: `/editor/${main.id}` },
+    { label: "Publish your page", done: Boolean(live), href: `/editor/${main.id}` },
+    {
+      label: "Share your link and get your first visit",
+      done: visited,
+      href: live ? `/p/${live.slug}` : `/editor/${main.id}`,
+    },
+  ];
+  const doneCount = steps.filter((step) => step.done).length;
+  if (doneCount === steps.length) return null;
+  const hide = () => {
+    try {
+      window.localStorage.setItem(CHECKLIST_KEY, "1");
+    } catch {
+      // Hidden for this visit only.
+    }
+    setHidden(true);
+  };
+  return (
+    <section
+      aria-labelledby="getting-started"
+      className="pm-card pm-animate-in mt-6 rounded-2xl p-5"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 id="getting-started" className="text-base font-bold tracking-tight">
+            Getting started
+          </h2>
+          <p className="mt-0.5 text-xs text-zinc-500">{`${doneCount} of ${steps.length} done`}</p>
+        </div>
+        <button type="button" className={`${buttonClass} px-2.5 py-1 text-xs`} onClick={hide}>
+          Hide
+        </button>
+      </div>
+      <div
+        className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-200/80 dark:bg-zinc-800"
+        aria-hidden="true"
+      >
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600"
+          initial={{ width: 0 }}
+          animate={{ width: `${(doneCount / steps.length) * 100}%` }}
+          transition={spring.soft}
+        />
+      </div>
+      <ol className="mt-4 grid gap-2 sm:grid-cols-2">
+        {steps.map((step) => (
+          <li key={step.label}>
+            <Link
+              href={step.href}
+              target={step.href.startsWith("/p/") ? "_blank" : undefined}
+              className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm transition-colors ${
+                step.done
+                  ? "border-emerald-200/80 bg-emerald-50/70 text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-100"
+                  : "border-zinc-200/80 bg-white/70 hover:border-blue-300 hover:bg-blue-50/60 dark:border-zinc-800 dark:bg-zinc-900/60 dark:hover:border-blue-800 dark:hover:bg-blue-950/40"
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                  step.done
+                    ? "bg-emerald-500 text-white"
+                    : "border border-zinc-300 dark:border-zinc-700"
+                }`}
+              >
+                {step.done ? "✓" : ""}
+              </span>
+              <span className={step.done ? "line-through decoration-emerald-500/60" : ""}>
+                {step.label}
+              </span>
+              <span className="sr-only">{step.done ? "Done" : "Not done yet"}</span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/** Rename, duplicate and delete for one card, behind a "…" button. */
+function CardMenu(props: {
+  title: string;
+  disabled: boolean;
+  onRename: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuId = useId();
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+  const item =
+    "w-full rounded-lg px-3 py-2 text-start text-sm font-medium transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:hover:bg-zinc-800";
+  const choose = (action: () => void) => () => {
+    setOpen(false);
+    action();
+  };
+  return (
+    <span className="relative">
+      <button
+        type="button"
+        className={`${buttonClass} px-2.5`}
+        aria-label={`More actions for ${props.title}`}
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span aria-hidden="true" className="text-base leading-none tracking-widest">
+          …
+        </span>
+      </button>
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label="Close the menu"
+            tabIndex={-1}
+            className="fixed inset-0 z-30 cursor-default"
+            onClick={() => setOpen(false)}
+          />
+          <span
+            id={menuId}
+            className="pm-animate-scale absolute bottom-full end-0 z-40 mb-1.5 grid w-40 gap-0.5 rounded-xl border border-zinc-200/80 bg-white p-1.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <button type="button" className={item} onClick={choose(props.onRename)}>
+              Rename
+            </button>
+            <button
+              type="button"
+              className={item}
+              disabled={props.disabled}
+              onClick={choose(props.onDuplicate)}
+            >
+              Duplicate
+            </button>
+            <button
+              type="button"
+              className={`${item} text-red-700 dark:text-red-400`}
+              onClick={choose(props.onDelete)}
+            >
+              Delete
+            </button>
+          </span>
+        </>
+      )}
+    </span>
+  );
 }
 
 type DialogState =
@@ -61,6 +250,7 @@ export function Dashboard() {
   const [views, setViews] = useState<Record<string, number>>({});
   const [unread, setUnread] = useState(0);
   const [account, setAccount] = useState<Account | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const plan = account?.plan ?? null;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -157,12 +347,15 @@ export function Dashboard() {
             <BrandMark size="sm" />
             <span className="hidden sm:inline">Portfolio Maker</span>
           </Link>
-          <span className="ms-auto truncate text-xs text-zinc-500 sm:text-sm" dir="ltr">
+          <span
+            className="ms-auto hidden truncate text-xs text-zinc-500 sm:inline sm:text-sm"
+            dir="ltr"
+          >
             {email}
           </span>
           {plan && (
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+              className={`ms-auto sm:ms-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                 plan === "pro"
                   ? "bg-gradient-to-r from-violet-600/15 to-indigo-600/15 text-violet-800 ring-1 ring-violet-500/30 dark:from-violet-500/20 dark:to-indigo-500/20 dark:text-violet-200"
                   : "bg-zinc-100 text-zinc-700 ring-1 ring-zinc-300/60 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700"
@@ -182,17 +375,67 @@ export function Dashboard() {
             <UiIcon name="sparkles" size={14} />
             <span>{plan === "pro" ? "Add Pro months" : "Go Pro"}</span>
           </Link>
-          <Link
-            href="/account"
-            className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200/60 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          <span className="hidden items-center gap-3 sm:flex">
+            <Link
+              href="/account"
+              className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200/60 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              Account
+            </Link>
+            <UiLanguageSwitch />
+            <button type="button" className={buttonClass} onClick={signOut}>
+              Log out
+            </button>
+          </span>
+          <button
+            type="button"
+            className={`${buttonClass} px-2.5 sm:hidden`}
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            aria-controls="dashboard-menu"
+            onClick={() => setMenuOpen((open) => !open)}
           >
-            Account
-          </Link>
-          <UiLanguageSwitch />
-          <button type="button" className={buttonClass} onClick={signOut}>
-            Log out
+            <span aria-hidden="true" className="grid gap-[3px]">
+              <span className="block h-0.5 w-4 rounded bg-current" />
+              <span className="block h-0.5 w-4 rounded bg-current" />
+              <span className="block h-0.5 w-4 rounded bg-current" />
+            </span>
           </button>
         </div>
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              id="dashboard-menu"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="overflow-hidden border-t border-zinc-200/80 sm:hidden dark:border-zinc-800"
+            >
+              <div className="grid gap-1 px-5 py-3">
+                <span className="truncate px-2.5 py-1 text-xs text-zinc-500" dir="ltr">
+                  {email}
+                </span>
+                <Link
+                  href="/account"
+                  className="rounded-lg px-2.5 py-2 text-sm font-medium hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+                >
+                  Account
+                </Link>
+                <span className="px-2.5 py-1">
+                  <UiLanguageSwitch />
+                </span>
+                <button
+                  type="button"
+                  className="rounded-lg px-2.5 py-2 text-start text-sm font-medium hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+                  onClick={signOut}
+                >
+                  Log out
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-9">
@@ -232,6 +475,8 @@ export function Dashboard() {
             </button>
           </div>
         )}
+
+        {items && items.length > 0 && <GettingStarted items={items} views={views} />}
 
         {items === null ? (
           <p className="mt-10 text-sm text-zinc-500">Loading your portfolios…</p>
@@ -322,32 +567,20 @@ export function Dashboard() {
                         <UiIcon name="external" size={11} />
                       </a>
                     )}
-                    <div className="mt-3.5 flex flex-wrap gap-1.5 pt-1">
-                      <Link href={`/editor/${item.id}`} className={primaryButtonClass}>
+                    <div className="mt-auto flex items-center gap-1.5 pt-4">
+                      <Link
+                        href={`/editor/${item.id}`}
+                        className={`${primaryButtonClass} flex-1 justify-center`}
+                      >
                         Edit
                       </Link>
-                      <button
-                        type="button"
-                        className={buttonClass}
-                        onClick={() => setDialog({ kind: "rename", item, title: item.title })}
-                      >
-                        Rename
-                      </button>
-                      <button
-                        type="button"
-                        className={buttonClass}
+                      <CardMenu
+                        title={item.title}
                         disabled={busy === item.id || !item.doc}
-                        onClick={() => run(item.id, () => duplicatePortfolio(item))}
-                      >
-                        Duplicate
-                      </button>
-                      <button
-                        type="button"
-                        className={buttonClass}
-                        onClick={() => setDialog({ kind: "delete", item })}
-                      >
-                        Delete
-                      </button>
+                        onRename={() => setDialog({ kind: "rename", item, title: item.title })}
+                        onDuplicate={() => run(item.id, () => duplicatePortfolio(item))}
+                        onDelete={() => setDialog({ kind: "delete", item })}
+                      />
                     </div>
                   </div>
                 </motion.li>

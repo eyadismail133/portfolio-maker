@@ -26,12 +26,18 @@ export function MiniPreview({
   pageWidth?: number;
 }) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0);
+  // The page is laid out at `pageWidth`, or wider when the box is wider, so it is never
+  // stretched beyond its real size.
+  const [view, setView] = useState({ scale: 0, width: pageWidth });
+  const scale = view.scale;
 
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / pageWidth));
+    const observer = new ResizeObserver(([entry]) => {
+      const width = Math.max(pageWidth, entry.contentRect.width);
+      setView({ scale: entry.contentRect.width / width, width });
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, [pageWidth]);
@@ -46,7 +52,7 @@ export function MiniPreview({
       {scale > 0 && (
         <div
           className="absolute left-0 top-0 transition-opacity duration-300"
-          style={{ width: pageWidth, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+          style={{ width: view.width, transform: `scale(${scale})`, transformOrigin: "0 0" }}
         >
           <Renderer doc={doc} lang={lang} />
         </div>

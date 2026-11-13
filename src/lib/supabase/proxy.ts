@@ -49,6 +49,14 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // The design test page is for development only.
+  if (request.nextUrl.pathname.startsWith("/dev") && process.env.VERCEL_ENV === "production") {
+    return new NextResponse(NOT_FOUND_HTML, {
+      status: 404,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+
   let response = NextResponse.next({ request });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

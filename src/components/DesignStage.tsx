@@ -34,13 +34,20 @@ export function DesignStage() {
 
   useEffect(() => {
     const onVisibility = () => setHidden(document.hidden);
+    // Follow the window when it is resized across the phone width.
+    const phone = window.matchMedia("(max-width: 639px)");
+    const onPhone = () => setNarrow(phone.matches);
+    phone.addEventListener("change", onPhone);
     document.addEventListener("visibilitychange", onVisibility);
     Promise.resolve().then(() => {
       setRtl(document.documentElement.dir === "rtl");
-      setNarrow(window.matchMedia("(max-width: 639px)").matches);
+      setNarrow(phone.matches);
       setMounted(true);
     });
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      phone.removeEventListener("change", onPhone);
+    };
   }, []);
 
   useEffect(() => {

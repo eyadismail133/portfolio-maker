@@ -95,6 +95,12 @@ const PATTERNS: [RegExp, (...groups: string[]) => string][] = [
     (e) => `أرسلنا رابطاً إلى ${e}. افتحه لتأكيد بريدك وإكمال التسجيل.`,
   ],
   [/^QR code for (.+)$/, (u) => `رمز QR للرابط ${u}`],
+  [/^(\d+) of (\d+) done$/, (a, b) => `تم ${a} من ${b}`],
+  [/^More actions for (.+)$/, (t) => `مزيد من الإجراءات لـ ${t}`],
+  [/^(\S+(?: \S+)?) layout$/, (v) => `تخطيط ${word(v)}`],
+  [/^(\S+(?: \S+)?) colors$/, (p) => `ألوان ${word(p)}`],
+  [/^(\S+(?: \S+)?) design$/, (f) => `تصميم ${word(f)}`],
+  [/^(.+) · Editor · Portfolio Maker$/, (t) => `${t} · المحرر · Portfolio Maker`],
   [
     /^(.+) (portfolio|company page|startup page)$/,
     (f, k) =>

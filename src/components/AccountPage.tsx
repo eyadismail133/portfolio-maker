@@ -16,7 +16,11 @@ const date = (iso: string) =>
 const mb = (bytes: number) =>
   bytes >= 1024 ** 3
     ? `${(bytes / 1024 ** 3).toFixed(1)} GB`
-    : `${Math.round(bytes / 1024 ** 2)} MB`;
+    : bytes >= 1024 ** 2
+      ? `${(bytes / 1024 ** 2).toFixed(bytes >= 10 * 1024 ** 2 ? 0 : 1)} MB`
+      : bytes > 0
+        ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+        : "0 MB";
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (

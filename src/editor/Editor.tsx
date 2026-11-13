@@ -83,9 +83,15 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   const [opening, setOpening] = useState<Opening>({ state: "loading" });
   const [tab, setTab] = useState<LeftTab>("sections");
   const [title, setTitle] = useState("");
+  // The browser tab names the portfolio being edited.
+  useEffect(() => {
+    const name = title || "Draft";
+    document.title = `${name} · Editor · Portfolio Maker`;
+  }, [title]);
   const [savedRevision, setSavedRevision] = useState(0);
   const [status, setStatus] = useState<SaveStatus>("saved");
   const [publishing, setPublishing] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [exporting, setExporting] = useState("");
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState("");
@@ -415,7 +421,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         {portfolioId && (
           <input
             aria-label="Portfolio name"
-            className={inputClass.replace("w-full", "w-52 py-1.5")}
+            className={inputClass.replace("w-full", "w-36 py-1.5 sm:w-52")}
             dir="auto"
             maxLength={120}
             value={title}
@@ -424,7 +430,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         )}
         <button
           type="button"
-          className={`${buttonClass} lg:hidden`}
+          className={`${buttonClass} hidden sm:inline-flex lg:hidden`}
           onClick={() => {
             select(null);
             setPanelOpen(true);
@@ -518,35 +524,37 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               />
             ))}
           </span>
-          <button
-            type="button"
-            className={buttonClass}
-            disabled={exporting === "Preparing the download…"}
-            onClick={download}
-          >
-            Download HTML
-          </button>
-          {portfolioId && (
-            <button type="button" className={buttonClass} onClick={() => setImporting(true)}>
-              Fill from CV
+          <span className="hidden items-center gap-2.5 lg:flex">
+            <button
+              type="button"
+              className={buttonClass}
+              disabled={exporting === "Preparing the download…"}
+              onClick={download}
+            >
+              Download HTML
             </button>
-          )}
-          {portfolioId && (
-            <Link href={`/editor/${portfolioId}/cv`} className={buttonClass}>
-              PDF CV
-            </Link>
-          )}
+            {portfolioId && (
+              <button type="button" className={buttonClass} onClick={() => setImporting(true)}>
+                Fill from CV
+              </button>
+            )}
+            {portfolioId && (
+              <Link href={`/editor/${portfolioId}/cv`} className={buttonClass}>
+                PDF CV
+              </Link>
+            )}
+          </span>
           {portfolioId && (
             <button
               type="button"
-              className={primaryButtonClass}
+              className={`${primaryButtonClass} hidden sm:inline-flex`}
               onClick={() => setPublishing(true)}
             >
               Publish
             </button>
           )}
           {!portfolioId && (
-            <>
+            <span className="hidden items-center gap-2.5 sm:flex">
               <select
                 aria-label="Start over from a sample"
                 className={inputClass.replace("w-full", "w-44 py-1.5")}
@@ -561,7 +569,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               <Link href="/signup" className={primaryButtonClass}>
                 Create account to keep it
               </Link>
-            </>
+            </span>
           )}
         </span>
       </header>
@@ -643,6 +651,116 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           </aside>
         )}
       </div>
+
+      {/* Phones: the main actions stay in reach at the bottom of the screen. */}
+      <nav
+        aria-label="Editor actions"
+        className="pm-glass-header relative flex items-center gap-1.5 border-t border-zinc-200/80 px-2.5 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden dark:border-zinc-800"
+      >
+        {moreOpen && (
+          <>
+            <button
+              type="button"
+              aria-label="Close the menu"
+              className="fixed inset-0 z-30 cursor-default"
+              onClick={() => setMoreOpen(false)}
+            />
+            <div
+              id="editor-more"
+              className="pm-animate-scale absolute bottom-full end-2.5 z-40 mb-2 grid w-60 gap-1 rounded-xl border border-zinc-200/80 bg-white p-1.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <button
+                type="button"
+                className={menuItemClass}
+                disabled={exporting === "Preparing the download…"}
+                onClick={() => {
+                  setMoreOpen(false);
+                  download();
+                }}
+              >
+                Download HTML
+              </button>
+              {portfolioId && (
+                <button
+                  type="button"
+                  className={menuItemClass}
+                  onClick={() => {
+                    setMoreOpen(false);
+                    setImporting(true);
+                  }}
+                >
+                  Fill from CV
+                </button>
+              )}
+              {portfolioId && (
+                <Link href={`/editor/${portfolioId}/cv`} className={menuItemClass}>
+                  PDF CV
+                </Link>
+              )}
+              {!portfolioId &&
+                (["personal", "company", "startup"] as const).map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={menuItemClass}
+                    onClick={() => {
+                      setMoreOpen(false);
+                      startOver(kind);
+                    }}
+                  >
+                    {kind === "personal"
+                      ? "Start over from the personal sample"
+                      : kind === "company"
+                        ? "Start over from the company sample"
+                        : "Start over from the startup sample"}
+                  </button>
+                ))}
+            </div>
+          </>
+        )}
+        {(["sections", "design"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            className={`${buttonClass} flex-1 justify-center px-2`}
+            onClick={() => {
+              select(null);
+              setTab(t);
+              setPanelOpen(true);
+            }}
+          >
+            {t === "sections" ? "Sections" : "Design"}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`${buttonClass} flex-1 justify-center px-2`}
+          aria-expanded={moreOpen}
+          aria-controls="editor-more"
+          onClick={() => setMoreOpen((open) => !open)}
+        >
+          More
+        </button>
+        {portfolioId ? (
+          <button
+            type="button"
+            className={`${primaryButtonClass} flex-1 justify-center px-2 sm:hidden`}
+            onClick={() => setPublishing(true)}
+          >
+            Publish
+          </button>
+        ) : (
+          <Link
+            href="/signup"
+            className={`${primaryButtonClass} flex-1 justify-center px-2 sm:hidden`}
+          >
+            Sign up
+          </Link>
+        )}
+      </nav>
     </div>
   );
 }
+
+const menuItemClass =
+  "w-full rounded-lg px-3 py-2.5 text-start text-sm font-medium transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:hover:bg-zinc-800";

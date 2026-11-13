@@ -22,6 +22,8 @@ export function Inbox() {
   const [problem, setProblem] = useState("");
   const [plan, setPlan] = useState<"free" | "pro" | null>(null);
   const [signups, setSignups] = useState<Signup[]>([]);
+  /** Why no messages can arrive yet, worked out from the account's portfolios. */
+  const [reason, setReason] = useState<{ text: string; editId?: string } | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -33,6 +35,25 @@ export function Inbox() {
       setPlan(account?.plan ?? null);
       setMessages(list);
       setTitles(Object.fromEntries(portfolios.map((p) => [p.id, p.title])));
+      const published = portfolios.filter((p) => p.status === "published");
+      const withoutForm = published.find(
+        (p) =>
+          !p.doc?.sections.some((s) => s.type === "contact" && !s.hidden && s.variant === "form"),
+      );
+      setReason(
+        published.length === 0
+          ? {
+              text: "No messages yet. Publish a portfolio with a Contact section and messages will arrive here.",
+            }
+          : withoutForm
+            ? {
+                text: "No messages yet. Your published page has no contact form, so visitors cannot write to you. Add a Contact section with the form layout, then update the live page.",
+                editId: withoutForm.id,
+              }
+            : {
+                text: "No messages yet. They will arrive here when visitors use your contact form.",
+              },
+      );
       setProblem("");
       // Sign-ups need migration 0006; without it the inbox still shows messages.
       listSignups()
@@ -96,9 +117,14 @@ export function Inbox() {
               <UiIcon name="mail" size={20} />
             </span>
             <p>
-              No messages yet. Publish a portfolio with a Contact section and messages will arrive
-              here.
+              {reason?.text ??
+                "No messages yet. Publish a portfolio with a Contact section and messages will arrive here."}
             </p>
+            {reason?.editId && (
+              <Link href={`/editor/${reason.editId}`} className={`${buttonClass} mt-3`}>
+                Open the editor
+              </Link>
+            )}
           </div>
         ) : (
           <ul className="mt-6 grid gap-3.5">

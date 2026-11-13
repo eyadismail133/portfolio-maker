@@ -248,7 +248,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
         <div className="flex items-center justify-between">
           <PanelHeading>Design</PanelHeading>
           <button type="button" className={buttonClass} onClick={shuffle}>
-            <UiIcon name="shuffle" size={14} /> Shuffle
+            <UiIcon name="shuffle" size={14} /> Shuffle colors and fonts
           </button>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
@@ -257,6 +257,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
               key={family.id}
               type="button"
               aria-pressed={theme.family === family.id}
+              aria-label={`${family.name} design`}
               onClick={() => setFamily(family.id)}
               className={`group rounded-xl border p-2 text-start transition-all duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
                 theme.family === family.id
@@ -377,6 +378,27 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
             ["airy", "Airy"],
           ]}
         />
+      </div>
+
+      <div className="grid gap-2">
+        <PanelHeading>Animation</PanelHeading>
+        <Segmented
+          label="Animation"
+          value={theme.animation}
+          onChange={(animation) => setTheme({ animation })}
+          options={[
+            ["none", "None"],
+            ["subtle", "Subtle"],
+            ["lively", "Lively"],
+          ]}
+        />
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          {theme.animation === "lively"
+            ? "Sections rise into view and their cards follow one after another."
+            : theme.animation === "subtle"
+              ? "Sections fade in gently as visitors scroll."
+              : "Everything is shown at once, without movement."}
+        </p>
       </div>
     </div>
   );

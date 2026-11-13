@@ -203,7 +203,7 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
                       />
                       <span className="font-semibold">{`${m} month${m > 1 ? "s" : ""}`}</span>
                     </span>
-                    <span className="ms-5 mt-0.5 text-xs text-zinc-500">
+                    <span className="ms-5 mt-0.5 text-xs text-zinc-600 dark:text-zinc-300">
                       {formatPrice(priceFor(m, currency), currency)}
                     </span>
                   </label>
