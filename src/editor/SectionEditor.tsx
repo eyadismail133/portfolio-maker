@@ -7,8 +7,9 @@ import type { Section } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import { isLocalizedIn } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
+import { SectionStylePanel } from "./SectionStylePanel";
 import { useEditor } from "./store";
-import { IconButton, inputClass, Label, PanelHeading, Segmented } from "./ui";
+import { IconButton, PanelHeading, Segmented } from "./ui";
 
 const ONLY_ENGLISH: Lang[] = ["en"];
 type Tab = "content" | "layout" | "style";
@@ -20,7 +21,7 @@ export function SectionEditor({ section }: { section: Section }) {
   const title = useEditor((s) => s.doc?.meta.title ?? "");
   const doc = useEditor((s) => s.doc);
   const languages = useEditor((s) => s.doc?.meta.languages ?? ONLY_ENGLISH);
-  const { updateContent, setVariant, setSectionStyle, select } = useEditor.getState();
+  const { updateContent, setVariant, select } = useEditor.getState();
   const def = getSection(section.type);
 
   const ctx = useMemo<FormContext | null>(
@@ -111,40 +112,7 @@ export function SectionEditor({ section }: { section: Section }) {
             ))}
           </div>
         )}
-        {tab === "style" && (
-          <div className="grid gap-4">
-            <div className="grid gap-1.5">
-              <Label htmlFor="section-bg">Background</Label>
-              <select
-                id="section-bg"
-                className={inputClass}
-                value={section.style?.background ?? "default"}
-                onChange={(e) =>
-                  setSectionStyle(section.id, {
-                    background: e.target.value as "default" | "surface" | "primary",
-                  })
-                }
-              >
-                <option value="default">Page background</option>
-                <option value="surface">Soft tint</option>
-                <option value="primary">Main color</option>
-              </select>
-            </div>
-            <div className="grid gap-1.5">
-              <Label>Space above and below</Label>
-              <Segmented
-                label="Space above and below"
-                value={section.style?.padding ?? "normal"}
-                onChange={(padding) => setSectionStyle(section.id, { padding })}
-                options={[
-                  ["small", "Small"],
-                  ["normal", "Normal"],
-                  ["large", "Large"],
-                ]}
-              />
-            </div>
-          </div>
-        )}
+        {tab === "style" && <SectionStylePanel section={section} ctx={ctx} />}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getSection } from "@/render-kit/registry";
-import type { PortfolioDoc, Section, Theme } from "@/render-kit/schema/document";
+import type { PortfolioDoc, Section, SectionStyle, Theme } from "@/render-kit/schema/document";
 import type { AssetRef, Lang } from "@/render-kit/schema/primitives";
 import { applyFamily } from "@/render-kit/themes/apply";
 import * as ops from "./doc-ops";
@@ -47,7 +47,9 @@ type EditorState = {
   moveSectionTo: (id: string, targetId: string) => void;
   toggleHidden: (id: string) => void;
   setVariant: (id: string, variant: string) => void;
-  setSectionStyle: (id: string, style: Partial<NonNullable<Section["style"]>>) => void;
+  setSectionStyle: (id: string, style: Partial<SectionStyle>, group?: string) => void;
+  resetSectionStyle: (id: string) => void;
+  applyStyleToAll: (id: string) => void;
   setTheme: (theme: Partial<Theme>, group?: string) => void;
   setFamily: (family: string, keepColors?: boolean) => void;
   setMeta: (meta: Partial<PortfolioDoc["meta"]>, group?: string) => void;
@@ -158,7 +160,10 @@ export const useEditor = create<EditorState>((set, get) => {
     moveSectionTo: (id, targetId) => change((doc) => ops.moveSectionTo(doc, id, targetId)),
     toggleHidden: (id) => change((doc) => ops.toggleHidden(doc, id)),
     setVariant: (id, variant) => change((doc) => ops.setVariant(doc, id, variant)),
-    setSectionStyle: (id, style) => change((doc) => ops.setSectionStyle(doc, id, style)),
+    setSectionStyle: (id, style, group) =>
+      change((doc) => ops.setSectionStyle(doc, id, style), group),
+    resetSectionStyle: (id) => change((doc) => ops.resetSectionStyle(doc, id)),
+    applyStyleToAll: (id) => change((doc) => ops.applyStyleToAll(doc, id)),
     setTheme: (theme, group) =>
       change((doc) => ({ ...doc, theme: { ...doc.theme, ...theme } }), group),
     setFamily: (family, keepColors) => change((doc) => applyFamily(doc, family, { keepColors })),

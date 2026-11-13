@@ -1,6 +1,6 @@
 import { getSection, type AnySectionDefinition } from "@/render-kit/registry";
 import { plainText } from "@/render-kit/rich-text";
-import type { PortfolioDoc, Section } from "@/render-kit/schema/document";
+import type { PortfolioDoc, Section, SectionStyle } from "@/render-kit/schema/document";
 import type { Lang, LocalizedText } from "@/render-kit/schema/primitives";
 
 /** Pure functions that change a portfolio document. Each returns a new document. */
@@ -139,15 +139,50 @@ export function setVariant(doc: PortfolioDoc, id: string, variant: string): Port
   );
 }
 
+/** Changes part of a section's style. A value of undefined removes that choice. */
 export function setSectionStyle(
   doc: PortfolioDoc,
   id: string,
-  style: Partial<NonNullable<Section["style"]>>,
+  style: Partial<SectionStyle>,
 ): PortfolioDoc {
-  return replaceSection(doc, id, (s) => ({
-    ...s,
-    style: { background: "default", padding: "normal", ...s.style, ...style },
-  }));
+  return replaceSection(doc, id, (s) => {
+    const next: Record<string, unknown> = { background: "default", padding: "normal", ...s.style };
+    for (const [key, value] of Object.entries(style)) {
+      if (value === undefined) delete next[key];
+      else next[key] = value;
+    }
+    return { ...s, style: next as SectionStyle };
+  });
+}
+
+function withoutStyle(section: Section): Section {
+  const copy = { ...section };
+  delete copy.style;
+  return copy;
+}
+
+/** Back to the look the design family gives the section. */
+export function resetSectionStyle(doc: PortfolioDoc, id: string): PortfolioDoc {
+  return replaceSection(doc, id, withoutStyle);
+}
+
+/**
+ * Gives every other section the same style as this one. The navigation bar and footer keep
+ * theirs: their look belongs to the frame of the page, not to its content.
+ */
+export function applyStyleToAll(doc: PortfolioDoc, id: string): PortfolioDoc {
+  const source = doc.sections.find((s) => s.id === id);
+  if (!source) return doc;
+  return {
+    ...doc,
+    sections: doc.sections.map((s) =>
+      s.id === id || getSection(s.type)?.pinned
+        ? s
+        : source.style
+          ? { ...s, style: { ...source.style } }
+          : withoutStyle(s),
+    ),
+  };
 }
 
 /**

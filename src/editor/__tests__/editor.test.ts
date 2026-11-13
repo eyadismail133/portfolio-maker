@@ -77,6 +77,22 @@ describe("document operations", () => {
     expect(content.groups[0].items).toEqual([]);
   });
 
+  test("section style: choices merge, undefined removes one, reset and copy to all", () => {
+    const style = (d: typeof doc, id: string) => d.sections.find((s) => s.id === id)!.style;
+    let next = ops.setSectionStyle(doc, "about", { background: "gradient", color: "#112233" });
+    next = ops.setSectionStyle(next, "about", { width: "wide", color: undefined });
+    expect(style(next, "about")).toEqual({ background: "gradient", padding: "normal", width: "wide" });
+
+    const copied = ops.applyStyleToAll(next, "about");
+    expect(style(copied, "skills")).toEqual(style(next, "about"));
+    expect(style(copied, "hero")).toEqual(style(next, "about"));
+    // The page frame keeps its own look.
+    expect(style(copied, "navbar")).toBeUndefined();
+    expect(style(copied, "footer")).toBeUndefined();
+
+    expect(style(ops.resetSectionStyle(copied, "skills"), "skills")).toBeUndefined();
+  });
+
   test("text is kept per language only when there are two languages", () => {
     expect(ops.writeLocalized("Hi", "en", "Hello", ["en"])).toBe("Hello");
     expect(ops.writeLocalized("Hi", "ar", "أهلاً", ["en", "ar"])).toEqual({ en: "Hi", ar: "أهلاً" });
