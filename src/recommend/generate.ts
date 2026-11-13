@@ -5,47 +5,124 @@ import type { LocalizedText } from "@/render-kit/schema/primitives";
 import { buildPalette } from "@/render-kit/themes/color";
 import { getFamily } from "@/render-kit/themes/families";
 import { getPalette, palettes } from "@/render-kit/themes/palettes";
+import { randomTouches, varyLayouts } from "@/render-kit/themes/variety";
 import { getBusiness } from "./business-content";
 import { getField } from "./content";
 import { recipeFor } from "./recipes";
 import { isOrganisation, STYLES, type Answers, type StyleId, type Who } from "./types";
 
-/** A design direction: a family with optional changes that give it its own character. */
-type Look = { name: string; family: string; fonts?: string; radius?: Theme["radius"] };
+/**
+ * A design direction: a family with optional changes that give it its own character, from
+ * fonts and corners to page-wide touches and signature layouts.
+ */
+type Look = {
+  name: string;
+  family: string;
+  fonts?: string;
+  radius?: Theme["radius"];
+  touches?: Partial<Theme>;
+  /** Layout per section type, where the look wants another one than its family. */
+  layouts?: Record<string, string>;
+};
 
 /** Two looks per style, so one style alone still gives variety. */
 export const LOOKS: Record<StyleId, [Look, Look]> = {
   minimal: [
     { name: "Clean minimal", family: "minimal" },
-    { name: "Soft minimal", family: "minimal", fonts: "jakarta", radius: "large" },
+    {
+      name: "Soft minimal",
+      family: "minimal",
+      fonts: "jakarta",
+      radius: "large",
+      touches: { imageShape: "rounded", buttons: "soft", headingDeco: "line" },
+      layouts: { projects: "slider", navbar: "floating" },
+    },
   ],
   bold: [
-    { name: "Big and bold", family: "bold" },
-    { name: "Raw brutalist", family: "brutalist" },
+    {
+      name: "Big and bold",
+      family: "bold",
+      touches: { headingCase: "upper" },
+      layouts: { hero: "statement", stats: "big", footer: "big" },
+    },
+    {
+      name: "Raw brutalist",
+      family: "brutalist",
+      touches: { pattern: "grid" },
+      layouts: { projects: "index", cta: "statement" },
+    },
   ],
   elegant: [
-    { name: "Quiet elegance", family: "elegant" },
-    { name: "Classic serif", family: "elegant", fonts: "classic" },
+    { name: "Quiet elegance", family: "elegant", touches: { imageShape: "arch" } },
+    {
+      name: "Classic serif",
+      family: "elegant",
+      fonts: "classic",
+      touches: { headingDeco: "underline", buttons: "underline" },
+      layouts: { "work-experience": "compact", education: "compact" },
+    },
   ],
   playful: [
-    { name: "Friendly and round", family: "playful" },
-    { name: "Bright and playful", family: "creative", fonts: "friendly", radius: "large" },
+    {
+      name: "Friendly and round",
+      family: "playful",
+      touches: { imageShape: "blob", pattern: "dots" },
+      layouts: { skills: "cards", navbar: "floating" },
+    },
+    {
+      name: "Bright and playful",
+      family: "creative",
+      fonts: "friendly",
+      radius: "large",
+      touches: { headingDeco: "marker" },
+      layouts: { testimonials: "wall", cta: "card" },
+    },
   ],
   tech: [
-    { name: "Dark terminal", family: "tech" },
-    { name: "Frosted glass", family: "glass" },
+    {
+      name: "Dark terminal",
+      family: "tech",
+      touches: { headingDeco: "number" },
+      layouts: { skills: "dots", projects: "index" },
+    },
+    {
+      name: "Frosted glass",
+      family: "glass",
+      touches: { pattern: "glow" },
+      layouts: { navbar: "floating", hero: "cover", testimonials: "slider" },
+    },
   ],
   editorial: [
-    { name: "Magazine", family: "editorial" },
-    { name: "Editorial serif", family: "elegant", fonts: "caslon" },
+    {
+      name: "Magazine",
+      family: "editorial",
+      layouts: { hero: "statement", projects: "masonry", "work-experience": "compact" },
+    },
+    {
+      name: "Editorial serif",
+      family: "elegant",
+      fonts: "caslon",
+      touches: { headingDeco: "number", imageShape: "square" },
+      layouts: { footer: "big" },
+    },
   ],
   corporate: [
     { name: "Trusted business", family: "corporate" },
     { name: "Classic CV", family: "classic-cv" },
   ],
   creative: [
-    { name: "Studio", family: "creative" },
-    { name: "Bright gradient", family: "gradient" },
+    {
+      name: "Studio",
+      family: "creative",
+      touches: { imageShape: "tilted" },
+      layouts: { projects: "masonry", features: "big" },
+    },
+    {
+      name: "Bright gradient",
+      family: "gradient",
+      touches: { pattern: "glow", buttons: "solid" },
+      layouts: { navbar: "floating", features: "big", cta: "card" },
+    },
   ],
 };
 
@@ -208,21 +285,28 @@ function buildIdea(
       paletteDark: palette.dark,
       mode: answers.mode ?? family.defaults.mode,
       radius: look.radius ?? sample.theme.radius,
+      ...look.touches,
+      // Later ideas in a batch get a few extra touches of their own, so none look alike.
+      ...(index >= 2 ? randomTouches(next) : {}),
     },
     sections: sample.sections.map((section) => ({
       ...section,
       hidden: recipe.hidden.includes(section.type),
       // Without photos ready, start with the layout that does not lean on one.
-      variant: section.type === "about" && !hasPhotos ? "text" : section.variant,
+      variant:
+        section.type === "about" && !hasPhotos
+          ? "text"
+          : (look.layouts?.[section.type] ?? section.variant),
     })),
   };
+  const varied = index >= 2 ? varyLayouts(themed, next, 0.35) : themed;
   return {
     id: `${look.name}-${alternate ? "b" : "a"}-${index}`.toLowerCase().replace(/\s+/g, "-"),
     name: look.name,
     note: surprise
       ? `Something different: ${family.name.toLowerCase()} design with ${palette.name.toLowerCase()} colors`
       : `${family.name} design, ${palette.name.toLowerCase()} colors${alternate ? ", second layouts" : ""}`,
-    doc: normalizeDoc(personalise(themed, answers)),
+    doc: normalizeDoc(personalise(varied, answers)),
   };
 }
 

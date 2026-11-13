@@ -170,7 +170,8 @@ describe("content and looks", () => {
         checked += 1;
       }
       const faq = content(idea.doc, "faq");
-      if (faq) expect(text((faq.items as { question: unknown }[])[0].question)).toMatch(/insurance/);
+      if (faq)
+        expect(text((faq.items as { question: unknown }[])[0].question)).toMatch(/insurance/);
     }
     expect(checked).toBeGreaterThan(0);
   });
@@ -186,12 +187,31 @@ describe("content and looks", () => {
           fontPairs.some((f) => f.id === look.fonts),
           look.name,
         ).toBe(true);
+      for (const [type, variant] of Object.entries(look.layouts ?? {}))
+        expect(getSection(type)?.variants[variant], `${look.name} ${type}`).toBeDefined();
+    }
+  });
+
+  test("no two ideas in a batch look the same", () => {
+    for (const who of WHO) {
+      for (const seed of [0, 1, 2]) {
+        const looks = generateIdeas(answers({ who }), seed).map((idea) =>
+          JSON.stringify([idea.doc.theme, idea.doc.sections.map((s) => s.variant)]),
+        );
+        expect(new Set(looks).size, `${who} ${seed}`).toBe(looks.length);
+      }
     }
   });
 });
 
 describe("onboarding picture", () => {
-  const asset = { assetId: "a1", url: "https://x.test/a.webp", alt: "Sara", width: 800, height: 800 };
+  const asset = {
+    assetId: "a1",
+    url: "https://x.test/a.webp",
+    alt: "Sara",
+    width: 800,
+    height: 800,
+  };
 
   test("a photo goes into the hero and a logo into the navbar", async () => {
     const { withPicture } = await import("../picture");
