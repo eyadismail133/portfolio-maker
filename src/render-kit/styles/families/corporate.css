@@ -57,6 +57,8 @@
   background: none;
   padding: 0;
 }
-.pk-root[data-pk-family="corporate"] .pk-footer {
-  background: var(--pk-c-surface);
+/* The footer sits on the surface color unless the person picks another background. */
+.pk-root[data-pk-family="corporate"] .pk-footer[data-pk-bg="default"] {
+  --pk-bg: var(--pk-c-surface);
+  --pk-surface: var(--pk-c-bg);
 }

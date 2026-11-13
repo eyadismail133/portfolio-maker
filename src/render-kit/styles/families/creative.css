@@ -101,5 +101,8 @@
 }
 .pk-root[data-pk-family="creative"] .pk-footer {
   border-block-start: 0;
-  background: var(--pk-c-surface);
+}
+.pk-root[data-pk-family="creative"] .pk-footer[data-pk-bg="default"] {
+  --pk-bg: var(--pk-c-surface);
+  --pk-surface: var(--pk-c-bg);
 }

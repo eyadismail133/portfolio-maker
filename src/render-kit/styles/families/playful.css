@@ -13,10 +13,7 @@
   --pk-btn-shadow: 0 4px 0 color-mix(in srgb, var(--pk-primary) 55%, var(--pk-text));
 }
 .pk-root[data-pk-family="playful"] :is(.pk-btn, .pk-tags li, .pk-hero__title) {
-  border-radius: 999px;
-}
-.pk-root[data-pk-family="playful"] .pk-card {
-  border-radius: max(var(--pk-radius), 22px);
+  border-radius: var(--pk-radius-control);
 }
 .pk-root[data-pk-family="playful"] .pk-card:nth-child(3n + 2) {
   --pk-card-bg: color-mix(in srgb, var(--pk-accent) 12%, var(--pk-bg));

@@ -7,6 +7,7 @@ import type { Lang } from "./schema/primitives";
 import "./sections";
 import { themeToCssVars } from "./themes/css-vars";
 import { getFamily } from "./themes/families";
+import { sectionLook } from "./themes/section-style";
 import { googleFontsUrl } from "./themes/fonts";
 
 type Props = {
@@ -90,13 +91,14 @@ export function Renderer({
         const Component = variant.component;
         const Tag =
           def.pinned === "top" ? "header" : def.pinned === "bottom" ? "footer" : "section";
+        const look = sectionLook(section.style, doc.theme.palette);
         return (
           <Tag
             key={section.id}
             id={section.id}
             className={`pk-section pk-${def.type} pk-${def.type}--${section.variant}`}
-            data-pk-bg={section.style?.background ?? "default"}
-            data-pk-pad={section.style?.padding ?? "normal"}
+            {...look.attrs}
+            style={Object.keys(look.vars).length ? (look.vars as CSSProperties) : undefined}
           >
             <div className="pk-container">
               <Component content={section.content} ctx={ctx} />

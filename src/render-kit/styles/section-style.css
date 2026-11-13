@@ -1,0 +1,186 @@
+/*
+ * Choices from the Style tab of a section. themes/section-style.ts turns the section's style
+ * into the data attributes used here, plus the --pk-x-* colors for backgrounds it picks itself.
+ * This file comes after the families so a person's choice wins over the family look.
+ */
+
+/* "page" needs no rule: family rules only match data-pk-bg="default", so it stays plain. */
+
+/* Inverted: the text color becomes the background. */
+.pk-section[data-pk-bg="inverted"] {
+  --pk-bg: var(--pk-c-text);
+  --pk-surface: color-mix(in srgb, var(--pk-c-bg) 10%, var(--pk-c-text));
+  --pk-text: var(--pk-c-bg);
+  --pk-muted: color-mix(in srgb, var(--pk-c-bg) 76%, var(--pk-c-text));
+  --pk-primary: var(--pk-c-bg);
+  --pk-on-primary: var(--pk-c-text);
+  --pk-accent: var(--pk-c-bg);
+  --pk-border: color-mix(in srgb, var(--pk-c-bg) 22%, var(--pk-c-text));
+}
+
+/* Accent, own color, gradient and picture: colors worked out for readable text. */
+.pk-section:is(
+    [data-pk-bg="accent"],
+    [data-pk-bg="custom"],
+    [data-pk-bg="gradient"],
+    [data-pk-bg="image"]
+  ) {
+  --pk-bg: var(--pk-x-bg);
+  --pk-surface: color-mix(in srgb, var(--pk-x-text) 10%, var(--pk-x-bg));
+  --pk-text: var(--pk-x-text);
+  --pk-muted: color-mix(in srgb, var(--pk-x-text) 80%, var(--pk-x-bg));
+  --pk-primary: var(--pk-x-primary);
+  --pk-on-primary: var(--pk-x-on-primary);
+  --pk-accent: var(--pk-x-primary);
+  --pk-border: color-mix(in srgb, var(--pk-x-text) 24%, var(--pk-x-bg));
+}
+.pk-root .pk-section:is([data-pk-bg="gradient"], [data-pk-bg="image"]) {
+  background: var(--pk-x-image) center / cover no-repeat, var(--pk-x-bg);
+}
+
+/* Width of the content. */
+.pk-section[data-pk-width="narrow"] {
+  --pk-container: 760px;
+}
+.pk-section[data-pk-width="wide"] {
+  --pk-container: 1360px;
+}
+.pk-section[data-pk-width="full"] > .pk-container {
+  max-width: none;
+}
+
+/* Heading alignment. Centered also puts a side heading above the content. */
+.pk-section[data-pk-align="center"] :is(.pk-stack__head, .pk-rail__head) {
+  text-align: center;
+}
+.pk-section[data-pk-align="center"] :is(.pk-stack__head, .pk-rail__head) > * {
+  margin-inline: auto;
+}
+.pk-section[data-pk-align="center"] .pk-rail {
+  grid-template-columns: minmax(0, 1fr);
+}
+.pk-section[data-pk-align="start"] :is(.pk-stack__head, .pk-rail__head) {
+  text-align: start;
+}
+.pk-section[data-pk-align="start"] :is(.pk-stack__head, .pk-rail__head) > * {
+  margin-inline: 0;
+}
+
+/* Heading size. */
+.pk-section[data-pk-hsize="small"] {
+  --pk-h-size: 0.8;
+}
+.pk-section[data-pk-hsize="large"] {
+  --pk-h-size: 1.25;
+}
+.pk-section[data-pk-hsize="huge"] {
+  --pk-h-size: 1.6;
+}
+
+/* Card style. */
+.pk-root[data-pk-family] .pk-section[data-pk-cards="flat"] {
+  --pk-card-bg: var(--pk-surface);
+  --pk-card-border: 1px solid transparent;
+  --pk-card-shadow: none;
+}
+.pk-root[data-pk-family] .pk-section[data-pk-cards="outline"] {
+  --pk-card-bg: transparent;
+  --pk-card-border: 1px solid var(--pk-border);
+  --pk-card-shadow: none;
+}
+.pk-root[data-pk-family] .pk-section[data-pk-cards="shadow"] {
+  --pk-card-bg: var(--pk-bg);
+  --pk-card-border: 1px solid color-mix(in srgb, var(--pk-border) 55%, transparent);
+  --pk-card-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.35), 0 2px 6px rgb(0 0 0 / 0.06);
+}
+.pk-root[data-pk-family] .pk-section[data-pk-cards="glass"] {
+  --pk-card-bg: color-mix(in srgb, var(--pk-bg) 55%, transparent);
+  --pk-card-border: 1px solid color-mix(in srgb, var(--pk-text) 16%, transparent);
+  --pk-card-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.3);
+}
+.pk-section[data-pk-cards="glass"] .pk-card {
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/*
+ * Shaped edges. The section is cut with a mask, so whatever is behind it (the page color)
+ * shows through the shape. Extra padding keeps the content clear of the cut.
+ */
+/* Defaults first, at the same weight as the shape rules below so those win. */
+.pk-section[data-pk-edge] {
+  --pk-edge-size: clamp(28px, 5vw, 64px);
+  --pk-et: 0px;
+  --pk-eb: 0px;
+  --pk-mt: linear-gradient(#000 0 0);
+  --pk-mb: linear-gradient(#000 0 0);
+}
+.pk-root .pk-section[data-pk-edge] {
+  padding-block-start: calc(var(--pk-pad) + var(--pk-et));
+  padding-block-end: calc(var(--pk-pad) + var(--pk-eb));
+  -webkit-mask:
+    var(--pk-mt) top / 100% calc(var(--pk-et) + 1px) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--pk-et) - 1px) / 100%
+      calc(100% - var(--pk-et) - var(--pk-eb) + 2px) no-repeat,
+    var(--pk-mb) bottom / 100% calc(var(--pk-eb) + 1px) no-repeat;
+  mask:
+    var(--pk-mt) top / 100% calc(var(--pk-et) + 1px) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--pk-et) - 1px) / 100%
+      calc(100% - var(--pk-et) - var(--pk-eb) + 2px) no-repeat,
+    var(--pk-mb) bottom / 100% calc(var(--pk-eb) + 1px) no-repeat;
+}
+.pk-section[data-pk-edge-top="wave"] {
+  --pk-et: var(--pk-edge-size);
+  --pk-mt: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cg transform=%27matrix(1 0 0 -1 0 60)%27%3E%3Cpath d=%27M0 0H1200V30C1000 66 800 -6 600 30S200 66 0 30Z%27/%3E%3C/g%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-bottom="wave"] {
+  --pk-eb: var(--pk-edge-size);
+  --pk-mb: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M0 0H1200V30C1000 66 800 -6 600 30S200 66 0 30Z%27/%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-top="slant"] {
+  --pk-et: var(--pk-edge-size);
+  --pk-mt: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cg transform=%27matrix(1 0 0 -1 0 60)%27%3E%3Cpath d=%27M0 0H1200L0 60Z%27/%3E%3C/g%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-bottom="slant"] {
+  --pk-eb: var(--pk-edge-size);
+  --pk-mb: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M0 0H1200L0 60Z%27/%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-top="curve"] {
+  --pk-et: var(--pk-edge-size);
+  --pk-mt: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cg transform=%27matrix(1 0 0 -1 0 60)%27%3E%3Cpath d=%27M0 0H1200Q600 120 0 0Z%27/%3E%3C/g%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-bottom="curve"] {
+  --pk-eb: var(--pk-edge-size);
+  --pk-mb: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M0 0H1200Q600 120 0 0Z%27/%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-top="zigzag"] {
+  --pk-et: var(--pk-edge-size);
+  --pk-mt: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cg transform=%27matrix(1 0 0 -1 0 60)%27%3E%3Cpath d=%27M0 0H1200V20L1150 60L1100 20L1050 60L1000 20L950 60L900 20L850 60L800 20L750 60L700 20L650 60L600 20L550 60L500 20L450 60L400 20L350 60L300 20L250 60L200 20L150 60L100 20L50 60L0 20Z%27/%3E%3C/g%3E%3C/svg%3E");
+}
+.pk-section[data-pk-edge-bottom="zigzag"] {
+  --pk-eb: var(--pk-edge-size);
+  --pk-mb: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 60%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M0 0H1200V20L1150 60L1100 20L1050 60L1000 20L950 60L900 20L850 60L800 20L750 60L700 20L650 60L600 20L550 60L500 20L450 60L400 20L350 60L300 20L250 60L200 20L150 60L100 20L50 60L0 20Z%27/%3E%3C/svg%3E");
+}
+
+/* Entrances added by page-script.ts ("fade" and "rise" reuse the page animation classes). */
+.pk-section.pk-reveal--zoom {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pk-section.pk-reveal--slide {
+  opacity: 0;
+  transform: translateX(-48px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pk-root[dir="rtl"] .pk-section.pk-reveal--slide {
+  transform: translateX(48px);
+}
+.pk-root .pk-section:is(.pk-reveal--zoom, .pk-reveal--slide).pk-in {
+  opacity: 1;
+  transform: none;
+}

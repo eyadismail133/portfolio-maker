@@ -25,6 +25,7 @@ import {
 import { families } from "../themes/families";
 import { fontPairs, getFontPair, googleFontsUrl } from "../themes/fonts";
 import { palettes } from "../themes/palettes";
+import { sectionLook } from "../themes/section-style";
 
 describe("document", () => {
   test("sample documents are valid, and the full sample uses every section", () => {
@@ -335,6 +336,74 @@ describe("menu labels", () => {
     expect(menuLabel("case-study", "توسعة مصنع في موعدها المحدد تماماً", "ar")).toBe("دراسة حالة");
     expect(menuLabel("text", "A very long heading with many words", "en")).toBe(
       "A very long heading with many words",
+    );
+  });
+});
+
+describe("section style", () => {
+  const palette = createSampleDoc().theme.palette;
+
+  test("old documents without the new choices render as before", () => {
+    expect(sectionLook(undefined, palette)).toEqual({
+      attrs: { "data-pk-bg": "default", "data-pk-pad": "normal" },
+      vars: {},
+    });
+    expect(sectionLook({ background: "surface", padding: "large" }, palette).vars).toEqual({});
+  });
+
+  test("own backgrounds always get readable text", () => {
+    for (const color of ["#ffffff", "#000000", "#ffd400", "#1f4fd8", "#7a1f5c", "#88aa88"]) {
+      const { vars } = sectionLook({ background: "custom", padding: "normal", color }, palette);
+      expect(contrastRatio(vars["--pk-x-text"], color), color).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(vars["--pk-x-primary"], color), color).toBeGreaterThanOrEqual(3);
+    }
+    const accent = sectionLook({ background: "accent", padding: "normal" }, palette).vars;
+    expect(contrastRatio(accent["--pk-x-text"], palette.accent)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test("a background picture cannot break out of its CSS", () => {
+    const look = (url: string) =>
+      sectionLook(
+        {
+          background: "image",
+          padding: "normal",
+          image: { assetId: "a", url, alt: "", width: 1, height: 1 },
+        },
+        palette,
+      ).vars["--pk-x-image"];
+    expect(look("javascript:alert(1)")).not.toContain("url(");
+    const escaped = look('https://x.test/a.webp");x{}');
+    expect(escaped).toContain('url("https://x.test/a.webp\\22 );x{}")');
+  });
+
+  test("the page shows the choices as attributes and colors, and they survive a save", () => {
+    const doc = createSampleDoc({ sections: ["navbar", "about", "footer"] });
+    doc.sections[1].style = {
+      background: "custom",
+      padding: "xlarge",
+      color: "#7a1f5c",
+      width: "narrow",
+      align: "center",
+      headingSize: "huge",
+      cards: "glass",
+      edgeBottom: "wave",
+      entrance: "zoom",
+    };
+    const html = renderToHtml(doc);
+    for (const part of [
+      'data-pk-bg="custom"',
+      'data-pk-pad="xlarge"',
+      'data-pk-width="narrow"',
+      'data-pk-align="center"',
+      'data-pk-hsize="huge"',
+      'data-pk-cards="glass"',
+      'data-pk-edge-bottom="wave"',
+      'data-pk-entrance="zoom"',
+      "--pk-x-bg:#7a1f5c",
+    ])
+      expect(html).toContain(part);
+    expect(normalizeDoc(JSON.parse(JSON.stringify(doc))).sections[1].style).toEqual(
+      doc.sections[1].style,
     );
   });
 });

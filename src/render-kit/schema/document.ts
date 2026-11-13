@@ -31,10 +31,52 @@ export const themeSchema = z.object({
 });
 export type Theme = z.infer<typeof themeSchema>;
 
+/**
+ * Backgrounds a section can have. "default" lets the design family decide (some color the hero
+ * or footer); "page" is always the plain page color. "custom", "gradient" and "image" take their
+ * colors from the style itself and pick readable text on their own.
+ */
+export const SECTION_BACKGROUNDS = [
+  "default",
+  "page",
+  "surface",
+  "primary",
+  "accent",
+  "inverted",
+  "custom",
+  "gradient",
+  "image",
+] as const;
+export const SECTION_EDGES = ["none", "wave", "slant", "curve", "zigzag"] as const;
+
+/**
+ * How one section looks. Everything past background and padding is optional and was added
+ * without a schema version bump: old documents simply do not have it, and missing means
+ * "as the design family does it".
+ */
 export const sectionStyleSchema = z.object({
-  background: z.enum(["default", "surface", "primary"]).default("default"),
-  padding: z.enum(["small", "normal", "large"]).default("normal"),
+  background: z.enum(SECTION_BACKGROUNDS).default("default"),
+  padding: z.enum(["none", "small", "normal", "large", "xlarge"]).default("normal"),
+  /** Color for "custom", first color for "gradient". */
+  color: hexColorSchema.optional(),
+  /** Second color for "gradient". */
+  color2: hexColorSchema.optional(),
+  gradient: z.enum(["down", "diagonal", "radial"]).optional(),
+  /** Picture for "image". */
+  image: assetRefSchema.optional(),
+  /** Layer over the picture so text stays readable. */
+  overlay: z.enum(["dark", "darker", "light", "lighter"]).optional(),
+  width: z.enum(["narrow", "normal", "wide", "full"]).optional(),
+  /** Alignment of the section heading and its subheading. */
+  align: z.enum(["start", "center"]).optional(),
+  headingSize: z.enum(["small", "normal", "large", "huge"]).optional(),
+  cards: z.enum(["flat", "outline", "shadow", "glass"]).optional(),
+  edgeTop: z.enum(SECTION_EDGES).optional(),
+  edgeBottom: z.enum(SECTION_EDGES).optional(),
+  /** How the section appears when scrolled to. Missing: the page's animation setting. */
+  entrance: z.enum(["none", "fade", "rise", "zoom", "slide"]).optional(),
 });
+export type SectionStyle = z.infer<typeof sectionStyleSchema>;
 
 export const sectionSchema = z.object({
   id: z.string().min(1),

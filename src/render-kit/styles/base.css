@@ -178,7 +178,10 @@
   --pk-tag-bg: transparent;
   --pk-tag-border: 1px solid var(--pk-border);
   --pk-btn-shadow: none;
-  --pk-pad: var(--pk-section-pad);
+  /* Space above and below: the section type sets a base, the person picks a scale. */
+  --pk-pad-base: 1;
+  --pk-pad-scale: 1;
+  --pk-pad: calc(var(--pk-section-pad) * var(--pk-pad-base) * var(--pk-pad-scale));
   background: var(--pk-bg);
   color: var(--pk-text);
   padding-block: var(--pk-pad);
@@ -197,11 +200,17 @@
   --pk-accent: var(--pk-c-on-primary);
   --pk-border: color-mix(in srgb, var(--pk-c-on-primary) 28%, var(--pk-c-primary));
 }
+.pk-section[data-pk-pad="none"] {
+  --pk-pad-scale: 0;
+}
 .pk-section[data-pk-pad="small"] {
-  --pk-pad: calc(var(--pk-section-pad) * 0.5);
+  --pk-pad-scale: 0.5;
 }
 .pk-section[data-pk-pad="large"] {
-  --pk-pad: calc(var(--pk-section-pad) * 1.4);
+  --pk-pad-scale: 1.4;
+}
+.pk-section[data-pk-pad="xlarge"] {
+  --pk-pad-scale: 2;
 }
 
 /* Reset, so the page looks the same inside the app and as an exported file. */
@@ -251,7 +260,7 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-style: var(--pk-heading-style);
-  font-size: calc(clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale));
+  font-size: calc(clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale) * var(--pk-h-size, 1));
   line-height: var(--pk-h-leading);
   letter-spacing: var(--pk-h-tracking);
   text-wrap: balance;

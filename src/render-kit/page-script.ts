@@ -197,14 +197,18 @@ export const PAGE_SCRIPT = String.raw`(function () {
 
   // Sections below the fold: "subtle" fades them in, "lively" lifts them in and lets their
   // cards follow one after another.
-  if (!calm && animation !== "none") {
-    var lively = animation === "lively";
+  // A section's own entrance (data-pk-entrance) wins over the page setting.
+  if (!calm) {
+    var pageEntrance = animation === "lively" ? "rise" : animation === "subtle" ? "fade" : "none";
+    var classes = { fade: "pk-reveal--soft", rise: "pk-reveal", zoom: "pk-reveal--zoom", slide: "pk-reveal--slide" };
     var sections = Array.prototype.filter.call(root.querySelectorAll(".pk-section"), function (el) {
-      return !el.classList.contains("pk-navbar") && !el.classList.contains("pk-hero") && el.getBoundingClientRect().top > window.innerHeight * 0.92;
+      var kind = el.getAttribute("data-pk-entrance") || pageEntrance;
+      return kind !== "none" && !el.classList.contains("pk-navbar") && !el.classList.contains("pk-hero") && el.getBoundingClientRect().top > window.innerHeight * 0.92;
     });
     sections.forEach(function (el) {
-      el.classList.add(lively ? "pk-reveal" : "pk-reveal--soft");
-      if (!lively) return;
+      var kind = el.getAttribute("data-pk-entrance") || pageEntrance;
+      el.classList.add(classes[kind] || "pk-reveal--soft");
+      if (kind !== "rise") return;
       var items = el.querySelectorAll(".pk-card, .pk-entry, .pk-project, .pk-grid > li, .pk-tags li");
       Array.prototype.forEach.call(items, function (item, i) {
         item.classList.add("pk-stagger");

@@ -1,5 +1,5 @@
 .pk-navbar {
-  padding-block: 18px;
+  padding-block: calc(18px * var(--pk-pad-scale));
 }
 .pk-nav {
   display: flex;

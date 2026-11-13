@@ -1,5 +1,5 @@
 .pk-footer {
-  padding-block: 36px;
+  padding-block: calc(36px * var(--pk-pad-scale));
   border-block-start: var(--pk-rule);
   font-size: 0.9375rem;
 }

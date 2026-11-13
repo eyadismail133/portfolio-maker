@@ -1,5 +1,5 @@
 .pk-logo-strip {
-  --pk-pad: calc(var(--pk-section-pad) * 0.45);
+  --pk-pad-base: 0.45;
 }
 .pk-logo-strip__label {
   color: var(--pk-muted);

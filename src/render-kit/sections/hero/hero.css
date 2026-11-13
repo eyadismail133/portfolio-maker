@@ -21,7 +21,7 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-style: var(--pk-heading-style);
-  font-size: calc(clamp(2.6rem, 1.4rem + 6vw, 5.75rem) * var(--pk-display-scale));
+  font-size: calc(clamp(2.6rem, 1.4rem + 6vw, 5.75rem) * var(--pk-display-scale) * var(--pk-h-size, 1));
   line-height: calc(var(--pk-h-leading) * 0.94);
   letter-spacing: calc(var(--pk-h-tracking) * 1.4);
   text-wrap: balance;

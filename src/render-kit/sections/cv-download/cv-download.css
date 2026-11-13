@@ -1,5 +1,5 @@
 .pk-cv-download {
-  --pk-pad: calc(var(--pk-section-pad) * 0.6);
+  --pk-pad-base: 0.6;
 }
 .pk-cv {
   display: flex;

@@ -14,9 +14,6 @@
   --pk-card-border: 0 solid transparent;
   --pk-tag-border: 0 solid transparent;
 }
-.pk-root[data-pk-family="editorial"] :is(.pk-card, .pk-btn, .pk-media, .pk-tags li) {
-  border-radius: 0;
-}
 .pk-root[data-pk-family="editorial"] .pk-card {
   border-block-start: var(--pk-rule);
   padding-inline: 0;

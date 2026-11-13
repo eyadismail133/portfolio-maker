@@ -1,5 +1,5 @@
 .pk-stats {
-  --pk-pad: calc(var(--pk-section-pad) * 0.7);
+  --pk-pad-base: 0.7;
 }
 .pk-stats__heading {
   margin-block-end: var(--pk-gap);
