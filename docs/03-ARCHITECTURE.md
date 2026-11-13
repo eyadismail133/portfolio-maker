@@ -203,6 +203,15 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 - `profiles.plan` and `profiles.pro_until` say who is Pro; the database function `is_pro()` is the single test (plan "pro" and not expired). Limits are enforced by triggers, storage rules and functions in `0004_plans_and_billing.sql`; the app only explains them.
 - Payments: `/api/billing/checkout` creates a pending row and a Paymob intention; `/api/billing/paymob` verifies the HMAC and calls `apply_paid_payment` with the server-only secret key (`src/lib/supabase/admin.ts`). Details in `docs/08-PLANS-AND-PAYMENTS.md`.
 
+## Added in Phase 6 (as built)
+- **Shared AI code:** `src/lib/ai/server.ts` holds the model settings, the credit check and the model fallback loop for `/api/ai` and `/api/ai/import`.
+- **CV import:** the browser reads the PDF with pdf.js (`src/lib/pdf-text.ts`); `/api/ai/import` turns the text into JSON (`src/lib/ai/cv-import.ts`, checked with Zod, bad entries dropped); `applyImport` writes it into the document as one undo step.
+- **PDF CV:** `buildCv` (`src/lib/cv.ts`) turns the document into plain CV data; `/editor/[id]/cv` lays it out for A4 and the browser's print dialog saves the PDF. No server PDF library.
+- **Emails:** `src/lib/email.ts` (Resend over HTTPS, off without settings). Sent after the response with `after()` so visitors and Paymob never wait: new message (`src/lib/notify.ts`), receipt (`src/lib/billing/receipt.ts`). `/api/cron/daily` sends Pro reminders.
+- **Custom domains:** `custom_domains` table; `/api/domains` adds the domain in Vercel (`src/lib/vercel-domains.ts`) and marks it verified with the server key. The proxy (`src/lib/supabase/proxy.ts`) looks up unknown hosts with `resolve_custom_domain` (cached a minute) and rewrites `/` to `/p/<slug>`. A host that is not a connected domain is treated as the app, so the app never breaks on a new address.
+- **Errors:** `src/instrumentation.ts` (`onRequestError`) writes to `error_log` with the server key.
+- **Templates:** `/templates` lists `src/lib/templates.ts` (one per family); "Use this template" opens `/editor?template=<id>`.
+
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.
 - Uploads: images only, 5 MB max, resized to 2000px max, converted to WebP.

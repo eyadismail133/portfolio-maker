@@ -62,10 +62,18 @@ describe("CV import", () => {
     summary: "I design concrete structures.",
     email: "omar@x.co",
     experience: [
-      { role: "Site engineer", company: "Orascom", start: "2019-3", end: "Present", achievements: ["Built 3 towers"] },
+      {
+        role: "Site engineer",
+        company: "Orascom",
+        start: "2019-3",
+        end: "Present",
+        achievements: ["Built 3 towers"],
+      },
       { role: 42 },
     ],
-    education: [{ degree: "BSc Civil Engineering", school: "Ain Shams", start: "2014", end: "2019" }],
+    education: [
+      { degree: "BSc Civil Engineering", school: "Ain Shams", start: "2014", end: "2019" },
+    ],
     skills: [{ group: "Software", items: ["AutoCAD", "ETABS"] }],
     languages: [{ name: "Arabic", level: "mother tongue" }],
     certificates: [{ name: "PMP", url: "javascript:alert(1)" }],
@@ -95,13 +103,22 @@ describe("CV import", () => {
     const next = applyImport(doc, data, "en");
     const types = next.sections.map((s) => s.type);
     expect(types).toEqual(
-      expect.arrayContaining(["work-experience", "education", "skills", "languages", "certificates"]),
+      expect.arrayContaining([
+        "work-experience",
+        "education",
+        "skills",
+        "languages",
+        "certificates",
+      ]),
     );
     expect(types.at(-1)).toBe("footer");
     const hero = next.sections.find((s) => s.type === "hero")!.content as Record<string, any>;
     expect(hero.name.en).toBe("Omar Fathy");
     expect(hero.name.ar).toBe("ليلى حسن");
-    const certs = next.sections.find((s) => s.type === "certificates")!.content as Record<string, any>;
+    const certs = next.sections.find((s) => s.type === "certificates")!.content as Record<
+      string,
+      any
+    >;
     expect(certs.items[0].url).toBe("");
     expect(normalizeDoc(next)).toEqual(next);
     expect(importMessages("x".repeat(30_000))[1].content.length).toBeLessThan(21_500);

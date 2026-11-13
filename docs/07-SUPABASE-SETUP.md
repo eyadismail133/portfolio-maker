@@ -65,6 +65,14 @@ Until steps 2 and 3 are filled in, `/pro` says "Payments open soon" and nothing 
 - The texts in `src/app/terms`, `src/app/privacy` and `src/app/refunds` are a plain-language starting point, not legal advice. Have a lawyer in Egypt review them before taking real payments. The refund rule (full refund within 14 days of the first purchase) is a suggested default: change it if you want something else.
 - Visitors' reports land in the `abuse_reports` table. Read them in the Table Editor; mark them `reviewed` or `actioned` in the `status` column. To take a page offline, set its portfolio's `status` to `draft` in the `portfolios` table.
 
+## 9. Emails, daily job, custom domains, error log and backups (optional)
+All of these are off until their settings exist; nothing breaks without them. Add each setting in `.env.local` and in Vercel (Settings → Environment Variables), then redeploy.
+- **Emails** (new message, receipt after payment, "Pro ends in 3 days"): make a free account at resend.com, verify your domain there, then set `RESEND_API_KEY` and `EMAIL_FROM` (for example `Portfolio Maker <hello@yourdomain.com>`). Emails also need `SUPABASE_SECRET_KEY`, which is already set for payments. Optional `NEXT_PUBLIC_SITE_URL` (your app's address) for the links inside emails.
+- **Daily job** (`vercel.json`, every day at 07:17 UTC): set `CRON_SECRET` to a long random string. It sends the Pro reminders and clears error-log rows older than 30 days. Vercel's free plan allows one daily job.
+- **Custom domains (Pro):** run `0006_signups_domains_errors.sql` (step 1), then set `VERCEL_TOKEN` (Vercel → Account settings → Tokens), `VERCEL_PROJECT_ID` (project → Settings → General) and, if the project is in a team, `VERCEL_TEAM_ID`. Pro owners then connect a domain in the Publish window; it shows the DNS records to add and turns on by itself once the DNS is right. When Pro ends, the domain stops showing the page.
+- **Error log:** after 0006, server errors are written to `error_log` (message, path and kind only). Read them with `select * from public.error_log order by created_at desc limit 50;`.
+- **Backups:** on GitHub, open the repository → Settings → Secrets and variables → Actions → New repository secret named `SUPABASE_DB_URL`, with the "Session pooler" connection string from Supabase (Connect button), password filled in. `.github/workflows/backup.yml` then saves a database dump every night, kept 14 days under the Actions tab. The dump holds user data, so keep the repository private. Run it once by hand (Actions → Nightly database backup → Run workflow) to check it works. Supabase's free plan has no backups of its own.
+
 ## Check of the live project (13 November 2026)
 
 Second check, after the owner ran 0003 and 0004: the new tables and columns exist, and visitors are refused by `is_slug_available`, `is_pro` and `apply_paid_payment`. Vercel deploys from GitHub.

@@ -58,6 +58,12 @@ export default function Home() {
         <span className="font-semibold">Portfolio Maker</span>
         <nav className="ms-auto flex items-center gap-2 text-sm">
           <Link
+            href="/templates"
+            className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+          >
+            Templates
+          </Link>
+          <Link
             href="/login"
             className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900"
           >
@@ -185,8 +191,8 @@ export default function Home() {
 
       <footer className="mx-auto flex max-w-6xl flex-wrap gap-4 px-5 py-8 text-sm text-zinc-500">
         <span>Portfolio Maker</span>
-        <Link href="/dev/render" className="hover:text-zinc-900 dark:hover:text-zinc-100">
-          All designs
+        <Link href="/templates" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          Templates
         </Link>
         <Link href="/pro" className="hover:text-zinc-900 dark:hover:text-zinc-100">
           Pricing

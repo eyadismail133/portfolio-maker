@@ -112,7 +112,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Add the AI key in `.env.local` (Vercel: owner)
 - [x] PDF CV download from the same data (Pro: an A4 page at /editor/[id]/cv; the browser's print dialog saves the PDF)
 - [x] Dark/light switch for visitors
-- [ ] Email the owner when a message arrives
+- [x] Email the owner when a message arrives (Resend; at most one email per page every 10 minutes)
 - [ ] App interface in Arabic
 
 ## Phase 7 - Launch and business
@@ -124,14 +124,14 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Run `0004` (checked live on 13 November 2026)
 - [ ] Run `0005`; test a payment with Paymob test keys on Vercel
 - [x] Account page with payment history
-- [ ] Receipts (PDF or email)
-- [ ] Emails: receipt, Pro ending soon
+- [x] Receipts (email after payment, and a printable receipt page in Account)
+- [x] Emails: receipt, Pro ending soon (daily job in vercel.json)
 - [ ] Auto-renewing card subscriptions (optional)
-- [ ] Custom domains
+- [x] Custom domains (Pro; Vercel API, verified by the server, stop when Pro ends)
 - [x] Terms, privacy and refund pages; "Report this page" on published pages (`0005_reports.sql`)
 - [ ] Have a lawyer review the terms, privacy and refund texts; set `NEXT_PUBLIC_LEGAL_NAME` and `NEXT_PUBLIC_CONTACT_EMAIL`
-- [ ] Error monitoring and backups
-- [ ] Template gallery page for SEO
+- [x] Error monitoring and backups (error_log table via instrumentation; nightly pg_dump GitHub Action)
+- [x] Template gallery page for SEO (/templates, plus sitemap.xml and robots.txt)
 
 ## Risks to watch
 | Risk | How we handle it |

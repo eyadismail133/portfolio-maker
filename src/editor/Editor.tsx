@@ -13,6 +13,7 @@ import { friendlyError, getMyPlan, getPortfolio, isOffline, savePortfolio } from
 import { uploadImage } from "@/lib/upload";
 import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
 import { downloadHtml } from "@/lib/export-download";
+import { templateDoc } from "@/lib/templates";
 import { ImportCvDialog } from "./ImportCvDialog";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
 import { PublishDialog } from "./PublishDialog";
@@ -90,7 +91,15 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
     let cancelled = false;
     if (!portfolioId) {
       useEditor.setState({ uploader: null, plan: null });
-      load(readDraft() ?? createSampleDoc());
+      // A template chosen on /templates. Over an existing draft it is one step that Undo reverses.
+      const params = new URLSearchParams(window.location.search);
+      const chosen = templateDoc(params.get("template") ?? "");
+      const draft = readDraft();
+      load(draft ?? chosen ?? createSampleDoc());
+      if (chosen) {
+        if (draft) useEditor.getState().commit(chosen);
+        window.history.replaceState(null, "", "/editor");
+      }
       Promise.resolve().then(() => !cancelled && setOpening({ state: "ready" }));
       return () => {
         cancelled = true;
