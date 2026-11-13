@@ -23,7 +23,7 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 ## Left panel
 
 **Sections tab**
-- List of sections in page order. Drag to reorder. Each row: eye icon (hide/show), duplicate, delete, and click to select.
+- List of sections in page order. Drag to reorder. Each row always shows a bin (delete) and an eye (hide/show); move up, move down and duplicate appear on the selected or hovered row. The section panel also has a "Remove section" button next to Close. Deleting is one Undo step.
 - "Add section" opens the library grouped by category, with a small preview of each variant. New sections come with sample content.
 - Navbar and footer are pinned to top and bottom.
 
@@ -52,7 +52,8 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - The preview is an `<iframe>` loading `/preview/[id]`, which runs the same Renderer as the published page. The frame gives true responsive behavior: the phone button really makes the page 390px wide, so CSS breakpoints act correctly.
 - The editor sends the document to the frame with `postMessage` on every change; the frame re-renders only what changed. Target: change visible in under 100 ms.
 - In the frame, sections show an outline on hover and a small toolbar when selected (move up, move down, duplicate, delete). Clicking a section selects it and scrolls the left list to it; selecting in the list scrolls the preview to it.
-- "Preview" button in the top bar opens the page in a new tab without editing outlines.
+- "Full preview" in the top bar hides both side panels so the page gets the whole width; Esc (also inside the preview) or "Show panels" brings them back. While it is on, clicking a section selects it without opening the form.
+- "Open in new tab" shows the page as visitors get it, with the real stylesheet and page script and no editing outlines. It is built in the browser from the current document (`openPreviewTab` in `lib/export-download.ts`), so unsaved and unpublished changes show too. The tab is opened on the click itself so pop-up blockers allow it, and it has no link back to the editor.
 - Double-click any plain text in the preview to edit it in place (Enter or clicking away saves, Escape cancels). The frame sends `pk:edit` with the element's original and new text; the editor finds the one field holding that text in the selected section and changes it through `setTextAt`, so it is one undo step. Text with rich-text marks, or text that appears twice, sends `pk:note` and is edited in the form instead.
 
 ## State, saving, undo
@@ -90,9 +91,10 @@ Stored in `section.style`. Every field past `background` and `padding` is option
 |---|---|
 | Background | Design default, Plain page, Soft tint, Main color, Accent, Inverted, My color (`color`), Gradient (`color`, `color2`, direction down / diagonal / glow), Picture (`image`, layer dark / darker / light / lighter) |
 | Shape | Top and bottom edge: straight, wave, slant, curve, zigzag |
-| Layout | Content width (narrow, normal, wide, full), heading position (design, start, centered), heading size (small to huge), cards (design, flat, outline, shadow, glass) |
+| Layout | Content width (narrow, normal, wide, full), text alignment (design, start, centered), heading size (small to huge), cards (design, flat, outline, shadow, glass) |
 | Space and motion | Space above and below (none, small, normal, large, extra), entrance when scrolled to (page setting, none, fade, rise, zoom, slide) |
 
+- Text alignment moves the standard section heading; sections with their own text block (hero, call to action, text, quote, CV download, newsletter, booking...) align all their text instead. In two-column layouts the text centers in its own column.
 - "Use this style on all sections" copies the style to every section except the navbar and footer; "Reset style" removes it. Both are one Undo step. Dragging a color picker is grouped into one step.
 - The navbar shows only Background and Space; the footer and divider hide the heading and card choices; the hero has no entrance (it is on screen when the page opens).
 - `render-kit/themes/section-style.ts` turns the style into data attributes for `styles/section-style.css` and, for own colors, gradients and pictures, the `--pk-x-*` colors. It picks white or near-black text, whichever reads better, and keeps the main color only where it still stands out (3:1), so no contrast warning is needed.
