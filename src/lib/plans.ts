@@ -22,6 +22,8 @@ export const FEATURES = {
   ai: { free: false, pro: true },
   downloadHtml: { free: false, pro: true },
   noBadge: { free: false, pro: true },
+  pdfCv: { free: false, pro: true },
+  cvImport: { free: false, pro: true },
 } satisfies Record<string, Record<Plan, boolean>>;
 
 export function hasFeature(plan: Plan | null | undefined, feature: keyof typeof FEATURES): boolean {
@@ -69,4 +71,6 @@ export const COMPARISON: { label: string; free: string; pro: string }[] = [
   { label: "Version history", free: "Last 5", pro: "Last 30" },
   { label: "Download as HTML", free: "No", pro: "Yes" },
   { label: "AI writing", free: "No", pro: "50 uses a day" },
+  { label: "PDF CV from your portfolio", free: "No", pro: "Yes" },
+  { label: "Fill from a CV or LinkedIn PDF", free: "No", pro: "Yes" },
 ];

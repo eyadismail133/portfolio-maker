@@ -107,10 +107,10 @@ The core. No login, no editor yet; work with JSON files.
 - [x] 6 more design families (playful, editorial, brutalist, glass, gradient, classic CV)
 - [x] Remaining "later" sections (publications, before and after, careers, booking)
 - [x] Edit text directly in the preview (double-click plain text; marked-up text opens in the form)
-- [ ] CV / LinkedIn import to fill data
+- [x] CV / LinkedIn import to fill data (Pro: PDF read in the browser with pdf.js, text turned into sections by the AI, shown before it is applied, one Undo step)
 - [x] AI writing help for Pro accounts: first draft, improve, shorten, translate between English and Arabic; free model (Google Gemini by default, any OpenAI-format service), 50 uses a day
 - [x] Add the AI key in `.env.local` (Vercel: owner)
-- [ ] PDF CV download from the same data
+- [x] PDF CV download from the same data (Pro: an A4 page at /editor/[id]/cv; the browser's print dialog saves the PDF)
 - [x] Dark/light switch for visitors
 - [ ] Email the owner when a message arrives
 - [ ] App interface in Arabic

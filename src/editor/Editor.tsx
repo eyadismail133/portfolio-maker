@@ -13,6 +13,7 @@ import { friendlyError, getMyPlan, getPortfolio, isOffline, savePortfolio } from
 import { uploadImage } from "@/lib/upload";
 import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
 import { downloadHtml } from "@/lib/export-download";
+import { ImportCvDialog } from "./ImportCvDialog";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
 import { PublishDialog } from "./PublishDialog";
 import { VersionsPanel } from "./VersionsPanel";
@@ -76,6 +77,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   const [status, setStatus] = useState<SaveStatus>("saved");
   const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState("");
+  const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState("");
   const [panelOpen, setPanelOpen] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
@@ -485,6 +487,16 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             Download HTML
           </button>
           {portfolioId && (
+            <button type="button" className={buttonClass} onClick={() => setImporting(true)}>
+              Fill from CV
+            </button>
+          )}
+          {portfolioId && (
+            <Link href={`/editor/${portfolioId}/cv`} className={buttonClass}>
+              PDF CV
+            </Link>
+          )}
+          {portfolioId && (
             <button
               type="button"
               className={primaryButtonClass}
@@ -568,6 +580,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           />
         </main>
 
+        {importing && <ImportCvDialog onClose={() => setImporting(false)} />}
         {publishing && portfolioId && (
           <PublishDialog
             portfolioId={portfolioId}

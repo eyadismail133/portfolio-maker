@@ -63,3 +63,25 @@ describe("image sizes", () => {
     expect(fitWithin(800, 600)).toEqual({ width: 800, height: 600 });
   });
 });
+
+describe("PDF CV", () => {
+  test("is built from the visible sections, as plain text, in either language", async () => {
+    const { buildCv } = await import("../cv");
+    const { createSampleDoc } = await import("@/render-kit/samples");
+    const { normalizeDoc } = await import("@/render-kit/registry");
+    const doc = normalizeDoc(createSampleDoc({ languages: ["en", "ar"] }));
+    const en = buildCv(doc, "en");
+    expect(en.name).toBe("Layla Hassan");
+    expect(en.experience.length).toBeGreaterThan(0);
+    expect(en.experience[0].when).toMatch(/Present/);
+    expect(en.skills.length).toBeGreaterThan(0);
+    expect(JSON.stringify(en)).not.toMatch(/\*\*/);
+    const ar = buildCv(doc, "ar");
+    expect(ar.headings.experience).not.toBe(en.headings.experience);
+    const hidden = {
+      ...doc,
+      sections: doc.sections.map((s) => (s.type === "work-experience" ? { ...s, hidden: true } : s)),
+    };
+    expect(buildCv(hidden, "en").experience).toEqual([]);
+  });
+});
