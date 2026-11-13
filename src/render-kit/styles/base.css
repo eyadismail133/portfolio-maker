@@ -260,10 +260,14 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-style: var(--pk-heading-style);
-  font-size: calc(
-    clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale) * var(--pk-h-size, 1) *
-      var(--pk-h-page, 1)
+  font-size: min(
+    calc(
+      clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale) * var(--pk-h-size, 1) *
+        var(--pk-h-page, 1)
+    ),
+    max(calc(clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale)), 11vw)
   );
+  overflow-wrap: anywhere;
   line-height: var(--pk-h-leading);
   letter-spacing: var(--pk-h-tracking);
   text-wrap: balance;

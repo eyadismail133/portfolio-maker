@@ -186,3 +186,93 @@
   opacity: 1;
   transform: none;
 }
+
+/*
+ * Alignment for sections that have their own text block instead of the standard heading
+ * (hero, call to action, text, quote, newsletter, numbers...): the whole text follows.
+ */
+.pk-section[data-pk-align="center"]:not(:has(.pk-stack__head, .pk-rail__head)) > .pk-container {
+  text-align: center;
+}
+.pk-section[data-pk-align="center"]:not(:has(.pk-stack__head, .pk-rail__head))
+  :is(
+    .pk-hero__copy,
+    .pk-hero__statement,
+    .pk-hero__center,
+    .pk-text__center,
+    .pk-news,
+    .pk-booking__box,
+    .pk-it__copy
+  ) {
+  justify-items: center;
+}
+.pk-section[data-pk-align="center"]:not(:has(.pk-stack__head, .pk-rail__head))
+  :is(.pk-hero__actions, .pk-hero__status, .pk-logos, .pk-socials, .pk-tags, .pk-news__form) {
+  justify-content: center;
+}
+.pk-section[data-pk-align="center"]:not(:has(.pk-stack__head, .pk-rail__head))
+  :is(.pk-hero__intro, .pk-sub, .pk-prose, .pk-hero__name, .pk-h2, blockquote, .pk-cv__text) {
+  margin-inline: auto;
+}
+.pk-section[data-pk-align="center"] .pk-hero__copy {
+  display: grid;
+}
+.pk-section[data-pk-align="center"] .pk-cta__box {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.pk-section[data-pk-align="center"] .pk-hero__below {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+/* Start: undo the centering some layouts have by design. */
+.pk-section[data-pk-align="start"]:not(:has(.pk-stack__head, .pk-rail__head)) .pk-container,
+.pk-section[data-pk-align="start"]:not(:has(.pk-stack__head, .pk-rail__head))
+  .pk-container
+  :is(div, p, h1, h2, h3, blockquote, figure, figcaption, form) {
+  text-align: start;
+}
+.pk-section[data-pk-align="start"]
+  :is(
+    .pk-hero__center,
+    .pk-hero__center .pk-hero__copy,
+    .pk-text__center,
+    .pk-news--card,
+    .pk-booking__box
+  ) {
+  justify-items: start;
+}
+.pk-section[data-pk-align="start"]
+  :is(.pk-hero__actions, .pk-hero__status, .pk-logos, .pk-socials, .pk-news__form) {
+  justify-content: flex-start;
+}
+.pk-section[data-pk-align="start"]:not(:has(.pk-stack__head, .pk-rail__head))
+  :is(.pk-sub, .pk-hero__intro, blockquote, .pk-testi--large, .pk-cta__box--card) {
+  margin-inline: 0;
+}
+.pk-section[data-pk-align="start"] .pk-cta__box {
+  align-items: flex-start;
+}
+.pk-section[data-pk-align="center"] :is(.pk-cta__box, .pk-cv) {
+  align-items: center;
+}
+.pk-section[data-pk-align="center"] .pk-cv {
+  flex-direction: column;
+  text-align: center;
+}
+.pk-section[data-pk-align="center"] :is(.pk-bigquote, .pk-testi--large) {
+  margin-inline: auto;
+}
+.pk-section[data-pk-align="center"] .pk-bigquote:not(.pk-bigquote--boxed) {
+  border-inline-start: 0;
+  padding-inline-start: 0;
+}
+.pk-section[data-pk-align="center"] :is(.pk-bigquote figcaption, .pk-testi--large figcaption) {
+  justify-items: center;
+  justify-content: center;
+}
+.pk-section[data-pk-align="center"] .pk-hero__cover {
+  margin-inline: auto;
+}

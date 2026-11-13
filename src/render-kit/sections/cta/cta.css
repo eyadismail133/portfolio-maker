@@ -48,7 +48,10 @@
   align-items: start;
 }
 .pk-cta__box--statement .pk-h2 {
-  font-size: calc(clamp(2.2rem, 1rem + 4.5vw, 4.6rem) * var(--pk-h-size, 1) * var(--pk-h-page, 1));
+  font-size: min(
+    calc(clamp(2.2rem, 1rem + 4.5vw, 4.6rem) * var(--pk-h-size, 1) * var(--pk-h-page, 1)),
+    max(clamp(2.2rem, 1rem + 4.5vw, 4.6rem), 12vw)
+  );
   line-height: 1.05;
   max-width: 18ch;
 }
