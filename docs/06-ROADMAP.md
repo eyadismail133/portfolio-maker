@@ -1,6 +1,6 @@
 # 06 - Roadmap
 
-Tick tasks as they are finished. Each phase ends with something you can see working. Sizes are rough, for one developer working with AI help.
+Tick tasks as they are finished (`[-]` means skipped on purpose, with the reason). Each phase ends with something you can see working. Sizes are rough, for one developer working with AI help.
 
 ## Phase 0 - Setup (1 to 2 days)
 - [x] Confirm the decisions in `README.md` (defaults accepted on 2026-11-12)
@@ -11,7 +11,7 @@ Tick tasks as they are finished. Each phase ends with something you can see work
 - [x] Create the Supabase project and fill in `.env.local`
 - [x] Session refresh in `src/proxy.ts`
 - [x] Push to GitHub (`eyadismail133/portfolio-maker`)
-- [ ] First deploy to Vercel (needs the owner's Vercel account)
+- [x] First deploy to Vercel (deploys from GitHub on every push)
 
 **Result:** empty app online.
 
@@ -23,7 +23,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] First design family: `minimal`
 - [x] First 12 sections: navbar, hero, about, work-experience, education, skills, languages, projects, testimonials, contact, cta, footer (at least 2 variants each)
 - [x] Right-to-left layout and Arabic sample content
-- [ ] Check the Arabic web fonts in a real browser (they could not load in the build sandbox)
+- [x] Check the Arabic web fonts in a real browser (13 Nov 2026: all 15 font links answer with Arabic faces, and all 12 Arabic families load and render)
 - [x] Demo page `/dev/render` that shows sample documents, with switches for family, palette, direction, screen size
 - [x] Add families: `bold`, `elegant`, `tech`, `corporate`, `creative`
 - [x] One-step family switch that keeps content (`themes/apply.ts`)
@@ -32,7 +32,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Newsletter form: send sign-ups to the inbox too (migration 0006; CSV download in the inbox)
 - [x] 24 palettes and 15 font pairs
 - [x] Visual check: `npm run visual` opens every section in every family, both languages, phone and desktop; it fails on sideways scrolling or empty sections and saves screenshots
-- [ ] Compare screenshots against saved good ones automatically (today a person looks at them)
+- [x] Compare screenshots against saved good ones automatically (`npm run visual -- --update`, then `-- --compare`)
 
 **Result:** any sample JSON becomes a beautiful page in 6 designs.
 
@@ -65,7 +65,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Image upload: resize, WebP
 - [x] Run the setup in `docs/07-SUPABASE-SETUP.md` (done by the owner; checked on 13 November 2026, one permission fixed in `0003`)
 - [x] Run `0003` and `0004` (checked live on 13 November 2026)
-- [ ] Confirm the Site URL and Redirect URLs, and try a real sign-up
+- [ ] Confirm the Site URL and Redirect URLs, and try a real sign-up (owner)
 - [x] Image crop tool (ratios, zoom, drag or arrow keys; runs before upload)
 - [x] Media library to reuse uploaded images ("My images" on every image field)
 - [x] Account page: name, password, plan, storage used, payment history, delete account (`/account`)
@@ -94,7 +94,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Take offline (unpublish)
 - [x] Marketing home page with example portfolios
 - [x] Run `0002_publishing.sql`
-- [ ] Test publishing with a real account on the live project
+- [ ] Test publishing with a real account on the live project (owner)
 - [x] Unknown or offline pages answer with a real 404 status (checked in `src/proxy.ts` before the page streams)
 
 **Result:** version 1 complete. Test with 5 to 10 real people before going further.
@@ -122,14 +122,16 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Remove badge for paid plan
 - [x] Database tests: every migration runs in a real Postgres in `npm test` (`supabase/__tests__`)
 - [x] Run `0004` (checked live on 13 November 2026)
-- [ ] Run `0005`; test a payment with Paymob test keys on Vercel
+- [x] Run `0005`
+- [ ] Run `0006`; test a payment with Paymob test keys on Vercel (owner)
 - [x] Account page with payment history
 - [x] Receipts (email after payment, and a printable receipt page in Account)
 - [x] Emails: receipt, Pro ending soon (daily job in vercel.json)
-- [ ] Auto-renewing card subscriptions (optional)
+- [-] Auto-renewing card subscriptions: skipped on purpose. Prepaid months work with every Paymob method (cards, wallets, kiosks), never charge anyone by surprise, and need no card storage or cancel flow. Revisit only if many people ask for it.
 - [x] Custom domains (Pro; Vercel API, verified by the server, stop when Pro ends)
 - [x] Terms, privacy and refund pages; "Report this page" on published pages (`0005_reports.sql`)
-- [ ] Have a lawyer review the terms, privacy and refund texts; set `NEXT_PUBLIC_LEGAL_NAME` and `NEXT_PUBLIC_CONTACT_EMAIL`
+- [x] Set `NEXT_PUBLIC_LEGAL_NAME` and `NEXT_PUBLIC_CONTACT_EMAIL`
+- [ ] Have a lawyer review the terms, privacy and refund texts (owner)
 - [x] Error monitoring and backups (error_log table via instrumentation; nightly pg_dump GitHub Action)
 - [x] Template gallery page for SEO (/templates, plus sitemap.xml and robots.txt)
 
