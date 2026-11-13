@@ -99,11 +99,11 @@ function AiBar(props: {
           type="button"
           disabled={busy !== null}
           onClick={() => run(action)}
-          className="rounded px-1.5 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-violet-600 disabled:opacity-50 dark:text-violet-300 dark:hover:bg-violet-950"
+          className="rounded-md px-2 py-0.5 text-xs font-medium text-violet-700 transition-colors hover:bg-violet-50 focus-visible:outline-2 focus-visible:outline-violet-600 disabled:opacity-50 dark:text-violet-300 dark:hover:bg-violet-950/70"
         >
           {busy === action ? "Writing…" : label}
           {plan !== "pro" && (
-            <span className="ms-1 rounded bg-violet-100 px-1 text-[10px] dark:bg-violet-900">
+            <span className="ms-1 rounded bg-violet-100 px-1 text-[10px] font-semibold dark:bg-violet-900">
               Pro
             </span>
           )}
@@ -261,7 +261,7 @@ function LinkField(props: FieldProps) {
   const set = (key: "label" | "href") => (next: unknown, group?: string) =>
     props.onChange({ label: link.label ?? "", href: link.href ?? "", [key]: next }, group);
   return (
-    <fieldset className="grid gap-2 rounded-md border border-zinc-200 p-2.5 dark:border-zinc-800">
+    <fieldset className="grid gap-2.5 rounded-xl border border-zinc-200/80 bg-zinc-50/30 p-3 dark:border-zinc-800 dark:bg-zinc-900/30">
       <legend className="px-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
         {props.field.label}
       </legend>
@@ -350,7 +350,7 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
     }
   };
   return (
-    <fieldset className="grid gap-2 rounded-md border border-zinc-200 p-2.5 dark:border-zinc-800">
+    <fieldset className="grid gap-2.5 rounded-xl border border-zinc-200/80 bg-zinc-50/30 p-3 dark:border-zinc-800 dark:bg-zinc-900/30">
       <legend className="px-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
         {field.label}
       </legend>
@@ -359,7 +359,7 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
         <img
           src={asset.url}
           alt=""
-          className="max-h-32 w-full rounded border border-zinc-200 object-cover dark:border-zinc-800"
+          className="max-h-32 w-full rounded-lg border border-zinc-200/80 object-cover shadow-2xs dark:border-zinc-800"
         />
       )}
       {uploader && (
@@ -517,9 +517,9 @@ function LevelField({ field, value, onChange }: FieldProps) {
             aria-pressed={level === n}
             aria-label={`${n} of 5`}
             onClick={() => onChange(n)}
-            className={`h-7 flex-1 rounded text-xs font-medium focus-visible:outline-2 focus-visible:outline-blue-600 ${
+            className={`h-7 flex-1 rounded-lg text-xs font-medium transition-all focus-visible:outline-2 focus-visible:outline-blue-600 ${
               n <= level
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600 text-white shadow-2xs"
                 : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400"
             }`}
           >
@@ -544,9 +544,9 @@ function IconField({ field, value, onChange }: FieldProps) {
             aria-label={name}
             aria-pressed={value === name}
             onClick={() => onChange(name)}
-            className={`flex aspect-square items-center justify-center rounded p-1.5 focus-visible:outline-2 focus-visible:outline-blue-600 [&_svg]:size-full ${
+            className={`flex aspect-square items-center justify-center rounded-lg p-1.5 transition-all focus-visible:outline-2 focus-visible:outline-blue-600 [&_svg]:size-full ${
               value === name
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600 text-white shadow-2xs"
                 : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
             }`}
           >
@@ -684,13 +684,16 @@ function ListField(props: FieldProps) {
             : "") || `Item ${i + 1}`;
         const isOpen = open === i;
         return (
-          <div key={i} className="rounded-md border border-zinc-200 dark:border-zinc-800">
+          <div
+            key={i}
+            className="overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-2xs transition-colors dark:border-zinc-800 dark:bg-zinc-900/50"
+          >
             <div className="flex items-center gap-1 py-0.5 pe-0.5 ps-1">
               <button
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="min-w-0 flex-1 truncate rounded px-1.5 py-1.5 text-start text-sm font-medium text-zinc-800 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                className="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-start text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
               >
                 <bdi>{title}</bdi>
               </button>
@@ -708,7 +711,7 @@ function ListField(props: FieldProps) {
               />
             </div>
             {isOpen && (
-              <div className="border-t border-zinc-200 p-2.5 dark:border-zinc-800">
+              <div className="border-t border-zinc-200/80 bg-zinc-50/40 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
                 <FormFields
                   fields={field.fields ?? []}
                   value={item}

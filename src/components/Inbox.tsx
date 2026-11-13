@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { buttonClass } from "@/editor/ui";
+import { buttonClass, UiIcon } from "@/editor/ui";
 import { friendlyError, getMyAccount, listPortfolios } from "@/lib/portfolios";
 import {
   deleteMessage,
@@ -58,21 +58,32 @@ export function Inbox() {
   };
 
   return (
-    <div className="min-h-dvh bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex items-center gap-4 border-b border-zinc-200 bg-white px-5 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-        <Link href="/dashboard" className="text-sm font-semibold">
-          ← My portfolios
-        </Link>
+    <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      <div
+        aria-hidden="true"
+        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
+      />
+      <header className="pm-glass-header sticky top-0 z-30">
+        <div className="mx-auto flex max-w-3xl items-center gap-4 px-5 py-3.5">
+          <Link
+            href="/dashboard"
+            className="rounded-lg px-2 py-1 text-sm font-semibold transition-colors hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+          >
+            ← My portfolios
+          </Link>
+        </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl px-5 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Messages and sign-ups</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Sent by visitors through the contact form on your published pages.
-        </p>
+      <main className="mx-auto w-full max-w-3xl px-5 py-9">
+        <div className="pm-animate-in">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Messages and sign-ups</h1>
+          <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+            Sent by visitors through the contact form on your published pages.
+          </p>
+        </div>
         {problem && (
           <p
             role="alert"
-            className="mt-5 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
+            className="mt-5 rounded-xl border border-red-300 bg-red-50 p-3.5 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
           >
             {problem}
           </p>
@@ -80,17 +91,26 @@ export function Inbox() {
         {messages === null ? (
           <p className="mt-8 text-sm text-zinc-500">Loading messages…</p>
         ) : messages.length === 0 && !problem ? (
-          <p className="mt-8 rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
-            No messages yet. Publish a portfolio with a Contact section and messages will arrive
-            here.
-          </p>
+          <div className="pm-card pm-animate-in mt-8 rounded-2xl border-dashed px-6 py-14 text-center text-sm text-zinc-600 dark:text-zinc-400">
+            <span
+              aria-hidden="true"
+              className="mx-auto mb-3 inline-flex size-10 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400"
+            >
+              <UiIcon name="mail" size={20} />
+            </span>
+            <p>
+              No messages yet. Publish a portfolio with a Contact section and messages will arrive
+              here.
+            </p>
+          </div>
         ) : (
-          <ul className="mt-6 grid gap-3">
-            {messages.map((m) =>
+          <ul className="mt-6 grid gap-3.5">
+            {messages.map((m, idx) =>
               m.locked && plan !== "pro" ? (
                 <li
                   key={m.id}
-                  className="rounded-xl border border-violet-300 bg-violet-50 p-4 text-sm dark:border-violet-900 dark:bg-violet-950"
+                  style={{ animationDelay: `${Math.min(idx * 45, 250)}ms` }}
+                  className="pm-animate-in pm-card rounded-2xl border-violet-300 bg-violet-50/80 p-5 text-sm dark:border-violet-900 dark:bg-violet-950/60"
                 >
                   <p className="font-semibold">A new message is waiting</p>
                   <p className="mt-1 text-zinc-700 dark:text-zinc-300">
@@ -99,7 +119,7 @@ export function Inbox() {
                   </p>
                   <Link
                     href="/pro"
-                    className="mt-3 inline-block font-medium text-violet-700 underline dark:text-violet-300"
+                    className="mt-3 inline-block font-semibold text-violet-700 underline underline-offset-2 dark:text-violet-300"
                   >
                     See Pro
                   </Link>
@@ -107,13 +127,18 @@ export function Inbox() {
               ) : (
                 <li
                   key={m.id}
-                  className={`rounded-xl border bg-white p-4 dark:bg-zinc-900 ${m.isRead ? "border-zinc-200 dark:border-zinc-800" : "border-blue-300 dark:border-blue-800"}`}
+                  style={{ animationDelay: `${Math.min(idx * 45, 250)}ms` }}
+                  className={`pm-animate-in pm-card rounded-2xl p-5 ${
+                    m.isRead
+                      ? "border-zinc-200/80 dark:border-zinc-800"
+                      : "border-blue-400/80 ring-1 ring-blue-500/20 dark:border-blue-800"
+                  }`}
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <p className="text-sm font-semibold" dir="auto">
                       {!m.isRead && (
                         <span
-                          className="me-2 inline-block size-2 rounded-full bg-blue-600"
+                          className="me-2 inline-block size-2 rounded-full bg-blue-600 shadow-xs shadow-blue-600/50"
                           aria-label="New"
                         />
                       )}
@@ -121,7 +146,7 @@ export function Inbox() {
                       <a
                         href={`mailto:${m.email}`}
                         dir="ltr"
-                        className="font-normal text-blue-700 underline dark:text-blue-400"
+                        className="font-normal text-blue-700 underline decoration-blue-700/40 underline-offset-2 dark:text-blue-400"
                       >
                         {m.email}
                       </a>
@@ -136,10 +161,10 @@ export function Inbox() {
                       {titles[m.portfolioId] && ` · ${titles[m.portfolioId]}`}
                     </span>
                   </div>
-                  <p className="mt-2 whitespace-pre-line text-sm" dir="auto">
+                  <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed" dir="auto">
                     {m.message}
                   </p>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     <a href={`mailto:${m.email}`} className={buttonClass}>
                       Reply by email
                     </a>
@@ -195,7 +220,7 @@ function Signups(props: {
   return (
     <section className="mt-12" aria-labelledby="signups-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 id="signups-heading" className="text-lg font-semibold">
+        <h2 id="signups-heading" className="text-lg font-bold tracking-tight">
           Newsletter sign-ups{" "}
           <span className="text-sm font-normal text-zinc-500">({props.signups.length})</span>
         </h2>
@@ -207,9 +232,9 @@ function Signups(props: {
         Addresses left in the newsletter section of your pages. Import the CSV into Mailchimp, Brevo
         or any mailing tool.
       </p>
-      <ul className="mt-4 divide-y divide-zinc-200 rounded-xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+      <ul className="pm-card mt-4 divide-y divide-zinc-200/80 overflow-hidden rounded-2xl dark:divide-zinc-800">
         {props.signups.slice(0, 100).map((s) => (
-          <li key={s.id} className="flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
+          <li key={s.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
             <span dir="ltr" className="font-medium">
               {s.email}
             </span>

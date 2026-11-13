@@ -1,29 +1,28 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { MiniPreview } from "@/components/MiniPreview";
 import { pickText } from "@/render-kit/i18n";
 import { allSections, getSection, type SectionCategory } from "@/render-kit/registry";
 import type { PortfolioDoc, Theme } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
-import { buildPalette } from "@/render-kit/themes/color";
+import { applyFamily } from "@/render-kit/themes/apply";
+import { buildPalette, contrastProblems } from "@/render-kit/themes/color";
 import { families } from "@/render-kit/themes/families";
 import { fontPairs } from "@/render-kit/themes/fonts";
 import { palettes } from "@/render-kit/themes/palettes";
-import { MiniPreview } from "@/components/MiniPreview";
-import { applyFamily } from "@/render-kit/themes/apply";
-import { contrastProblems } from "@/render-kit/themes/color";
 import { canMove } from "./doc-ops";
 import { FormFields } from "./fields";
 import { sectionName, useEditor } from "./store";
 import {
+  buttonClass,
   IconButton,
+  inputClass,
   Label,
   PanelHeading,
+  primaryButtonClass,
   Segmented,
   UiIcon,
-  buttonClass,
-  inputClass,
-  primaryButtonClass,
 } from "./ui";
 
 const CATEGORY_NAMES: Record<SectionCategory, string> = {
@@ -43,7 +42,7 @@ function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
     <>
       <button
         type="button"
-        className={`${primaryButtonClass} w-full`}
+        className={`${primaryButtonClass} w-full py-2`}
         onClick={() => ref.current?.showModal()}
       >
         <UiIcon name="plus" /> Add section
@@ -51,21 +50,21 @@ function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
       <dialog
         ref={ref}
         aria-labelledby="add-section-title"
-        className="m-auto w-[min(720px,calc(100vw-32px))] rounded-xl border border-zinc-200 bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-black/40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto w-[min(720px,calc(100vw-32px))] rounded-2xl border border-zinc-200 bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-black/40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
       >
-        <div className="flex items-center justify-between border-b border-zinc-200 py-3 pe-3 ps-5 dark:border-zinc-800">
-          <h2 id="add-section-title" className="text-base font-semibold">
+        <div className="flex items-center justify-between border-b border-zinc-200/80 py-3.5 pe-3.5 ps-5 dark:border-zinc-800">
+          <h2 id="add-section-title" className="text-base font-bold tracking-tight">
             Add a section
           </h2>
           <IconButton icon="close" label="Close" onClick={() => ref.current?.close()} />
         </div>
-        <div className="grid max-h-[70vh] gap-5 overflow-y-auto p-5">
+        <div className="grid max-h-[70vh] gap-6 overflow-y-auto p-5">
           {(Object.keys(CATEGORY_NAMES) as SectionCategory[]).map((category) => {
             const items = allSections().filter((s) => s.category === category);
             return (
-              <div key={category} className="grid gap-2">
+              <div key={category} className="grid gap-2.5">
                 <PanelHeading>{CATEGORY_NAMES[category]}</PanelHeading>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                   {items.map((def) => {
                     const taken = !!def.pinned && present.has(def.type);
                     return (
@@ -77,10 +76,10 @@ function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
                           addSection(def.type);
                           ref.current?.close();
                         }}
-                        className="rounded-md border border-zinc-200 px-3 py-2.5 text-start text-sm hover:border-blue-600 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-600 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-800 dark:hover:bg-blue-950"
+                        className="rounded-xl border border-zinc-200/90 bg-white px-3.5 py-3 text-start text-sm shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-600 hover:bg-blue-50/70 hover:shadow-xs focus-visible:outline-2 focus-visible:outline-blue-600 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-500 dark:hover:bg-blue-950/60"
                       >
-                        <span className="block font-medium">{def.name}</span>
-                        <span className="block text-xs text-zinc-500">
+                        <span className="block font-semibold tracking-tight">{def.name}</span>
+                        <span className="mt-0.5 block text-xs text-zinc-500">
                           {taken
                             ? "Already on the page"
                             : `${Object.keys(def.variants).length} layouts`}
@@ -114,8 +113,8 @@ export function SectionsPanel({
   const [overId, setOverId] = useState<string | null>(null);
 
   return (
-    <div className="grid gap-3">
-      <ol className="grid gap-1">
+    <div className="grid gap-3.5">
+      <ol className="grid gap-1.5">
         {doc.sections.map((section) => {
           const def = getSection(section.type);
           const pinned = !!def?.pinned;
@@ -146,16 +145,16 @@ export function SectionsPanel({
                 setDragId(null);
                 setOverId(null);
               }}
-              className={`group flex items-center rounded-md border ${
+              className={`group flex items-center rounded-xl border transition-all duration-150 ${
                 overId === section.id
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
+                  ? "border-blue-600 bg-blue-50 shadow-xs dark:bg-blue-950"
                   : active
-                    ? "border-blue-600 bg-blue-50/60 dark:bg-blue-950/60"
-                    : "border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    ? "border-blue-600/90 bg-blue-50/70 shadow-2xs ring-1 ring-blue-600/20 dark:bg-blue-950/60"
+                    : "border-zinc-200/60 bg-zinc-50/40 hover:border-zinc-300 hover:bg-zinc-100/80 dark:border-zinc-800/60 dark:bg-zinc-900/40 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/80"
               } ${section.hidden ? "opacity-55" : ""}`}
             >
               <span
-                className={`flex w-6 shrink-0 justify-center text-zinc-400 ${pinned ? "invisible" : "cursor-grab"}`}
+                className={`flex w-6 shrink-0 justify-center text-zinc-400 ${pinned ? "invisible" : "cursor-grab active:cursor-grabbing"}`}
                 aria-hidden="true"
               >
                 <UiIcon name="grip" size={14} />
@@ -172,7 +171,7 @@ export function SectionsPanel({
                 )}
               </button>
               <span
-                className={`flex shrink-0 ${active ? "" : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"}`}
+                className={`flex shrink-0 transition-opacity ${active ? "" : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"}`}
               >
                 <IconButton
                   icon="up"
@@ -245,33 +244,36 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-2">
+      <div className="grid gap-2.5">
         <div className="flex items-center justify-between">
           <PanelHeading>Design</PanelHeading>
           <button type="button" className={buttonClass} onClick={shuffle}>
             <UiIcon name="shuffle" size={14} /> Shuffle
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           {families.map((family) => (
             <button
               key={family.id}
               type="button"
               aria-pressed={theme.family === family.id}
               onClick={() => setFamily(family.id)}
-              className={`rounded-md border p-2 text-start focus-visible:outline-2 focus-visible:outline-blue-600 ${
+              className={`group rounded-xl border p-2 text-start transition-all duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
                 theme.family === family.id
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
-                  : "border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+                  ? "border-blue-600 bg-blue-50/80 shadow-xs ring-1 ring-blue-600 dark:bg-blue-950/70"
+                  : "border-zinc-200/80 hover:-translate-y-0.5 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/70"
               }`}
             >
-              <MiniPreview
-                doc={familyPreviews[family.id]}
-                lang={lang}
-                aspect="aspect-[16/10]"
-                className="mb-2 rounded border border-zinc-200 dark:border-zinc-700"
-              />
-              <span className="block text-sm font-medium">{family.name}</span>
+              <div className="mb-2 overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-700">
+                <div className="transition-transform duration-300 group-hover:scale-[1.03]">
+                  <MiniPreview
+                    doc={familyPreviews[family.id]}
+                    lang={lang}
+                    aspect="aspect-[16/10]"
+                  />
+                </div>
+              </div>
+              <span className="block text-sm font-semibold tracking-tight">{family.name}</span>
               <span className="mt-0.5 block text-xs leading-snug text-zinc-500">
                 {family.feeling}
               </span>
@@ -283,9 +285,9 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
         </p>
       </div>
 
-      <div className="grid gap-2">
+      <div className="grid gap-2.5">
         <PanelHeading>Colors</PanelHeading>
-        <div className="grid grid-cols-6 gap-1.5">
+        <div className="grid grid-cols-6 gap-2">
           {palettes.map((palette) => (
             <button
               key={palette.id}
@@ -294,7 +296,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
               aria-label={`${palette.name} colors`}
               aria-pressed={sameColors(theme.palette, palette.light)}
               onClick={() => setTheme({ palette: palette.light, paletteDark: palette.dark })}
-              className="aspect-square overflow-hidden rounded-full border-2 border-white ring-1 ring-zinc-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-pressed:ring-2 aria-pressed:ring-blue-600 dark:border-zinc-900 dark:ring-zinc-700"
+              className="aspect-square overflow-hidden rounded-full border-2 border-white shadow-2xs ring-1 ring-zinc-300 transition-transform duration-150 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-pressed:scale-110 aria-pressed:ring-2 aria-pressed:ring-blue-600 dark:border-zinc-900 dark:ring-zinc-700"
               style={{
                 background: `linear-gradient(135deg, ${palette.light.primary} 50%, ${palette.light.accent} 50%)`,
               }}
@@ -315,7 +317,7 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
                 "brand-color",
               )
             }
-            className="size-8 cursor-pointer rounded border border-zinc-300 bg-transparent p-0.5 dark:border-zinc-700"
+            className="size-8 cursor-pointer rounded-lg border border-zinc-300 bg-transparent p-0.5 dark:border-zinc-700"
           />
           <Label htmlFor="brand-color">Use my own brand color</Label>
         </div>
@@ -332,11 +334,11 @@ export function DesignPanel({ doc }: { doc: PortfolioDoc }) {
         <ColorEditor doc={doc} />
       </div>
 
-      <div className="grid gap-1">
+      <div className="grid gap-1.5">
         <PanelHeading>Fonts</PanelHeading>
         <select
           aria-label="Fonts"
-          className={`${inputClass} mt-1`}
+          className={`${inputClass} mt-0.5`}
           value={theme.fonts}
           onChange={(e) => setTheme({ fonts: e.target.value })}
         >
@@ -388,7 +390,7 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
   const languages = doc.meta.languages;
   return (
     <div className="grid gap-5">
-      <div className="grid gap-1">
+      <div className="grid gap-1.5">
         <Label htmlFor="meta-title">Page title</Label>
         <input
           id="meta-title"
@@ -399,7 +401,7 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
         />
         <p className="text-xs text-zinc-500">Shown in the browser tab and in search results.</p>
       </div>
-      <div className="grid gap-1">
+      <div className="grid gap-1.5">
         <Label htmlFor="meta-description">Description</Label>
         <textarea
           id="meta-description"
@@ -434,11 +436,12 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
         }
       />
       <fieldset className="grid gap-2">
-        <legend className="mb-1 text-xs font-semibold">Languages</legend>
+        <legend className="mb-1 text-xs font-semibold uppercase tracking-wide">Languages</legend>
         {(Object.keys(LANGUAGE_NAMES) as Lang[]).map((lang) => (
           <label key={lang} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
+              className="accent-blue-600"
               checked={languages.includes(lang)}
               disabled={languages.length === 1 && languages[0] === lang}
               onChange={(e) =>
@@ -451,7 +454,7 @@ export function SettingsPanel({ doc }: { doc: PortfolioDoc }) {
           </label>
         ))}
         {languages.length > 1 && (
-          <div className="mt-1 grid gap-1">
+          <div className="mt-1 grid gap-1.5">
             <Label htmlFor="default-language">Visitors see first</Label>
             <select
               id="default-language"
@@ -506,9 +509,11 @@ function ColorEditor({ doc }: { doc: PortfolioDoc }) {
       `color-${which}-${key}`,
     );
   return (
-    <details className="rounded-md border border-zinc-200 dark:border-zinc-800">
-      <summary className="cursor-pointer px-3 py-2 text-xs font-medium">Edit each color</summary>
-      <div className="grid gap-3 border-t border-zinc-200 p-3 dark:border-zinc-800">
+    <details className="rounded-xl border border-zinc-200/90 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+      <summary className="cursor-pointer px-3.5 py-2.5 text-xs font-semibold">
+        Edit each color
+      </summary>
+      <div className="grid gap-3 border-t border-zinc-200/80 p-3.5 dark:border-zinc-800">
         {theme.mode !== "light" && (
           <Segmented
             label="Which colors"
@@ -520,14 +525,14 @@ function ColorEditor({ doc }: { doc: PortfolioDoc }) {
             ]}
           />
         )}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           {COLOR_NAMES.map(([key, name]) => (
             <label key={key} className="flex items-center gap-2 text-xs">
               <input
                 type="color"
                 value={palette[key]}
                 onChange={(e) => change(key, e.target.value)}
-                className="size-7 shrink-0 cursor-pointer rounded border border-zinc-300 bg-transparent p-0.5 dark:border-zinc-700"
+                className="size-7 shrink-0 cursor-pointer rounded-md border border-zinc-300 bg-transparent p-0.5 dark:border-zinc-700"
               />
               {name}
             </label>

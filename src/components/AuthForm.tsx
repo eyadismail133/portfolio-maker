@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { buttonClass, inputClass, Label, primaryButtonClass } from "@/editor/ui";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
+import { BrandMark, buttonClass, inputClass, Label, primaryButtonClass, UiIcon } from "@/editor/ui";
 import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/supabase/proxy";
-import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 type Mode = "login" | "signup" | "forgot" | "reset";
 
@@ -129,21 +129,30 @@ export function AuthForm({ mode }: { mode: Mode }) {
   };
 
   return (
-    <main className="flex flex-1 items-center justify-center px-5 py-12">
-      <div className="w-full max-w-sm">
+    <main className="pm-aurora-bg relative flex flex-1 items-center justify-center overflow-hidden px-5 py-12">
+      <div
+        aria-hidden="true"
+        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
+      />
+      <div
+        aria-hidden="true"
+        className="pm-float pointer-events-none fixed -top-24 left-1/3 -z-10 h-72 w-72 rounded-full bg-blue-500/15 blur-3xl"
+      />
+      <div className="pm-card pm-animate-scale w-full max-w-md rounded-3xl p-7 sm:p-9">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-sm font-semibold">
-            Portfolio Maker
+          <Link href="/" className="group inline-flex items-center gap-2.5 text-sm font-semibold">
+            <BrandMark size="sm" />
+            <span>Portfolio Maker</span>
           </Link>
           <UiLanguageSwitch />
         </div>
-        <h1 className="mt-6 text-2xl font-semibold tracking-tight">{copy.title}</h1>
+        <h1 className="mt-7 text-2xl font-bold tracking-tight sm:text-3xl">{copy.title}</h1>
         <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">{copy.lead}</p>
 
         {sent ? (
           <p
             role="status"
-            className="mt-6 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100"
+            className="mt-6 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100"
           >
             {sent}
           </p>
@@ -156,9 +165,37 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   onClick={google}
                   className={`${buttonClass} mt-6 w-full py-2.5`}
                 >
-                  Continue with Google
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="#4285F4"
+                      d="M23.5 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.57-5.17 3.57-8.82z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
                 </button>
-                <p className="my-4 text-center text-xs text-zinc-500">or with your email</p>
+                <div className="my-5 flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"
+                  />
+                  <p className="text-center text-xs text-zinc-500">or with your email</p>
+                  <span
+                    aria-hidden="true"
+                    className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"
+                  />
+                </div>
               </>
             )}
             <form
@@ -166,7 +203,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               className={`grid gap-4 ${mode === "forgot" || mode === "reset" ? "mt-6" : ""}`}
             >
               {mode === "signup" && (
-                <div className="grid gap-1">
+                <div className="grid gap-1.5">
                   <Label htmlFor="auth-name">Your name</Label>
                   <input
                     id="auth-name"
@@ -178,7 +215,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 </div>
               )}
               {mode !== "reset" && (
-                <div className="grid gap-1">
+                <div className="grid gap-1.5">
                   <Label htmlFor="auth-email">Email</Label>
                   <input
                     id="auth-email"
@@ -193,7 +230,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 </div>
               )}
               {mode !== "forgot" && (
-                <div className="grid gap-1">
+                <div className="grid gap-1.5">
                   <div className="flex items-baseline justify-between">
                     <Label htmlFor="auth-password">
                       {mode === "reset" ? "New password" : "Password"}
@@ -201,7 +238,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
                     {mode === "login" && (
                       <Link
                         href="/forgot-password"
-                        className="text-xs text-blue-700 underline dark:text-blue-400"
+                        className="text-xs font-medium text-blue-700 underline decoration-blue-700/40 underline-offset-2 hover:decoration-blue-700 dark:text-blue-400"
                       >
                         Forgot it?
                       </Link>
@@ -226,7 +263,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
               {error && (
                 <p
                   role="alert"
-                  className="rounded-md border border-red-300 bg-red-50 p-2.5 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
+                  className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
                 >
                   {error}
                 </p>
@@ -234,18 +271,19 @@ export function AuthForm({ mode }: { mode: Mode }) {
               <button
                 type="submit"
                 disabled={busy}
-                className={`${primaryButtonClass} py-2.5 disabled:opacity-60`}
+                className={`${primaryButtonClass} mt-1 py-2.5 disabled:opacity-60`}
               >
-                {busy ? "One moment…" : copy.submit}
+                <span>{busy ? "One moment…" : copy.submit}</span>
+                {!busy && <UiIcon name="arrowRight" size={15} className="rtl:rotate-180" />}
               </button>
               {mode === "signup" && (
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs leading-relaxed text-zinc-500">
                   By creating an account you accept the{" "}
-                  <Link href="/terms" className="underline">
+                  <Link href="/terms" className="underline underline-offset-2">
                     terms
                   </Link>{" "}
                   and the{" "}
-                  <Link href="/privacy" className="underline">
+                  <Link href="/privacy" className="underline underline-offset-2">
                     privacy policy
                   </Link>
                   .
@@ -255,13 +293,13 @@ export function AuthForm({ mode }: { mode: Mode }) {
           </>
         )}
 
-        <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-6 border-t border-zinc-200/80 pt-5 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
           {mode === "login" && (
             <>
               New here?{" "}
               <Link
                 href={`/signup${nextQuery}`}
-                className="font-medium text-blue-700 underline dark:text-blue-400"
+                className="font-semibold text-blue-700 underline underline-offset-2 dark:text-blue-400"
               >
                 Create an account
               </Link>
@@ -272,14 +310,17 @@ export function AuthForm({ mode }: { mode: Mode }) {
               Already have an account?{" "}
               <Link
                 href={`/login${nextQuery}`}
-                className="font-medium text-blue-700 underline dark:text-blue-400"
+                className="font-semibold text-blue-700 underline underline-offset-2 dark:text-blue-400"
               >
                 Log in
               </Link>
             </>
           )}
           {mode === "forgot" && (
-            <Link href="/login" className="font-medium text-blue-700 underline dark:text-blue-400">
+            <Link
+              href="/login"
+              className="font-semibold text-blue-700 underline underline-offset-2 dark:text-blue-400"
+            >
               Back to log in
             </Link>
           )}

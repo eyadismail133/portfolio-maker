@@ -144,10 +144,10 @@ export function PublishDialog(props: {
       ref={ref}
       onClose={props.onClose}
       aria-labelledby="publish-title"
-      className="m-auto w-[min(560px,calc(100vw-32px))] rounded-xl border border-zinc-200 bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-black/40 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+      className="m-auto w-[min(560px,calc(100vw-32px))] rounded-2xl border border-zinc-200/80 bg-white/95 p-0 text-zinc-900 shadow-2xl backdrop-blur-xl backdrop:bg-black/45 dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-100"
     >
-      <div className="flex items-center justify-between border-b border-zinc-200 py-3 pe-3 ps-5 dark:border-zinc-800">
-        <h2 id="publish-title" className="text-base font-semibold">
+      <div className="flex items-center justify-between border-b border-zinc-200/80 py-3.5 pe-3 ps-5 dark:border-zinc-800">
+        <h2 id="publish-title" className="text-base font-bold tracking-tight">
           {published ? "Your page is live" : "Publish your portfolio"}
         </h2>
         <IconButton icon="close" label="Close" onClick={() => ref.current?.close()} />
@@ -157,13 +157,13 @@ export function PublishDialog(props: {
         {!state && !problem && <p className="text-sm text-zinc-500">Checking your page…</p>}
 
         {published && liveUrl && (
-          <div className="grid gap-3 rounded-lg border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950">
+          <div className="grid gap-3 rounded-xl border border-emerald-200/80 bg-emerald-50/90 p-4 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/60">
             <a
               href={liveUrl}
               target="_blank"
               rel="noopener noreferrer"
               dir="ltr"
-              className="break-all text-sm font-medium text-emerald-900 underline dark:text-emerald-100"
+              className="break-all text-sm font-semibold text-emerald-900 underline decoration-emerald-400 underline-offset-2 hover:text-emerald-700 dark:text-emerald-100"
             >
               {liveUrl}
             </a>
@@ -182,7 +182,7 @@ export function PublishDialog(props: {
                 alt={`QR code for ${liveUrl}`}
                 width={120}
                 height={120}
-                className="rounded border border-emerald-200 bg-white p-1"
+                className="rounded-xl border border-emerald-200 bg-white p-1.5 shadow-sm"
               />
             )}
             {state?.changedSincePublish && (
@@ -201,18 +201,18 @@ export function PublishDialog(props: {
         )}
 
         {state && (
-          <div className="grid gap-1">
+          <div className="grid gap-1.5">
             <Label htmlFor="publish-slug">Link name</Label>
             <div
-              className="flex items-center rounded-md border border-zinc-300 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 dark:border-zinc-700"
+              className="flex items-center rounded-lg border border-zinc-300/90 bg-white shadow-2xs transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-zinc-700/90 dark:bg-zinc-900/90"
               dir="ltr"
             >
-              <span className="ps-2.5 text-sm text-zinc-500">
+              <span className="ps-3 text-sm text-zinc-500">
                 {origin.replace(/^https?:\/\//, "")}/p/
               </span>
               <input
                 id="publish-slug"
-                className={`${inputClass} border-0 ps-0.5 focus:ring-0`}
+                className={`${inputClass} border-0 bg-transparent ps-0.5 shadow-none focus:ring-0`}
                 value={slug}
                 maxLength={50}
                 spellCheck={false}
@@ -249,7 +249,7 @@ export function PublishDialog(props: {
                 {checks.map((check) => (
                   <li
                     key={check.id}
-                    className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100"
+                    className="rounded-xl border border-amber-200/80 bg-amber-50/90 px-3.5 py-2.5 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/60 dark:text-amber-100"
                   >
                     {check.text}
                     {check.sections && (
@@ -272,13 +272,13 @@ export function PublishDialog(props: {
         {problem && (
           <p
             role="alert"
-            className="rounded-md border border-red-300 bg-red-50 p-2.5 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
+            className="rounded-xl border border-red-200/80 bg-red-50/90 p-3 text-sm text-red-900 dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-100"
           >
             {problem}
             {problem.includes("go Pro") && (
               <>
                 {" "}
-                <a href="/pro" className="font-medium underline">
+                <a href="/pro" className="font-semibold underline">
                   See Pro
                 </a>
               </>
@@ -288,7 +288,7 @@ export function PublishDialog(props: {
       </div>
 
       {state && (
-        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 px-5 py-3 dark:border-zinc-800">
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200/80 px-5 py-3.5 dark:border-zinc-800">
           {published && (
             <button
               type="button"

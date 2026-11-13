@@ -66,7 +66,7 @@ export async function PublishedPage({ slug, wanted }: { slug: string; wanted?: s
       {found.showBadge && (
         <Link
           href="/"
-          className="fixed bottom-3 end-3 z-50 rounded-full bg-zinc-900/85 px-3 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="fixed bottom-3 end-3 z-50 rounded-full border border-white/10 bg-zinc-900/85 px-3.5 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-zinc-900 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           Made with Portfolio Maker
         </Link>

@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { primaryButtonClass } from "@/editor/ui";
-import { createClient } from "@/lib/supabase/client";
+import { primaryButtonClass, UiIcon } from "@/editor/ui";
 import { getMyAccount } from "@/lib/portfolios";
+import { createClient } from "@/lib/supabase/client";
 
 type State =
   | { kind: "waiting" }
@@ -66,27 +66,41 @@ export function PaymentResult() {
   }[state.kind];
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-zinc-50 px-6 text-center text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <h1 className="text-2xl font-semibold tracking-tight" role="status">
-        {text[0]}
-      </h1>
-      <p className="max-w-md text-zinc-600 dark:text-zinc-400">{text[1]}</p>
-      <div className="flex gap-2">
-        {state.kind === "failed" && (
-          <Link href="/pro" className={primaryButtonClass}>
-            Try again
-          </Link>
-        )}
-        <Link
-          href="/dashboard"
-          className={
-            state.kind === "failed"
-              ? "rounded-md px-3 py-1.5 text-sm underline"
-              : primaryButtonClass
-          }
+    <main className="pm-aurora-bg flex min-h-dvh flex-col items-center justify-center px-6 text-center text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      <div className="pm-card pm-animate-scale flex max-w-md flex-col items-center gap-4 rounded-3xl p-8">
+        <span
+          aria-hidden="true"
+          className={`inline-flex size-12 items-center justify-center rounded-2xl ${
+            state.kind === "paid"
+              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+              : state.kind === "failed"
+                ? "bg-red-500/15 text-red-600 dark:text-red-400"
+                : "bg-violet-500/15 text-violet-600 dark:text-violet-400"
+          }`}
         >
-          Go to my portfolios
-        </Link>
+          <UiIcon name={state.kind === "paid" ? "check" : "sparkles"} size={24} />
+        </span>
+        <h1 className="text-2xl font-bold tracking-tight" role="status">
+          {text[0]}
+        </h1>
+        <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{text[1]}</p>
+        <div className="mt-2 flex gap-2.5">
+          {state.kind === "failed" && (
+            <Link href="/pro" className={primaryButtonClass}>
+              Try again
+            </Link>
+          )}
+          <Link
+            href="/dashboard"
+            className={
+              state.kind === "failed"
+                ? "rounded-lg px-3 py-1.5 text-sm font-medium underline underline-offset-2"
+                : primaryButtonClass
+            }
+          >
+            Go to my portfolios
+          </Link>
+        </div>
       </div>
     </main>
   );

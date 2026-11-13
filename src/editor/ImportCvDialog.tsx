@@ -89,14 +89,14 @@ export function ImportCvDialog({ onClose }: { onClose: () => void }) {
       ref={dialog}
       onClose={onClose}
       aria-labelledby="import-title"
-      className="m-auto w-[min(560px,calc(100vw-24px))] rounded-xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+      className="m-auto w-[min(560px,calc(100vw-24px))] rounded-2xl border border-zinc-200/80 bg-white/95 p-6 text-zinc-900 shadow-2xl backdrop-blur-xl backdrop:bg-black/45 dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-100"
     >
-      <h2 id="import-title" className="text-base font-semibold">
+      <h2 id="import-title" className="text-base font-bold tracking-tight">
         Fill the page from your CV
       </h2>
       {plan !== "pro" ? (
         <div className="mt-3 text-sm">
-          <p>
+          <p className="leading-relaxed text-zinc-600 dark:text-zinc-400">
             {MESSAGES.pro} It reads a CV or LinkedIn PDF and fills your experience, education,
             skills and languages.
           </p>
@@ -111,8 +111,8 @@ export function ImportCvDialog({ onClose }: { onClose: () => void }) {
         </div>
       ) : result ? (
         <div className="mt-3 text-sm">
-          <p>Found in your CV:</p>
-          <ul className="mt-2 list-disc ps-5">
+          <p className="font-medium">Found in your CV:</p>
+          <ul className="mt-2 list-disc space-y-1 ps-5 text-zinc-700 dark:text-zinc-300">
             {importSummary(result).map((part) => (
               <li key={part}>{part}</li>
             ))}
@@ -132,8 +132,8 @@ export function ImportCvDialog({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       ) : (
-        <div className="mt-3 grid gap-3 text-sm">
-          <p className="text-zinc-600 dark:text-zinc-400">
+        <div className="mt-3 grid gap-3.5 text-sm">
+          <p className="leading-relaxed text-zinc-600 dark:text-zinc-400">
             Choose your CV as a PDF, or your LinkedIn profile saved as PDF (on your profile: More,
             then Save to PDF). The file stays on your device; only its text is read.
           </p>
@@ -141,17 +141,17 @@ export function ImportCvDialog({ onClose }: { onClose: () => void }) {
             type="file"
             accept="application/pdf,.pdf"
             aria-label="CV or LinkedIn PDF"
-            className="text-sm file:me-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-1.5 dark:file:border-zinc-700 dark:file:bg-zinc-900"
+            className="text-sm file:me-3 file:cursor-pointer file:rounded-lg file:border file:border-zinc-300/90 file:bg-white file:px-3 file:py-1.5 file:font-medium file:shadow-2xs file:transition-colors hover:file:bg-zinc-50 dark:file:border-zinc-700 dark:file:bg-zinc-900 dark:hover:file:bg-zinc-800"
             onChange={(e) => readFile(e.target.files?.[0])}
           />
-          <label className="grid gap-1">
+          <label className="grid gap-1.5">
             <span className="font-medium">Or paste the text</span>
             <textarea
               dir="auto"
               rows={7}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-xl border border-zinc-300/90 bg-white px-3.5 py-2.5 text-sm shadow-2xs transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700/90 dark:bg-zinc-950"
             />
           </label>
           {busy && (

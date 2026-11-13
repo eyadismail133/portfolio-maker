@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 import { buttonClass, inputClass, Label, primaryButtonClass } from "@/editor/ui";
 import { formatPrice, LIMITS, PLAN_NAMES } from "@/lib/plans";
 import { friendlyError, getMyAccount, type Account } from "@/lib/portfolios";
 import { listPayments, type PaymentRecord } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { storageUsed } from "@/lib/upload";
-import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 const date = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
@@ -20,8 +20,8 @@ const mb = (bytes: number) =>
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 className="text-base font-semibold">{title}</h2>
+    <section className="pm-card pm-animate-in rounded-2xl p-6">
+      <h2 className="text-base font-bold tracking-tight">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -32,7 +32,7 @@ function Message({ text, error }: { text: string; error?: boolean }) {
   return (
     <p
       role={error ? "alert" : "status"}
-      className={`mt-3 text-sm ${error ? "text-red-700 dark:text-red-400" : "text-emerald-700 dark:text-emerald-400"}`}
+      className={`mt-3 text-sm font-medium ${error ? "text-red-700 dark:text-red-400" : "text-emerald-700 dark:text-emerald-400"}`}
     >
       {text}
     </p>
@@ -134,15 +134,24 @@ export function AccountPage() {
   const limit = LIMITS.storageBytes[plan];
 
   return (
-    <div className="min-h-dvh bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex items-center gap-4 border-b border-zinc-200 bg-white px-5 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-        <Link href="/dashboard" className="text-sm font-semibold">
-          ← My portfolios
-        </Link>
-        <UiLanguageSwitch className="ms-auto" />
+    <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      <div
+        aria-hidden="true"
+        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
+      />
+      <header className="pm-glass-header sticky top-0 z-30">
+        <div className="mx-auto flex max-w-2xl items-center gap-4 px-5 py-3.5">
+          <Link
+            href="/dashboard"
+            className="rounded-lg px-2 py-1 text-sm font-semibold transition-colors hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+          >
+            ← My portfolios
+          </Link>
+          <UiLanguageSwitch className="ms-auto" />
+        </div>
       </header>
-      <main className="mx-auto grid w-full max-w-2xl gap-5 px-5 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
+      <main className="mx-auto grid w-full max-w-2xl gap-5 px-5 py-9">
+        <h1 className="pm-animate-in text-2xl font-bold tracking-tight sm:text-3xl">Account</h1>
 
         <Card title="Plan">
           <p className="text-sm">
@@ -151,13 +160,13 @@ export function AccountPage() {
               (account?.proUntil ? ` until ${date(account.proUntil)}` : ", no end date")}
           </p>
           {used !== null && (
-            <div className="mt-3">
+            <div className="mt-3.5">
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 {`Images: ${mb(used)} of ${mb(limit)}`}
               </p>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                 <div
-                  className="h-full rounded-full bg-violet-600"
+                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-violet-600 transition-[width] duration-300"
                   style={{ width: `${Math.min(100, (used / limit) * 100)}%` }}
                 />
               </div>
@@ -175,23 +184,26 @@ export function AccountPage() {
             <table className="mt-2 w-full text-sm">
               <thead>
                 <tr className="text-start text-xs text-zinc-500">
-                  <th className="py-1 text-start font-medium">Date</th>
-                  <th className="py-1 text-start font-medium">Pro</th>
-                  <th className="py-1 text-start font-medium">Amount</th>
-                  <th className="py-1 text-start font-medium">Status</th>
+                  <th className="py-1.5 text-start font-medium">Date</th>
+                  <th className="py-1.5 text-start font-medium">Pro</th>
+                  <th className="py-1.5 text-start font-medium">Amount</th>
+                  <th className="py-1.5 text-start font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((p) => (
                   <tr key={p.id} className="border-t border-zinc-100 dark:border-zinc-800">
-                    <td className="py-1.5">{date(p.paidAt ?? p.createdAt)}</td>
-                    <td className="py-1.5">
+                    <td className="py-2">{date(p.paidAt ?? p.createdAt)}</td>
+                    <td className="py-2">
                       {p.months} month{p.months > 1 ? "s" : ""}
                     </td>
-                    <td className="py-1.5">{formatPrice(p.amountCents, p.currency)}</td>
-                    <td className="py-1.5">
+                    <td className="py-2">{formatPrice(p.amountCents, p.currency)}</td>
+                    <td className="py-2">
                       {p.status === "paid" ? (
-                        <Link href={`/account/receipt/${p.id}`} className="underline">
+                        <Link
+                          href={`/account/receipt/${p.id}`}
+                          className="font-medium text-blue-700 underline underline-offset-2 dark:text-blue-400"
+                        >
                           Paid · receipt
                         </Link>
                       ) : p.status === "failed" ? (
@@ -208,18 +220,18 @@ export function AccountPage() {
         </Card>
 
         <Card title="Your details">
-          <form onSubmit={saveName} className="grid gap-3">
-            <div className="grid gap-1">
+          <form onSubmit={saveName} className="grid gap-3.5">
+            <div className="grid gap-1.5">
               <Label htmlFor="account-email">Email</Label>
               <input
                 id="account-email"
-                className={`${inputClass} bg-zinc-50 dark:bg-zinc-800`}
+                className={`${inputClass} bg-zinc-50 dark:bg-zinc-800/80`}
                 dir="ltr"
                 readOnly
                 value={account?.email ?? ""}
               />
             </div>
-            <div className="grid gap-1">
+            <div className="grid gap-1.5">
               <Label htmlFor="account-name">Name</Label>
               <input
                 id="account-name"
@@ -242,8 +254,8 @@ export function AccountPage() {
         </Card>
 
         <Card title="Password">
-          <form onSubmit={savePassword} className="grid gap-3">
-            <div className="grid gap-1">
+          <form onSubmit={savePassword} className="grid gap-3.5">
+            <div className="grid gap-1.5">
               <Label htmlFor="account-password">New password</Label>
               <input
                 id="account-password"
@@ -270,12 +282,12 @@ export function AccountPage() {
         </Card>
 
         <Card title="Delete account">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             Deletes your account, every portfolio, published page, message and uploaded image. This
             cannot be undone.
           </p>
-          <form onSubmit={deleteAccount} className="mt-4 grid gap-3">
-            <div className="grid gap-1">
+          <form onSubmit={deleteAccount} className="mt-4 grid gap-3.5">
+            <div className="grid gap-1.5">
               <Label htmlFor="account-delete">
                 Type <strong data-no-translate>delete</strong> to confirm
               </Label>
@@ -291,7 +303,7 @@ export function AccountPage() {
             <button
               type="submit"
               disabled={confirm !== "delete" || busy === "delete"}
-              className="inline-flex items-center justify-self-start rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-40"
+              className="inline-flex items-center justify-self-start rounded-lg bg-red-600 px-3.5 py-2 text-sm font-medium text-white shadow-xs transition-all hover:bg-red-700 disabled:pointer-events-none disabled:opacity-40"
             >
               {busy === "delete" ? "Deleting…" : "Delete my account"}
             </button>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { downloadHtml } from "@/lib/export-download";
 import {
   clearUnsynced,
   readDraft,
@@ -10,21 +11,27 @@ import {
   writeUnsynced,
 } from "@/lib/local-drafts";
 import { friendlyError, getMyPlan, getPortfolio, isOffline, savePortfolio } from "@/lib/portfolios";
-import { uploadImage } from "@/lib/upload";
-import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
-import { downloadHtml } from "@/lib/export-download";
 import { templateDoc } from "@/lib/templates";
+import { uploadImage } from "@/lib/upload";
+import { getSection } from "@/render-kit/registry";
+import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
+import type { PortfolioDoc } from "@/render-kit/schema/document";
+import { canMove } from "./doc-ops";
 import { ImportCvDialog } from "./ImportCvDialog";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
-import { PublishDialog } from "./PublishDialog";
-import { VersionsPanel } from "./VersionsPanel";
 import type { FromPreview, SectionAction, ToPreview } from "./PreviewFrame";
-import { canMove } from "./doc-ops";
-import { getSection } from "@/render-kit/registry";
-import type { PortfolioDoc } from "@/render-kit/schema/document";
+import { PublishDialog } from "./PublishDialog";
 import { SectionEditor } from "./SectionEditor";
 import { useEditor, type Device } from "./store";
-import { IconButton, Segmented, buttonClass, inputClass, primaryButtonClass } from "./ui";
+import {
+  BrandMark,
+  buttonClass,
+  IconButton,
+  inputClass,
+  primaryButtonClass,
+  Segmented,
+} from "./ui";
+import { VersionsPanel } from "./VersionsPanel";
 
 const LOCAL_SAVE_DELAY_MS = 600;
 const REMOTE_SAVE_DELAY_MS = 1500;
@@ -321,9 +328,9 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
 
   if (opening.state === "problem") {
     return (
-      <div className="flex h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="pm-aurora-bg flex h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
         <p className="max-w-md text-sm text-zinc-700 dark:text-zinc-300">{opening.message}</p>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           {!opening.missing && (
             <button type="button" className={buttonClass} onClick={() => window.location.reload()}>
               Try again
@@ -338,7 +345,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   }
   if (opening.state === "loading" || !doc) {
     return (
-      <div className="flex h-dvh items-center justify-center text-sm text-zinc-500">
+      <div className="pm-aurora-bg flex h-dvh items-center justify-center text-sm text-zinc-500">
         {portfolioId ? "Opening your portfolio…" : "Opening your draft…"}
       </div>
     );
@@ -395,17 +402,18 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
 
   return (
     <div className="flex h-dvh flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <header className="flex items-center gap-x-3 gap-y-2 overflow-x-auto border-b border-zinc-200 bg-white px-3 py-2 lg:flex-wrap lg:overflow-visible dark:border-zinc-800 dark:bg-zinc-900 [&>*]:shrink-0">
+      <header className="pm-glass-header flex items-center gap-x-2.5 gap-y-2 overflow-x-auto px-3.5 py-2 lg:flex-wrap lg:overflow-visible [&>*]:shrink-0">
         <Link
           href={portfolioId ? "/dashboard" : "/"}
-          className="rounded px-1 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-blue-600"
+          className="group inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold transition-colors hover:bg-zinc-200/60 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-zinc-800"
         >
-          {portfolioId ? "← My portfolios" : "Portfolio Maker"}
+          {!portfolioId && <BrandMark size="sm" />}
+          <span>{portfolioId ? "← My portfolios" : "Portfolio Maker"}</span>
         </Link>
         {portfolioId && (
           <input
             aria-label="Portfolio name"
-            className={inputClass.replace("w-full", "w-56")}
+            className={inputClass.replace("w-full", "w-52 py-1.5")}
             dir="auto"
             maxLength={120}
             value={title}
@@ -422,15 +430,29 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         >
           Sections and design
         </button>
-        <span className="flex">
+        <span className="flex rounded-lg border border-zinc-200/80 bg-zinc-100/70 p-0.5 dark:border-zinc-800 dark:bg-zinc-900">
           <IconButton icon="undo" label="Undo (Ctrl+Z)" disabled={!canUndo} onClick={undo} />
           <IconButton icon="redo" label="Redo (Ctrl+Shift+Z)" disabled={!canRedo} onClick={redo} />
         </span>
         <span
           role="status"
-          className={`max-w-sm text-xs ${status === "saved" ? "text-zinc-500" : "font-medium text-amber-700 dark:text-amber-400"}`}
+          className={`inline-flex max-w-sm items-center gap-1.5 rounded-full px-2.5 py-1 text-xs ${
+            status === "saved"
+              ? "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+              : "bg-amber-50 font-medium text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+          }`}
         >
-          {statusText}
+          <span
+            aria-hidden="true"
+            className={`size-1.5 rounded-full ${
+              status === "saved"
+                ? dirty
+                  ? "animate-pulse bg-blue-500"
+                  : "bg-emerald-500"
+                : "bg-amber-500"
+            }`}
+          />
+          <span>{statusText}</span>
         </span>
         {exporting && (
           <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
@@ -440,7 +462,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
                 {" "}
                 <Link
                   href="/pro"
-                  className="font-medium text-violet-700 underline dark:text-violet-300"
+                  className="font-semibold text-violet-700 underline underline-offset-2 dark:text-violet-300"
                 >
                   See Pro
                 </Link>
@@ -449,7 +471,10 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           </span>
         )}
         {notice && (
-          <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
+          <span
+            role="status"
+            className="rounded-lg bg-zinc-900 px-2.5 py-1 text-xs font-medium text-white shadow-xs dark:bg-zinc-100 dark:text-zinc-900"
+          >
             {notice}
           </span>
         )}
@@ -458,7 +483,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             Reload the latest version
           </button>
         )}
-        <span className="ms-auto flex items-center gap-3 lg:flex-wrap">
+        <span className="ms-auto flex items-center gap-2.5 lg:flex-wrap">
           {doc.meta.languages.length > 1 && (
             <span className="w-40">
               <Segmented
@@ -471,7 +496,11 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               />
             </span>
           )}
-          <span className="hidden lg:flex" role="group" aria-label="Screen size">
+          <span
+            className="hidden rounded-lg border border-zinc-200/80 bg-zinc-100/70 p-0.5 lg:flex dark:border-zinc-800 dark:bg-zinc-900"
+            role="group"
+            aria-label="Screen size"
+          >
             {(["desktop", "tablet", "phone"] as const).map((d) => (
               <IconButton
                 key={d}
@@ -480,7 +509,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
                 aria-pressed={device === d}
                 className={
                   device === d
-                    ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100"
+                    ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-800 dark:text-white"
                     : ""
                 }
                 onClick={() => setDevice(d)}
@@ -518,7 +547,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             <>
               <select
                 aria-label="Start over from a sample"
-                className={inputClass.replace("w-full", "w-44")}
+                className={inputClass.replace("w-full", "w-44 py-1.5")}
                 value=""
                 onChange={(e) => e.target.value && startOver(e.target.value as SampleKind)}
               >
@@ -540,14 +569,14 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           <button
             type="button"
             aria-label="Close the panel"
-            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs lg:hidden"
             onClick={() => setPanelOpen(false)}
           />
         )}
         <aside
-          className={`${panelOpen ? "fixed inset-y-0 start-0 z-40 flex shadow-2xl" : "hidden"} w-[min(20rem,88vw)] shrink-0 flex-col border-e border-zinc-200 bg-white lg:static lg:z-auto lg:flex lg:w-80 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900`}
+          className={`${panelOpen ? "fixed inset-y-0 start-0 z-40 flex shadow-2xl" : "hidden"} w-[min(20rem,88vw)] shrink-0 flex-col border-e border-zinc-200/80 bg-white lg:static lg:z-auto lg:flex lg:w-80 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900`}
         >
-          <div className="border-b border-zinc-200 p-3 dark:border-zinc-800">
+          <div className="border-b border-zinc-200/80 p-3 dark:border-zinc-800">
             <Segmented
               label="Panel"
               value={tab}
@@ -559,7 +588,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               ]}
             />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <div className="min-h-0 flex-1 overflow-y-auto p-3.5">
             {tab === "sections" && (
               <SectionsPanel
                 doc={doc}
@@ -579,12 +608,12 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           </div>
         </aside>
 
-        <main className="flex min-w-0 flex-1 justify-center overflow-auto p-0 lg:p-4">
+        <main className="pm-dots-canvas flex min-w-0 flex-1 justify-center overflow-auto p-0 lg:p-5">
           <iframe
             ref={frame}
             title="Preview of your portfolio"
             src="/preview"
-            className="h-full border border-zinc-200 bg-white shadow-sm dark:border-zinc-800"
+            className="h-full border border-zinc-200/90 bg-white shadow-xl transition-[width] duration-300 ease-out lg:rounded-xl dark:border-zinc-800"
             style={{ width: WIDTHS[device], maxWidth: "100%" }}
           />
         </main>
@@ -601,7 +630,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         )}
 
         {selected && (
-          <aside className="fixed inset-x-0 bottom-0 z-40 h-[70dvh] rounded-t-xl border-t border-zinc-200 bg-white shadow-2xl lg:static lg:h-auto lg:w-[340px] lg:shrink-0 lg:rounded-none lg:border-s lg:border-t-0 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900">
+          <aside className="pm-animate-scale fixed inset-x-0 bottom-0 z-40 h-[70dvh] rounded-t-2xl border-t border-zinc-200/80 bg-white shadow-2xl lg:static lg:h-auto lg:w-[350px] lg:shrink-0 lg:rounded-none lg:border-s lg:border-t-0 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900">
             <SectionEditor key={selected.id} section={selected} />
           </aside>
         )}

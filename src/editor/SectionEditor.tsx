@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { MiniPreview } from "@/components/MiniPreview";
 import { getSection } from "@/render-kit/registry";
 import type { Section } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
-import { MiniPreview } from "@/components/MiniPreview";
 import { isLocalizedIn } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
 import { useEditor } from "./store";
-import { IconButton, Label, PanelHeading, Segmented, inputClass } from "./ui";
+import { IconButton, inputClass, Label, PanelHeading, Segmented } from "./ui";
 
 const ONLY_ENGLISH: Lang[] = ["en"];
 type Tab = "content" | "layout" | "style";
@@ -39,11 +39,11 @@ export function SectionEditor({ section }: { section: Section }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between gap-2 border-b border-zinc-200 py-2 pe-2 ps-4 dark:border-zinc-800">
-        <h2 className="truncate text-sm font-semibold">{def.name}</h2>
+      <div className="flex items-center justify-between gap-2 border-b border-zinc-200/80 py-2.5 pe-2.5 ps-4 dark:border-zinc-800">
+        <h2 className="truncate text-sm font-bold tracking-tight">{def.name}</h2>
         <IconButton icon="close" label="Close" onClick={() => select(null)} />
       </div>
-      <div className="border-b border-zinc-200 px-4 py-2.5 dark:border-zinc-800">
+      <div className="border-b border-zinc-200/80 px-4 py-2.5 dark:border-zinc-800">
         <Segmented
           label="What to edit"
           value={tab}
@@ -55,7 +55,7 @@ export function SectionEditor({ section }: { section: Section }) {
           ]}
         />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+      <div key={tab} className="pm-step-transition min-h-0 flex-1 overflow-y-auto p-4">
         {tab === "content" && (
           <FormFields
             fields={def.fields}
@@ -68,7 +68,7 @@ export function SectionEditor({ section }: { section: Section }) {
           />
         )}
         {tab === "layout" && (
-          <div className="grid gap-2">
+          <div className="grid gap-2.5">
             <PanelHeading>Layout</PanelHeading>
             {Object.entries(def.variants).map(([id, variant]) => (
               <button
@@ -76,18 +76,21 @@ export function SectionEditor({ section }: { section: Section }) {
                 type="button"
                 aria-pressed={section.variant === id}
                 onClick={() => setVariant(section.id, id)}
-                className={`rounded-md border px-3 py-2.5 text-start text-sm focus-visible:outline-2 focus-visible:outline-blue-600 ${
+                className={`group rounded-xl border p-2.5 text-start text-sm transition-all duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
                   section.variant === id
-                    ? "border-blue-600 bg-blue-50 font-medium text-blue-900 dark:bg-blue-950 dark:text-blue-100"
-                    : "border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+                    ? "border-blue-600 bg-blue-50/80 font-semibold text-blue-950 shadow-xs ring-1 ring-blue-600 dark:bg-blue-950/70 dark:text-blue-100"
+                    : "border-zinc-200/80 hover:-translate-y-0.5 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/70"
                 }`}
               >
-                <MiniPreview
-                  doc={{ ...doc!, sections: [{ ...section, variant: id, hidden: false }] }}
-                  lang={lang}
-                  aspect="aspect-[16/9]"
-                  className="mb-2 rounded border border-zinc-200 dark:border-zinc-700"
-                />
+                <div className="mb-2 overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-700">
+                  <div className="transition-transform duration-300 group-hover:scale-[1.02]">
+                    <MiniPreview
+                      doc={{ ...doc!, sections: [{ ...section, variant: id, hidden: false }] }}
+                      lang={lang}
+                      aspect="aspect-[16/9]"
+                    />
+                  </div>
+                </div>
                 {variant.name}
               </button>
             ))}
@@ -95,7 +98,7 @@ export function SectionEditor({ section }: { section: Section }) {
         )}
         {tab === "style" && (
           <div className="grid gap-4">
-            <div className="grid gap-1">
+            <div className="grid gap-1.5">
               <Label htmlFor="section-bg">Background</Label>
               <select
                 id="section-bg"
@@ -112,7 +115,7 @@ export function SectionEditor({ section }: { section: Section }) {
                 <option value="primary">Main color</option>
               </select>
             </div>
-            <div className="grid gap-1">
+            <div className="grid gap-1.5">
               <Label>Space above and below</Label>
               <Segmented
                 label="Space above and below"

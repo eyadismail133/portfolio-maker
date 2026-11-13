@@ -5,7 +5,7 @@
  * - Contact form: sends without leaving the page and shows the result.
  * - Gallery: opens images large, with arrow keys and Escape.
  * - Numbers in the stats section count up once, when they come into view.
- * - "Lively" animation: sections fade in as they come into view.
+ * - Scroll animation: sections fade and slide in smoothly as they come into view.
  * - Before and after (slider layout): the two images stack with a handle to drag. Without the
  *   script they are shown side by side.
  * - Pages set to "both" light and dark get a switch in the navbar. Without the script the page
@@ -180,10 +180,10 @@ export const PAGE_SCRIPT = String.raw`(function () {
     apply();
   }
 
-  // Lively: sections fade in
-  if (!calm && animation === "lively") {
+  // Smooth scroll reveal for sections below the fold
+  if (!calm && animation !== "none") {
     var sections = Array.prototype.filter.call(root.querySelectorAll(".pk-section"), function (el) {
-      return !el.classList.contains("pk-navbar") && !el.classList.contains("pk-hero") && el.getBoundingClientRect().top > window.innerHeight;
+      return !el.classList.contains("pk-navbar") && !el.classList.contains("pk-hero") && el.getBoundingClientRect().top > window.innerHeight * 0.92;
     });
     sections.forEach(function (el) { el.classList.add("pk-reveal"); });
     onView(sections, function (el) { el.classList.add("pk-in"); });

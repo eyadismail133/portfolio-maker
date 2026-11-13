@@ -127,9 +127,9 @@ export function CropDialog({
       ref={dialog}
       onClose={onCancel}
       aria-labelledby="crop-title"
-      className="m-auto w-[min(520px,calc(100vw-24px))] rounded-xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-2xl backdrop:bg-black/50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+      className="m-auto w-[min(520px,calc(100vw-24px))] rounded-2xl border border-zinc-200/80 bg-white/95 p-5 text-zinc-900 shadow-2xl backdrop-blur-xl backdrop:bg-black/45 dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-100"
     >
-      <h2 id="crop-title" className="text-base font-semibold">
+      <h2 id="crop-title" className="text-base font-bold tracking-tight">
         Crop the picture
       </h2>
       <div role="group" aria-label="Shape" className="mt-3 flex flex-wrap gap-1.5">
@@ -142,13 +142,13 @@ export function CropDialog({
               setRatio(value);
               setOffset({ x: 0, y: 0 });
             }}
-            className={`rounded-md border px-2.5 py-1 text-xs font-medium ${ratio === value ? "border-blue-600 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100" : "border-zinc-300 dark:border-zinc-700"}`}
+            className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${ratio === value ? "border-blue-600 bg-blue-50 text-blue-900 shadow-2xs dark:bg-blue-950/70 dark:text-blue-100" : "border-zinc-200/80 hover:bg-zinc-50 dark:border-zinc-700/80 dark:hover:bg-zinc-800"}`}
           >
             {name}
           </button>
         ))}
       </div>
-      <div className="mt-3 flex justify-center rounded-lg bg-zinc-100 p-2 dark:bg-zinc-800">
+      <div className="mt-3.5 flex justify-center rounded-xl border border-zinc-200/60 bg-zinc-100/80 p-2.5 dark:border-zinc-800 dark:bg-zinc-800/80">
         <div
           role="img"
           aria-label="Drag to choose which part of the picture to keep. Arrow keys move it too."
@@ -170,7 +170,7 @@ export function CropDialog({
               move({ x: offset.x + m[0], y: offset.y + m[1] });
             }
           }}
-          className="relative cursor-grab touch-none overflow-hidden rounded outline-offset-2 focus-visible:outline-2 focus-visible:outline-blue-600 active:cursor-grabbing"
+          className="relative cursor-grab touch-none overflow-hidden rounded-lg shadow-inner outline-offset-2 focus-visible:outline-2 focus-visible:outline-blue-600 active:cursor-grabbing"
           style={{ width: box.width, height: box.height, maxWidth: "100%" }}
         >
           {image && (
@@ -189,7 +189,7 @@ export function CropDialog({
           )}
         </div>
       </div>
-      <label className="mt-3 flex items-center gap-3 text-xs">
+      <label className="mt-3.5 flex items-center gap-3 text-xs font-medium">
         Zoom
         <input
           type="range"
@@ -202,7 +202,7 @@ export function CropDialog({
             setZoom(next);
             setOffset((o) => clampOffset(natural, box, next, o));
           }}
-          className="flex-1"
+          className="flex-1 accent-blue-600"
         />
       </label>
       <div className="mt-4 flex justify-end gap-2">

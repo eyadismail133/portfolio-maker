@@ -38,13 +38,13 @@ export function MiniPreview({
   return (
     <div
       ref={box}
-      className={`relative ${aspect} overflow-hidden bg-white ${className}`}
+      className={`relative ${aspect} overflow-hidden bg-white select-none ${className}`}
       aria-hidden="true"
       inert
     >
       {scale > 0 && (
         <div
-          className="absolute left-0 top-0"
+          className="absolute left-0 top-0 transition-opacity duration-300"
           style={{ width: PAGE_WIDTH, transform: `scale(${scale})`, transformOrigin: "0 0" }}
         >
           <Renderer doc={doc} lang={lang} />
