@@ -31,7 +31,7 @@ const make = (layout: "cards" | "list"): VariantComponent<Content> =>
                 <p className="pk-muted">
                   {[ctx.t(item.issuer), formatMonth(item.date, ctx.lang)]
                     .filter(Boolean)
-                    .join(", ")}
+                    .join(ctx.lang === "ar" ? "، " : ", ")}
                 </p>
               </div>
               {item.url && (

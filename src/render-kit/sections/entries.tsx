@@ -24,7 +24,7 @@ function EntryBody({ entry, ctx }: { entry: Entry; ctx: SectionContext }) {
       </div>
       {(entry.place || entry.location) && (
         <p className="pk-entry__place">
-          {[entry.place, entry.location].filter(Boolean).join(", ")}
+          {[entry.place, entry.location].filter(Boolean).join(ctx.lang === "ar" ? "، " : ", ")}
         </p>
       )}
       {entry.body && (
