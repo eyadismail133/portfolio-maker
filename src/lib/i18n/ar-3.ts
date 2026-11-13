@@ -156,7 +156,8 @@ export const AR_3: Record<string, string> = {
   Narrow: "ضيق",
   Wide: "عريض",
   Full: "كامل",
-  "Heading position": "موضع العنوان",
+  "Text alignment": "محاذاة النص",
+  "Start is left in English and right in Arabic.": "البداية يسار في الإنجليزية ويمين في العربية.",
   "Heading size": "حجم العنوان",
   Huge: "ضخم",
   Flat: "مسطحة",
@@ -214,4 +215,16 @@ export const AR_3: Record<string, string> = {
   Numbered: "مرقّمة",
   "Background pattern": "نقش الخلفية",
   Grain: "حبيبات",
+  // Editor: removing sections and previewing.
+  "Full preview": "معاينة كاملة",
+  "Show panels": "إظهار اللوحات",
+  "Open in new tab": "فتح في تبويب جديد",
+  "Remove section": "حذف القسم",
+  "Hide the side panels": "إخفاء اللوحات الجانبية",
+  "Show the side panels again (Esc)": "إظهار اللوحات الجانبية مرة أخرى (Esc)",
+  "See the page in a new tab, as visitors will": "شاهد الصفحة في تبويب جديد كما سيراها الزوار",
+  "Full preview. Press Esc or Show panels to edit again.":
+    "معاينة كاملة. اضغط Esc أو إظهار اللوحات لتعود إلى التحرير.",
+  "Drag a section to move it. The bin removes a section; Undo brings it back.":
+    "اسحب القسم لتحريكه. سلة المهملات تحذف القسم، والتراجع يعيده.",
 };

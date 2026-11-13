@@ -17,6 +17,8 @@ const PATHS = {
   tablet: "M6 3h12v18H6zM11 18h2",
   phone: "M8 3h8v18H8zM11 18h2",
   close: "M6 6l12 12M18 6L6 18",
+  expand: "M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5",
+  shrink: "M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5",
   grip: "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01",
   shuffle: "M3 7h4l10 10h4M17 7h4M3 17h4l3-3M14 10l3-3M18 4l3 3-3 3M18 14l3 3-3 3",
   sparkles:

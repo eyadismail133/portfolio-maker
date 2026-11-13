@@ -74,7 +74,7 @@ export function PreviewFrame() {
       );
       if (editing) return;
       const ctrl = event.ctrlKey || event.metaKey;
-      if (ctrl || event.key === "Delete" || event.key === "Backspace") {
+      if (ctrl || event.key === "Delete" || event.key === "Backspace" || event.key === "Escape") {
         if (ctrl && ["z", "y", "s", "d"].includes(event.key.toLowerCase())) event.preventDefault();
         send({ type: "pk:key", key: event.key, ctrl, shift: event.shiftKey });
       }

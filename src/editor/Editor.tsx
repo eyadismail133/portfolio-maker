@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { downloadHtml } from "@/lib/export-download";
+import { downloadHtml, openPreviewTab } from "@/lib/export-download";
 import {
   clearUnsynced,
   readDraft,
@@ -32,6 +32,7 @@ import {
   inputClass,
   primaryButtonClass,
   Segmented,
+  UiIcon,
 } from "./ui";
 import { VersionsPanel } from "./VersionsPanel";
 
@@ -96,6 +97,8 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState("");
   const [panelOpen, setPanelOpen] = useState(false);
+  /** Full preview: both side panels hidden so the page gets the whole width. */
+  const [focus, setFocus] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
   const frameReady = useRef(false);
   const titleRef = useRef("");
@@ -170,23 +173,26 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
     sendRef.current = send;
   }, [send]);
 
-  const runAction = useCallback((id: string, action: SectionAction) => {
-    const state = useEditor.getState();
-    if (action === "up") state.moveSection(id, -1);
-    if (action === "down") state.moveSection(id, 1);
-    if (action === "duplicate") state.duplicateSection(id);
-    if (action === "delete") {
-      state.removeSection(id);
-      setNotice("Section deleted. Press Ctrl+Z to bring it back.");
-      return;
-    }
-    // Keep the moved or copied section in view, so its toolbar stays at hand.
-    const shown = useEditor.getState().selectedId ?? id;
-    window.setTimeout(
-      () => sendRef.current({ type: "pk:scroll", id: shown, block: "nearest" }),
-      50,
-    );
-  }, []);
+  const runAction = useCallback(
+    (id: string, action: SectionAction) => {
+      const state = useEditor.getState();
+      if (action === "up") state.moveSection(id, -1);
+      if (action === "down") state.moveSection(id, 1);
+      if (action === "duplicate") state.duplicateSection(id);
+      if (action === "delete") {
+        state.removeSection(id);
+        setNotice("Section deleted. Press Ctrl+Z to bring it back.");
+        return;
+      }
+      // Keep the moved or copied section in view, so its toolbar stays at hand.
+      const shown = useEditor.getState().selectedId ?? id;
+      window.setTimeout(
+        () => sendRef.current({ type: "pk:scroll", id: shown, block: "nearest" }),
+        50,
+      );
+    },
+    [setNotice],
+  );
 
   // Keep the preview showing the current document.
   useEffect(() => {
@@ -299,6 +305,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
       const typing = (event.target as HTMLElement | null)?.closest?.(
         "input, textarea, select, [contenteditable]",
       );
+      if (event.key === "Escape") setFocus(false);
       const selected = useEditor.getState().selectedId;
       if (
         (event.key === "Delete" || event.key === "Backspace") &&
@@ -533,6 +540,29 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               />
             ))}
           </span>
+          <span className="hidden items-center gap-1.5 lg:flex">
+            <button
+              type="button"
+              aria-pressed={focus}
+              className={buttonClass}
+              title={focus ? "Show the side panels again (Esc)" : "Hide the side panels"}
+              onClick={() => {
+                setFocus((on) => !on);
+                if (!focus) setNotice("Full preview. Press Esc or Show panels to edit again.");
+              }}
+            >
+              <UiIcon name={focus ? "shrink" : "expand"} size={14} />
+              {focus ? "Show panels" : "Full preview"}
+            </button>
+            <button
+              type="button"
+              className={buttonClass}
+              title="See the page in a new tab, as visitors will"
+              onClick={() => void openPreviewTab(doc, lang, window.open("", "_blank"))}
+            >
+              <UiIcon name="external" size={14} /> Open in new tab
+            </button>
+          </span>
           <span className="hidden items-center gap-2.5 lg:flex">
             <button
               type="button"
@@ -593,7 +623,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           />
         )}
         <aside
-          className={`${panelOpen ? "fixed inset-y-0 start-0 z-40 flex shadow-2xl" : "hidden"} w-[min(20rem,88vw)] shrink-0 flex-col border-e border-zinc-200/80 bg-white lg:static lg:z-auto lg:flex lg:w-80 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900`}
+          className={`${panelOpen ? "fixed inset-y-0 start-0 z-40 flex shadow-2xl" : "hidden"} w-[min(20rem,88vw)] shrink-0 flex-col border-e border-zinc-200/80 bg-white lg:static lg:z-auto ${focus ? "lg:hidden" : "lg:flex"} lg:w-80 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900`}
         >
           <div className="border-b border-zinc-200/80 p-3 dark:border-zinc-800">
             <Segmented
@@ -654,7 +684,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           />
         )}
 
-        {selected && (
+        {selected && !focus && (
           <aside className="pm-animate-scale fixed inset-x-0 bottom-0 z-40 h-[70dvh] rounded-t-2xl border-t border-zinc-200/80 bg-white shadow-2xl lg:static lg:h-auto lg:w-[350px] lg:shrink-0 lg:rounded-none lg:border-s lg:border-t-0 lg:shadow-none dark:border-zinc-800 dark:bg-zinc-900">
             <SectionEditor key={selected.id} section={selected} />
           </aside>

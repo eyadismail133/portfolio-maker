@@ -146,7 +146,7 @@ export function SectionsPanel({
                 setDragId(null);
                 setOverId(null);
               }}
-              className={`group flex items-center rounded-xl border transition-all duration-150 ${
+              className={`group flex min-w-0 items-center rounded-xl border transition-all duration-150 ${
                 overId === section.id
                   ? "border-blue-600 bg-blue-50 shadow-xs dark:bg-blue-950"
                   : active
@@ -172,7 +172,7 @@ export function SectionsPanel({
                 )}
               </button>
               <span
-                className={`flex shrink-0 transition-opacity ${active ? "" : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"}`}
+                className={`shrink-0 ${active ? "flex" : "hidden focus-within:flex group-hover:flex"}`}
               >
                 <IconButton
                   icon="up"
@@ -192,8 +192,13 @@ export function SectionsPanel({
                   disabled={pinned}
                   onClick={() => duplicateSection(section.id)}
                 />
-                <IconButton icon="trash" label="Delete" onClick={() => removeSection(section.id)} />
               </span>
+              <IconButton
+                icon="trash"
+                label={`Delete ${sectionName(section)}`}
+                onClick={() => removeSection(section.id)}
+                className="hover:!bg-red-50 hover:!text-red-700 dark:hover:!bg-red-950/60 dark:hover:!text-red-300"
+              />
               <IconButton
                 icon={section.hidden ? "eyeOff" : "eye"}
                 label={section.hidden ? "Show on the page" : "Hide from the page"}
@@ -206,7 +211,7 @@ export function SectionsPanel({
       </ol>
       <AddSectionDialog doc={doc} />
       <p className="text-xs text-zinc-500">
-        Drag a section to move it. Deleting can be undone with Undo.
+        Drag a section to move it. The bin removes a section; Undo brings it back.
       </p>
     </div>
   );

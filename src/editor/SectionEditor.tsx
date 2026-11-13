@@ -9,7 +9,7 @@ import { isLocalizedIn } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
 import { SectionStylePanel } from "./SectionStylePanel";
 import { useEditor } from "./store";
-import { IconButton, PanelHeading, Segmented } from "./ui";
+import { IconButton, PanelHeading, Segmented, UiIcon } from "./ui";
 
 const ONLY_ENGLISH: Lang[] = ["en"];
 type Tab = "content" | "layout" | "style";
@@ -21,7 +21,7 @@ export function SectionEditor({ section }: { section: Section }) {
   const title = useEditor((s) => s.doc?.meta.title ?? "");
   const doc = useEditor((s) => s.doc);
   const languages = useEditor((s) => s.doc?.meta.languages ?? ONLY_ENGLISH);
-  const { updateContent, setVariant, select } = useEditor.getState();
+  const { updateContent, setVariant, select, removeSection } = useEditor.getState();
   const def = getSection(section.type);
 
   const ctx = useMemo<FormContext | null>(
@@ -42,7 +42,16 @@ export function SectionEditor({ section }: { section: Section }) {
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 border-b border-zinc-200/80 py-2.5 pe-2.5 ps-4 dark:border-zinc-800">
         <h2 className="truncate text-sm font-bold tracking-tight">{def.name}</h2>
-        <IconButton icon="close" label="Close" onClick={() => select(null)} />
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => removeSection(section.id)}
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-red-300 dark:hover:bg-red-950/60"
+          >
+            <UiIcon name="trash" size={14} /> Remove section
+          </button>
+          <IconButton icon="close" label="Close" onClick={() => select(null)} />
+        </div>
       </div>
       <div className="border-b border-zinc-200/80 px-4 py-2.5 dark:border-zinc-800">
         <Segmented

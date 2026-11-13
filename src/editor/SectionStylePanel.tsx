@@ -269,9 +269,9 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
           {!framed && !isDivider && (
             <>
               <div className="grid gap-1.5">
-                <Label>Heading position</Label>
+                <Label>Text alignment</Label>
                 <Segmented
-                  label="Heading position"
+                  label="Text alignment"
                   value={style?.align ?? "design"}
                   onChange={(align) => set({ align: align === "design" ? undefined : align })}
                   options={[
@@ -280,6 +280,9 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
                     ["center", "Centered"],
                   ]}
                 />
+                <p className="text-xs text-zinc-500">
+                  Start is left in English and right in Arabic.
+                </p>
               </div>
               <div className="grid gap-1.5">
                 <Label>Heading size</Label>
