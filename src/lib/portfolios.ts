@@ -1,3 +1,5 @@
+// Reading a saved document needs every section type known, or unknown ones would be dropped.
+import "@/render-kit/sections";
 import { normalizeDoc } from "@/render-kit/registry";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { effectivePlan, type Plan } from "@/lib/plans";

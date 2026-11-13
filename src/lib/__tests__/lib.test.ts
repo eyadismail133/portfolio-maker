@@ -198,3 +198,12 @@ describe("screenshot comparison", () => {
     ).toBe(0);
   });
 });
+
+describe("reading saved portfolios", () => {
+  test("loading the portfolio code alone knows every section type", async () => {
+    await import("../portfolios");
+    const { getSection } = await import("@/render-kit/registry");
+    expect(getSection("work-experience")).toBeDefined();
+    expect(getSection("careers")).toBeDefined();
+  });
+});

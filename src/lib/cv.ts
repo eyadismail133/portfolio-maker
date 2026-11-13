@@ -1,5 +1,6 @@
 import { formatMonth, formatRange, pickText, uiText, type UiKey } from "@/render-kit/i18n";
 import { plainText } from "@/render-kit/rich-text";
+import "@/render-kit/sections";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import type { Lang, LocalizedText } from "@/render-kit/schema/primitives";
 
