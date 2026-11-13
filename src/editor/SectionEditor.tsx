@@ -56,18 +56,20 @@ export function SectionEditor({ section }: { section: Section }) {
         />
       </div>
       <div key={tab} className="pm-step-transition min-h-0 flex-1 overflow-y-auto p-4">
-        {tab === "content" && section.type === "contact" && section.variant !== "form" && (
-          <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
-            This layout shows your details but no form, so visitors cannot send you messages here.
-            <button
-              type="button"
-              className="ms-1 font-semibold underline"
-              onClick={() => setVariant(section.id, "form")}
-            >
-              Use the layout with a form
-            </button>
-          </p>
-        )}
+        {(tab === "content" || tab === "layout") &&
+          section.type === "contact" &&
+          section.variant !== "form" && (
+            <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
+              This layout shows your details but no form, so visitors cannot send you messages here.
+              <button
+                type="button"
+                className="ms-1 font-semibold underline"
+                onClick={() => setVariant(section.id, "form")}
+              >
+                Use the layout with a form
+              </button>
+            </p>
+          )}
         {tab === "content" && (
           <FormFields
             fields={def.fields}

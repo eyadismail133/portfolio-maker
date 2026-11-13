@@ -416,7 +416,16 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           className="group inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold transition-colors hover:bg-zinc-200/60 focus-visible:outline-2 focus-visible:outline-blue-600 dark:hover:bg-zinc-800"
         >
           {!portfolioId && <BrandMark size="sm" />}
-          <span>{portfolioId ? "← My portfolios" : "Portfolio Maker"}</span>
+          {portfolioId ? (
+            <>
+              <span aria-hidden="true" className="inline-block rtl:rotate-180">
+                ←
+              </span>
+              <span className="max-sm:sr-only">My portfolios</span>
+            </>
+          ) : (
+            <span className="max-sm:sr-only">Portfolio Maker</span>
+          )}
         </Link>
         {portfolioId && (
           <input
@@ -430,7 +439,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         )}
         <button
           type="button"
-          className={`${buttonClass} hidden sm:inline-flex lg:hidden`}
+          className={`${buttonClass} max-sm:hidden lg:hidden`}
           onClick={() => {
             select(null);
             setPanelOpen(true);
@@ -460,7 +469,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
                 : "bg-amber-500"
             }`}
           />
-          <span>{statusText}</span>
+          <span className="max-sm:sr-only">{statusText}</span>
         </span>
         {exporting && (
           <span role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
@@ -547,7 +556,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
           {portfolioId && (
             <button
               type="button"
-              className={`${primaryButtonClass} hidden sm:inline-flex`}
+              className={`${primaryButtonClass} max-sm:hidden`}
               onClick={() => setPublishing(true)}
             >
               Publish

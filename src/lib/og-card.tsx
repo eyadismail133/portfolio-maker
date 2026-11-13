@@ -28,7 +28,7 @@ export async function shareCard(card: {
         background: card.background,
         color: card.text,
         direction: card.rtl ? "rtl" : "ltr",
-        fontFamily: fonts.length ? "Arabic" : undefined,
+        ...(fonts.length ? { fontFamily: "Arabic" } : {}),
       }}
     >
       <div
