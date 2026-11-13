@@ -5,20 +5,52 @@
  *
  *   npm run visual               one full-page screenshot per page
  *   npm run visual -- --sections also one screenshot per section
+ *   npm run visual -- --update   saves these screenshots as the good ones (./screenshots-baseline)
+ *   npm run visual -- --compare  compares with the good ones; fails and saves a picture of the
+ *                                differences (./screenshots/diff) when a page changed
  *
  * First use on a new computer: npx playwright install chromium
  */
-import { mkdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { chromium } from "playwright";
 import { renderToHtml } from "../src/render-kit/export";
 import { createSampleDoc } from "../src/render-kit/samples";
 import { families } from "../src/render-kit/themes/families";
 import { renderKitCss } from "./bundle-css";
+import { difference } from "./png-diff";
 
 const perSection = process.argv.includes("--sections");
 const css = renderKitCss();
 const out = resolve("screenshots");
+const baseline = resolve("screenshots-baseline");
+const update = process.argv.includes("--update");
+const compare = process.argv.includes("--compare");
+/** Share of pixels that may differ (anti-aliasing noise) before a page counts as changed. */
+const TOLERANCE = 0.001;
+
+const changes: string[] = [];
+function checkAgainstBaseline(family: string, name: string, file: string) {
+  const good = join(baseline, family, `${name}.png`);
+  if (update) {
+    mkdirSync(join(baseline, family), { recursive: true });
+    copyFileSync(file, good);
+    return;
+  }
+  if (!compare) return;
+  if (!existsSync(good)) {
+    changes.push(`${name}: no saved good screenshot (run with --update first)`);
+    return;
+  }
+  const { share, picture } = difference(readFileSync(good), readFileSync(file));
+  if (share > TOLERANCE) {
+    changes.push(`${name}: ${(share * 100).toFixed(2)}% of the page changed`);
+    if (picture) {
+      mkdirSync(join(out, "diff"), { recursive: true });
+      writeFileSync(join(out, "diff", `${name}.png`), picture);
+    }
+  }
+}
 const widths = { phone: 360, desktop: 1280 };
 const problems: string[] = [];
 
@@ -53,7 +85,9 @@ async function main() {
 
           const dir = join(out, family.id);
           mkdirSync(dir, { recursive: true });
-          await page.screenshot({ path: join(dir, `${name}.png`), fullPage: true });
+          const file = join(dir, `${name}.png`);
+          await page.screenshot({ path: file, fullPage: true });
+          checkAgainstBaseline(family.id, name, file);
           if (perSection) {
             const sectionDir = join(dir, name);
             mkdirSync(sectionDir, { recursive: true });
@@ -72,6 +106,14 @@ async function main() {
   await browser.close();
 
   console.log(`Checked ${pages} pages. Screenshots are in ./screenshots`);
+  if (update) console.log("Saved them as the good screenshots in ./screenshots-baseline.");
+  if (compare && changes.length === 0) console.log("Every page matches its good screenshot.");
+  if (changes.length > 0) {
+    console.error(
+      `\n${changes.length} page(s) look different (pictures in ./screenshots/diff):\n${changes.map((c) => `  - ${c}`).join("\n")}`,
+    );
+    process.exitCode = 1;
+  }
   if (problems.length > 0) {
     console.error(
       `\n${problems.length} problem(s):\n${problems.map((p) => `  - ${p}`).join("\n")}`,
