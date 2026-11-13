@@ -5,6 +5,7 @@ import "./globals.css";
 import { MotionProvider } from "@/components/MotionProvider";
 import { UiTranslator } from "@/components/UiTranslator";
 import { UI_LANG_SCRIPT } from "@/lib/i18n/ui";
+import { siteUrl } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +18,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: "Portfolio Maker",
-  description: "Build a rich portfolio landing page in minutes.",
+  description:
+    "Build a portfolio page for a person, a company or a startup, in English and Arabic, with 12 designs and 43 sections.",
+  openGraph: {
+    title: "Portfolio Maker",
+    description: "Fill in your story once. See it in every design. In English and Arabic.",
+    siteName: "Portfolio Maker",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

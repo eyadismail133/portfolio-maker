@@ -63,12 +63,15 @@ const WithForm: VariantComponent<Content> = (props) => {
   return (
     <Rail heading={content.heading} subheading={content.body} ctx={ctx}>
       <div className="pk-contact__grid">
+        {/* With an inbox the form posts there. Without one (previews, downloaded pages) the page
+            script opens the visitor's email app with the message filled in, and a plain email
+            link is always there for visitors without scripts. */}
         <form
           className="pk-form"
           data-pk-contact={ctx.formAction ? "" : undefined}
-          action={ctx.formAction ?? (content.email ? `mailto:${content.email}` : undefined)}
-          method="post"
-          encType={ctx.formAction ? undefined : "text/plain"}
+          data-pk-mailto={!ctx.formAction && content.email ? content.email : undefined}
+          action={ctx.formAction}
+          method={ctx.formAction ? "post" : undefined}
         >
           {ctx.formAction && (
             // Left empty by people; filled in by spam robots, whose messages are then dropped.
@@ -99,6 +102,11 @@ const WithForm: VariantComponent<Content> = (props) => {
             data-pk-sent={ctx.ui("sent")}
             data-pk-failed={ctx.ui("sendFailed")}
           />
+          {!ctx.formAction && content.email && (
+            <p className="pk-form__direct">
+              {ctx.ui("orEmail")} <a href={`mailto:${content.email}`}>{content.email}</a>
+            </p>
+          )}
         </form>
         <div className="pk-contact__info">
           <dl className="pk-facts pk-facts--stacked">

@@ -80,3 +80,18 @@
 .pk-form__status[data-pk-state="error"] {
   color: var(--pk-accent);
 }
+.pk-form__direct {
+  font-size: 0.9375rem;
+  color: var(--pk-muted);
+}
+.pk-form__direct a {
+  color: var(--pk-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+/* In a standalone page before its script runs, an email-app form cannot send: show only the
+   direct email link. */
+.pk-root[data-pk-static] form[data-pk-mailto] button[type="submit"] {
+  display: none;
+}

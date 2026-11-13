@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { safeImageUrl } from "../../i18n";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, linkSchema, textSchema } from "../../schema/primitives";
 import { L, linkProps } from "../shared";
@@ -6,6 +7,7 @@ import { L, linkProps } from "../shared";
 const schema = z.object({
   brand: textSchema,
   logo: assetRefSchema.optional(),
+  logoSize: z.enum(["small", "medium", "large"]).default("medium"),
   /** Link to every section that has a heading. */
   autoLinks: z.boolean().default(true),
   links: z.array(linkSchema).default([]),
@@ -15,6 +17,7 @@ type Content = z.output<typeof schema>;
 
 const Nav: VariantComponent<Content> = ({ content, ctx }) => {
   const brand = ctx.t(content.brand);
+  const logo = safeImageUrl(content.logo?.url);
   const links = [
     ...(content.autoLinks ? ctx.nav.map((n) => ({ label: n.label, href: `#${n.id}` })) : []),
     ...content.links.map((l) => ({ label: ctx.t(l.label), href: l.href })).filter((l) => l.label),
@@ -32,8 +35,17 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
   ));
   return (
     <nav className="pk-nav" aria-label={ctx.ui("menu")}>
-      <a className="pk-nav__brand" href="#">
-        {brand}
+      <a className="pk-nav__brand" href="#" data-pk-logo-size={content.logoSize}>
+        {logo && (
+          <img
+            className="pk-nav__logo"
+            src={logo}
+            alt={brand ? "" : content.logo?.alt || ctx.ui("logo")}
+            width={content.logo?.width}
+            height={content.logo?.height}
+          />
+        )}
+        {brand && <span>{brand}</span>}
       </a>
       {links.length > 0 && <ul className="pk-nav__links">{items}</ul>}
       {switches}
@@ -75,6 +87,7 @@ export const navbar = defineSection({
   fields: [
     { key: "brand", label: "Name or brand", type: "text" },
     { key: "logo", label: "Logo", type: "image" },
+    { key: "logoSize", label: "Logo size", type: "select", options: ["small", "medium", "large"] },
     { key: "autoLinks", label: "Link to page sections automatically", type: "toggle" },
     {
       key: "links",

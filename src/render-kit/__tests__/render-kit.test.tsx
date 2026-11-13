@@ -278,3 +278,63 @@ describe("text helpers", () => {
     expect(safeImageUrl("/images/a.webp")).toBe("/images/a.webp");
   });
 });
+
+describe("logo", () => {
+  const logo = {
+    assetId: "l1",
+    url: "https://cdn.example/logo.webp",
+    alt: "",
+    width: 300,
+    height: 120,
+  };
+  const withLogo = (variant: string, brand: string) => {
+    const doc = normalizeDoc(
+      createSampleDoc({ languages: ["en", "ar"], sections: ["navbar", "hero", "footer"] }),
+    );
+    return {
+      ...doc,
+      sections: doc.sections.map((s) =>
+        s.type === "navbar"
+          ? { ...s, variant, content: { ...(s.content as object), logo, brand, logoSize: "large" } }
+          : s.type === "footer"
+            ? { ...s, content: { ...(s.content as object), logo } }
+            : s,
+      ),
+    };
+  };
+
+  test.each([
+    ["simple", "en"],
+    ["simple", "ar"],
+    ["centered", "en"],
+    ["centered", "ar"],
+  ] as const)("the navbar shows the logo (%s, %s)", (variant, lang) => {
+    const html = renderToStaticMarkup(<Renderer doc={withLogo(variant, "Nour")} lang={lang} />);
+    expect(html).toMatch(/class="pk-nav__logo" src="https:\/\/cdn\.example\/logo\.webp"/);
+    expect(html).toContain('data-pk-logo-size="large"');
+    expect(html).toContain("pk-footer__logo");
+  });
+
+  test("a logo without a name still has a text alternative", () => {
+    const html = renderToStaticMarkup(<Renderer doc={withLogo("simple", "")} lang="en" />);
+    expect(html).toMatch(/class="pk-nav__logo"[^>]*alt="Logo"/);
+  });
+
+  test("the logo becomes the page icon when there is no favicon", () => {
+    expect(renderToHtml(withLogo("simple", "Nour"))).toContain(
+      '<link rel="icon" href="https://cdn.example/logo.webp">',
+    );
+  });
+});
+
+describe("menu labels", () => {
+  test("short headings stay, long ones become a short name", async () => {
+    const { menuLabel } = await import("../i18n");
+    expect(menuLabel("about", "About me", "en")).toBe("About me");
+    expect(menuLabel("case-study", "A factory extension on schedule", "en")).toBe("Case study");
+    expect(menuLabel("case-study", "توسعة مصنع في موعدها المحدد تماماً", "ar")).toBe("دراسة حالة");
+    expect(menuLabel("text", "A very long heading with many words", "en")).toBe(
+      "A very long heading with many words",
+    );
+  });
+});

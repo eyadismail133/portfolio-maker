@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { dirOf, pickText, uiText } from "./i18n";
+import { dirOf, pickText, menuLabel, uiText } from "./i18n";
 import { getSection, type SectionContext } from "./registry";
 import { RichInline } from "./rich-text";
 import type { PortfolioDoc } from "./schema/document";
@@ -20,12 +20,24 @@ type Props = {
   languageHrefs?: Partial<Record<Lang, string>>;
   /** Where the contact form posts on a published page. */
   formAction?: string;
+  /**
+   * Set for standalone HTML (exports and published pages). Until the page script runs, controls
+   * that only work with it are hidden and their plain fallbacks shown.
+   */
+  standalone?: boolean;
 };
 
 const LANGUAGE_NAMES: Record<Lang, string> = { en: "English", ar: "العربية" };
 
 /** Turns a portfolio document into the page. The same code runs in previews, published pages and exports. */
-export function Renderer({ doc, lang, fontLink = true, languageHrefs, formAction }: Props) {
+export function Renderer({
+  doc,
+  lang,
+  fontLink = true,
+  languageHrefs,
+  formAction,
+  standalone,
+}: Props) {
   const language = lang && doc.meta.languages.includes(lang) ? lang : doc.meta.languages[0];
   const visible = doc.sections.flatMap((section) => {
     const def = getSection(section.type);
@@ -47,7 +59,8 @@ export function Renderer({ doc, lang, fontLink = true, languageHrefs, formAction
     }),
     formAction,
     nav: visible.flatMap(({ section, def }) => {
-      const label = def.navLabel ? pickText(def.navLabel(section.content), language) : "";
+      const heading = def.navLabel ? pickText(def.navLabel(section.content), language) : "";
+      const label = heading ? menuLabel(section.type, heading, language) : "";
       return label ? [{ id: section.id, label }] : [];
     }),
   };
@@ -65,6 +78,7 @@ export function Renderer({ doc, lang, fontLink = true, languageHrefs, formAction
       data-pk-family={getFamily(doc.theme.family).id}
       data-pk-mode={doc.theme.mode}
       data-pk-animation={doc.theme.animation}
+      data-pk-static={standalone ? "" : undefined}
       style={themeToCssVars(doc.theme, language) as CSSProperties}
     >
       {/* A plain link: the page must still show when the font service is slow or blocked. */}

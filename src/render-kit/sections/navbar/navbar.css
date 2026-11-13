@@ -7,6 +7,11 @@
   gap: 16px 28px;
 }
 .pk-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  --pk-logo-h: 34px;
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-size: 1.125rem;
@@ -109,4 +114,18 @@
 }
 .pk-nav__lang:hover {
   color: var(--pk-text);
+}
+.pk-nav__brand[data-pk-logo-size="small"] {
+  --pk-logo-h: 26px;
+}
+.pk-nav__brand[data-pk-logo-size="large"] {
+  --pk-logo-h: 46px;
+}
+.pk-nav__logo {
+  display: block;
+  height: var(--pk-logo-h);
+  width: auto;
+  max-width: min(180px, 45vw);
+  object-fit: contain;
+  flex: none;
 }

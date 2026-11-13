@@ -60,6 +60,8 @@ const UI = {
   addBooking: { en: "Add a Calendly link", ar: "أضف رابط Calendly" },
   bookingTitle: { en: "Booking calendar", ar: "تقويم الحجز" },
   darkMode: { en: "Dark mode", ar: "الوضع الداكن" },
+  logo: { en: "Logo", ar: "الشعار" },
+  orEmail: { en: "Or email directly:", ar: "أو راسلني مباشرة:" },
   signedUp: { en: "Thank you. You are signed up.", ar: "شكراً لك. تم تسجيلك." },
   signupFailed: {
     en: "The sign-up did not go through. Try again.",
@@ -67,6 +69,37 @@ const UI = {
   },
 } as const;
 export type UiKey = keyof typeof UI;
+
+/** Short menu names, used when a section's heading is too long for the navigation bar. */
+const SHORT_MENU_NAMES: Record<string, { en: string; ar: string }> = {
+  about: { en: "About", ar: "نبذة" },
+  careers: { en: "Careers", ar: "الوظائف" },
+  "case-study": { en: "Case study", ar: "دراسة حالة" },
+  contact: { en: "Contact", ar: "تواصل" },
+  education: { en: "Education", ar: "التعليم" },
+  faq: { en: "FAQ", ar: "الأسئلة" },
+  features: { en: "Features", ar: "المزايا" },
+  gallery: { en: "Gallery", ar: "المعرض" },
+  "how-it-works": { en: "How it works", ar: "كيف نعمل" },
+  pricing: { en: "Pricing", ar: "الأسعار" },
+  projects: { en: "Work", ar: "الأعمال" },
+  publications: { en: "Writing", ar: "المنشورات" },
+  services: { en: "Services", ar: "الخدمات" },
+  skills: { en: "Skills", ar: "المهارات" },
+  team: { en: "Team", ar: "الفريق" },
+  timeline: { en: "Story", ar: "قصتنا" },
+  "work-experience": { en: "Experience", ar: "الخبرات" },
+};
+
+/**
+ * The menu label of a section: its heading when that is short, or else a short name for the
+ * section type, so the navigation bar never fills up with long titles.
+ */
+export function menuLabel(type: string, heading: string, lang: Lang): string {
+  const text = heading.trim();
+  if (text && text.length <= 22 && text.split(/\s+/).length <= 3) return text;
+  return SHORT_MENU_NAMES[type]?.[lang] ?? text;
+}
 
 /** Built-in words the page needs, such as "Present" or "Send message". */
 export function uiText(key: UiKey, lang: Lang): string {

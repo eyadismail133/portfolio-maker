@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { linkSchema, textSchema } from "../../schema/primitives";
+import { safeImageUrl } from "../../i18n";
+import { assetRefSchema, linkSchema, textSchema } from "../../schema/primitives";
 import { L, linkProps } from "../shared";
 
 const schema = z.object({
+  logo: assetRefSchema.optional(),
   name: textSchema,
   tagline: textSchema,
   links: z.array(linkSchema).default([]),
@@ -14,9 +16,19 @@ type Content = z.output<typeof schema>;
 const make = (layout: "simple" | "columns"): VariantComponent<Content> =>
   function Footer({ content, ctx }) {
     const links = content.links.filter((l) => ctx.t(l.label));
+    const logo = safeImageUrl(content.logo?.url);
     return (
       <div className={`pk-footer__inner pk-footer__inner--${layout}`}>
         <div>
+          {logo && (
+            <img
+              className="pk-footer__logo"
+              src={logo}
+              alt={ctx.t(content.name) ? "" : content.logo?.alt || ctx.ui("logo")}
+              width={content.logo?.width}
+              height={content.logo?.height}
+            />
+          )}
           <p className="pk-footer__name">{ctx.t(content.name)}</p>
           {layout === "columns" && ctx.t(content.tagline) && (
             <p className="pk-footer__tagline">{ctx.t(content.tagline)}</p>
@@ -58,6 +70,7 @@ export const footer = defineSection({
   },
   defaultVariant: "simple",
   fields: [
+    { key: "logo", label: "Logo", type: "image" },
     { key: "name", label: "Name", type: "text" },
     { key: "tagline", label: "Tagline", type: "text" },
     {

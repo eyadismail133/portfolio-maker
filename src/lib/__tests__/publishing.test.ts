@@ -171,7 +171,12 @@ describe("HTML export", () => {
     expect(renderToHtml(doc, { formAction: "/api/contact?slug=mona" })).toContain(
       'action="/api/contact?slug=mona"',
     );
-    expect(renderToHtml(doc)).toContain('action="mailto:');
+    const exported = renderToHtml(doc);
+    // No mailto: form action (browsers warn about it): the script writes the email, and a plain
+    // link works without the script.
+    expect(exported).not.toContain('action="mailto:');
+    expect(exported).toContain('data-pk-mailto="hello@example.com"');
+    expect(exported).toContain('class="pk-form__direct"');
   });
 
   test("newsletter sign-ups go to the inbox unless the owner set a mailing list", () => {

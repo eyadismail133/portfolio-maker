@@ -19,6 +19,7 @@ export const PAGE_SCRIPT = String.raw`(function () {
   var root = document.querySelector(".pk-root");
   if (!root) return;
   root.classList.add("pk-js");
+  root.removeAttribute("data-pk-static");
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var animation = root.getAttribute("data-pk-animation") || "subtle";
   var closeLabel = root.getAttribute("lang") === "ar" ? "إغلاق" : "Close";
@@ -62,6 +63,19 @@ export const PAGE_SCRIPT = String.raw`(function () {
         })
         .catch(function () { say("failed", "error"); })
         .then(function () { if (button) button.disabled = false; });
+    });
+  });
+
+  // Contact form without an inbox: open the visitor's email app with the message filled in
+  Array.prototype.forEach.call(root.querySelectorAll("form[data-pk-mailto]"), function (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var value = function (name) { var el = form.elements[name]; return el ? String(el.value || "").trim() : ""; };
+      var from = value("name");
+      var body = value("message") + "\n\n" + from + (value("email") ? " <" + value("email") + ">" : "");
+      window.location.href = "mailto:" + form.getAttribute("data-pk-mailto") +
+        "?subject=" + encodeURIComponent((from ? from + ": " : "") + document.title) +
+        "&body=" + encodeURIComponent(body);
     });
   });
 

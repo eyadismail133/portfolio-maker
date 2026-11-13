@@ -40,3 +40,11 @@
   padding-block-start: 20px;
   border-block-start: var(--pk-rule);
 }
+.pk-footer__logo {
+  display: block;
+  height: 32px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  margin-block-end: 10px;
+}
