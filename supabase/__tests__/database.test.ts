@@ -106,6 +106,65 @@ beforeAll(async () => {
       )
     ).rows?.length === 1,
   );
+  // Free: publish another page in place of the live one, in one step.
+  const rep = await as(
+    "authenticated",
+    A,
+    "select public.publish_replacing_live($1, 'Ann-Two', doc) r from portfolios where id = $1",
+    [ids[1]],
+  );
+  const repOut = rep.rows?.[0]?.r;
+  check(
+    "free: replace the live page in one step",
+    !rep.error && repOut?.offline?.[0] === "ann",
+    rep.error ?? JSON.stringify(repOut),
+  );
+  const after = (
+    await as(
+      "authenticated",
+      A,
+      "select id, slug, status, published_doc is null gone from portfolios where status = 'published' or id = $1",
+      [p1],
+    )
+  ).rows;
+  check(
+    "replace: old page offline, new page live with a lower-case slug",
+    after.length === 2 &&
+      after.some((r) => r.id === p1 && r.status === "draft" && r.gone) &&
+      after.some((r) => r.id === ids[1] && r.status === "published" && r.slug === "ann-two"),
+    JSON.stringify(after),
+  );
+  check(
+    "replace: a Published version is saved",
+    (
+      await q(
+        `select count(*)::int n from portfolio_versions where portfolio_id = '${ids[1]}' and label = 'Published'`,
+      )
+    )[0].n === 1,
+  );
+  check(
+    "replace: others' portfolios are refused",
+    /not_found/.test(
+      (
+        await as("authenticated", B, "select public.publish_replacing_live($1, 'x', '{}'::jsonb)", [
+          ids[1],
+        ])
+      ).error ?? "",
+    ),
+  );
+  check(
+    "replace: visitors cannot call it",
+    !!(
+      await as("anon", null, "select public.publish_replacing_live($1, 'x', '{}'::jsonb)", [ids[1]])
+    ).error,
+  );
+  // Back to the first page live, as the later checks expect.
+  await as(
+    "authenticated",
+    A,
+    "select public.publish_replacing_live($1, 'ann', doc) from portfolios where id = $1",
+    [p1],
+  );
   check(
     "B cannot see A's portfolios",
     (await as("authenticated", B, "select * from portfolios")).rows.length === 0,
@@ -175,8 +234,14 @@ beforeAll(async () => {
     );
   check(
     "free: 5 versions kept",
-    (await as("authenticated", A, "select count(*)::int n from portfolio_versions")).rows[0].n ===
-      5,
+    (
+      await as(
+        "authenticated",
+        A,
+        "select count(*)::int n from portfolio_versions where portfolio_id = $1",
+        [p1],
+      )
+    ).rows[0].n === 5,
   );
   check(
     "B cannot add a version to A's portfolio",

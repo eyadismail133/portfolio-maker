@@ -7,9 +7,11 @@ import {
   getPublishState,
   isSlugAvailable,
   publish,
+  publishReplacingLive,
   unpublish,
   type PublishState,
 } from "@/lib/publishing";
+import { LIMITS } from "@/lib/plans";
 import { cleanSlugInput, slugProblem, suggestSlug } from "@/lib/slug";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { IconButton, Label, buttonClass, inputClass, primaryButtonClass } from "./ui";
@@ -38,6 +40,11 @@ export function PublishDialog(props: {
   const checks = publishChecks(props.doc);
   const origin = typeof window === "undefined" ? "" : window.location.origin;
   const liveUrl = state?.status === "published" && state.slug ? `${origin}/p/${state.slug}` : "";
+  const plan = useEditor((s) => s.plan) ?? "free";
+  const limit = LIMITS.published[plan];
+  // Publishing this page would go over the plan's limit of live pages.
+  const atLimit = Boolean(state && state.status !== "published" && state.otherLive.length >= limit);
+  const canReplace = atLimit && plan === "free";
 
   useEffect(() => {
     ref.current?.showModal();
@@ -87,8 +94,16 @@ export function PublishDialog(props: {
     setProblem("");
     try {
       await props.beforePublish();
-      const publishedAt = await publish(props.portfolioId, props.doc, slug, state.slug);
-      setState({ status: "published", slug, publishedAt, changedSincePublish: false });
+      const publishedAt = canReplace
+        ? await publishReplacingLive(props.portfolioId, props.doc, slug, state.slug)
+        : await publish(props.portfolioId, props.doc, slug, state.slug);
+      setState({
+        status: "published",
+        slug,
+        publishedAt,
+        changedSincePublish: false,
+        otherLive: canReplace ? [] : state.otherLive,
+      });
       setAvailability("mine");
     } catch (error) {
       if (error instanceof Error && error.message === "plan_limit_published") {
@@ -129,15 +144,25 @@ export function PublishDialog(props: {
     }
   };
 
+  const shareText = encodeURIComponent(props.title);
+  const shareUrl = encodeURIComponent(liveUrl);
+  const shareLinks = [
+    { name: "WhatsApp", href: `https://wa.me/?text=${shareText}%20${shareUrl}` },
+    { name: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}` },
+    { name: "X", href: `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}` },
+  ];
+
   const published = state?.status === "published";
   const slugChanged = published && slug !== state?.slug;
-  const action = !published
-    ? "Publish"
-    : slugChanged
-      ? "Publish at the new link"
-      : state?.changedSincePublish
-        ? "Update the live page"
-        : "Publish again";
+  const action = canReplace
+    ? "Replace my live page"
+    : !published
+      ? "Publish"
+      : slugChanged
+        ? "Publish at the new link"
+        : state?.changedSincePublish
+          ? "Update the live page"
+          : "Publish again";
 
   return (
     <dialog
@@ -155,6 +180,38 @@ export function PublishDialog(props: {
 
       <div className="grid max-h-[75vh] gap-5 overflow-y-auto p-5">
         {!state && !problem && <p className="text-sm text-zinc-500">Checking your page…</p>}
+
+        {atLimit && state && (
+          <div className="grid gap-2 rounded-xl border border-blue-200/80 bg-blue-50/90 p-4 text-sm text-blue-950 shadow-sm dark:border-blue-900/60 dark:bg-blue-950/60 dark:text-blue-100">
+            <p className="font-semibold">
+              {canReplace
+                ? "Free accounts can have 1 live page."
+                : "Pro accounts can have 10 live pages."}
+            </p>
+            <p>
+              <span>Live now:</span>{" "}
+              {state.otherLive.slice(0, 3).map((page, i) => (
+                <span key={page.slug ?? i}>
+                  {i > 0 && ", "}
+                  <strong>{page.title || page.slug}</strong>
+                </span>
+              ))}
+              {state.otherLive.length > 3 && <span> …</span>}
+            </p>
+            <p>
+              {canReplace
+                ? "Publishing this page takes that one offline at the same moment. Its text and design stay saved in your dashboard."
+                : "Take one of them offline from its editor first."}
+            </p>
+            {canReplace && (
+              <p>
+                <a href="/pro" className="font-semibold underline">
+                  Or go Pro to keep up to 10 pages live
+                </a>
+              </p>
+            )}
+          </div>
+        )}
 
         {published && liveUrl && (
           <div className="grid gap-3 rounded-xl border border-emerald-200/80 bg-emerald-50/90 p-4 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/60">
@@ -174,6 +231,22 @@ export function PublishDialog(props: {
               <a href={liveUrl} target="_blank" rel="noopener noreferrer" className={buttonClass}>
                 Open the page
               </a>
+            </div>
+            <div className="flex flex-wrap items-center gap-2" aria-label="Share">
+              <span className="text-xs font-semibold text-emerald-900 dark:text-emerald-100">
+                Share on
+              </span>
+              {shareLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${buttonClass} px-2.5 py-1 text-xs`}
+                >
+                  {link.name}
+                </a>
+              ))}
             </div>
             {qr && (
               // eslint-disable-next-line @next/next/no-img-element -- a generated QR code image
@@ -307,7 +380,8 @@ export function PublishDialog(props: {
               Boolean(shapeProblem) ||
               !slug ||
               availability === "taken" ||
-              availability === "checking"
+              availability === "checking" ||
+              (atLimit && !canReplace)
             }
             onClick={go}
           >

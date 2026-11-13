@@ -10,22 +10,33 @@ export type PublishState = {
   publishedAt: string | null;
   /** True when the editor has changes that visitors do not see yet. */
   changedSincePublish: boolean;
+  /** The account's other live pages, which count toward the plan's published-page limit. */
+  otherLive: { title: string; slug: string | null }[];
 };
 
 export async function getPublishState(id: string, current: PortfolioDoc): Promise<PublishState> {
   const { data, error } = await createClient()
     .from("portfolios")
-    .select("status, slug, published_at, published_doc")
+    .select("status, slug, published_at, published_doc, user_id")
     .eq("id", id)
     .single();
   if (error) throw error;
   const row = data as {
+    user_id: string;
     status: "draft" | "published";
     slug: string | null;
     published_at: string | null;
     published_doc: unknown;
   };
+  // Published pages are readable by everyone, so filter to this account explicitly.
+  const others = await createClient()
+    .from("portfolios")
+    .select("title, slug")
+    .eq("user_id", row.user_id)
+    .eq("status", "published")
+    .neq("id", id);
   return {
+    otherLive: (others.data ?? []) as { title: string; slug: string | null }[],
     status: row.status,
     slug: row.slug,
     publishedAt: row.published_at,
@@ -79,6 +90,31 @@ export async function publish(
   await supabase.from("portfolio_versions").insert({ portfolio_id: id, doc, label: "Published" });
   await refreshPublicPages([slug, previousSlug]);
   return publishedAt;
+}
+
+/**
+ * Publishes this page and takes the account's other live pages offline, in one database step, for
+ * accounts at their published-page limit. Returns when it was published.
+ */
+export async function publishReplacingLive(
+  id: string,
+  doc: PortfolioDoc,
+  slug: string,
+  previousSlug: string | null,
+): Promise<string> {
+  const { data, error } = await createClient().rpc("publish_replacing_live", {
+    p_id: id,
+    p_slug: slug,
+    p_doc: doc,
+  });
+  if (error) {
+    if (error.code === "23505") throw new Error("taken");
+    if (/plan_limit_published/.test(error.message)) throw new Error("plan_limit_published");
+    throw error;
+  }
+  const result = data as { published_at: string; offline: string[] };
+  await refreshPublicPages([slug, previousSlug, ...(result.offline ?? [])]);
+  return result.published_at;
 }
 
 /** Takes the page offline. The link name stays reserved for this portfolio. */
