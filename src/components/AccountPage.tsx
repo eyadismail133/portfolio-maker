@@ -188,11 +188,15 @@ export function AccountPage() {
                     </td>
                     <td className="py-1.5">{formatPrice(p.amountCents, p.currency)}</td>
                     <td className="py-1.5">
-                      {p.status === "paid"
-                        ? "Paid"
-                        : p.status === "failed"
-                          ? "Not completed"
-                          : "Waiting"}
+                      {p.status === "paid" ? (
+                        <Link href={`/account/receipt/${p.id}`} className="underline">
+                          Paid · receipt
+                        </Link>
+                      ) : p.status === "failed" ? (
+                        "Not completed"
+                      ) : (
+                        "Waiting"
+                      )}
                     </td>
                   </tr>
                 ))}

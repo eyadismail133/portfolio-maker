@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
+import { sendReceipt } from "@/lib/billing/receipt";
 import { isGenuineCallback, paymobConfig, readOutcome } from "@/lib/billing/paymob";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
     });
     // An error makes Paymob try the callback again later.
     if (error) return NextResponse.json({ ok: false }, { status: 500 });
+    if (data === "ok") after(() => sendReceipt(outcome.paymentId));
     return NextResponse.json({ ok: true, result: data });
   }
   if (outcome.state === "failed")

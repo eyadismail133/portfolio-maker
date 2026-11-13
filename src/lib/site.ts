@@ -10,3 +10,14 @@ export const SITE = {
   /** Date the current terms, privacy and refund texts took effect. Change it when the texts change. */
   policiesUpdated: "13 November 2026",
 };
+
+/**
+ * The public address of the app, for links in emails. Vercel sets VERCEL_PROJECT_PRODUCTION_URL
+ * by itself; NEXT_PUBLIC_SITE_URL wins when a custom address is in use.
+ */
+export function siteUrl(): string {
+  const own = process.env.NEXT_PUBLIC_SITE_URL;
+  if (own) return own.replace(/\/$/, "");
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  return vercel ? `https://${vercel}` : "http://localhost:3000";
+}

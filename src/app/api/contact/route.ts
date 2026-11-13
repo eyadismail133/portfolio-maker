@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
+import { notifyNewMessage } from "@/lib/notify";
 import { createPublicClient } from "@/lib/supabase/public";
 
 const escape = (value: string) =>
@@ -68,6 +69,9 @@ export async function POST(request: NextRequest) {
     p_message: message,
   });
   if (error) return answer(false, 502);
-  if (data === "ok") return answer(true);
+  if (data === "ok") {
+    after(() => notifyNewMessage(slug));
+    return answer(true);
+  }
   return answer(false, data === "busy" ? 429 : data === "not_found" ? 404 : 400);
 }
