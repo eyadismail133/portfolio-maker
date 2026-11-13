@@ -120,6 +120,9 @@ Version 1 shipped 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creativ
 - Every pair must have an Arabic partner. Suggested: Cairo, Tajawal, IBM Plex Sans Arabic, Almarai, Readex Pro, Noto Kufi Arabic, Amiri (for elegant).
 - Fonts load from Google Fonts with `font-display: swap`; only the weights in use.
 
+## Settings a design must respect
+A design family sets defaults, never fixed values, for anything the person can change: corners come from `--pk-radius` and `--pk-radius-control` (a square family sets `radius: "none"` as its default instead of `border-radius: 0`), section colors only through rules on `data-pk-bg="default"`, and section space through `--pk-pad-base`. That way the Corners setting and every choice in a section's Style tab work in all 12 designs. The per-section style choices are listed in `05-EDITOR-AND-PREVIEW.md`.
+
 ## Quality bar for every section
 - Looks finished with the sample content, and still fine with very long or very short text, 1 item or 20 items, and no image.
 - Phone, tablet, desktop.

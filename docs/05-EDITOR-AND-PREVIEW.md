@@ -43,7 +43,7 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 
 - **Content:** a form built automatically from the section's `fields` list. Field types: text, long text, rich text, image, image list, link, date range, number, level (1 to 5), icon picker, toggle, select, and repeating list (add, remove, reorder items).
 - **Layout:** variant picker with thumbnails.
-- **Style:** background (default, surface, primary color, image), padding.
+- **Style:** background, shape, layout, space and motion (see "Section style" below).
 - Two-language portfolios show an EN / AR switch at the top of the form.
 
 ## Preview
@@ -82,6 +82,24 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - **Publishing on Free:** when the account already has its one live page, the dialog says so at the top, names that page, and the main button becomes "Replace my live page" (one database step). After publishing: share buttons for WhatsApp, LinkedIn and X.
 - **Dashboard:** a "Getting started" checklist (replace the sample text, add a photo or logo, publish, get a first visit) that ticks itself and can be hidden; each card has Edit plus a "…" menu; on phones the header folds into a menu.
 
+## Section style (Style tab)
+Stored in `section.style`. Every field past `background` and `padding` is optional, so saved portfolios need no migration and `schemaVersion` stays 1. Missing means "as the design does it".
+
+| Group | Choices |
+|---|---|
+| Background | Design default, Plain page, Soft tint, Main color, Accent, Inverted, My color (`color`), Gradient (`color`, `color2`, direction down / diagonal / glow), Picture (`image`, layer dark / darker / light / lighter) |
+| Shape | Top and bottom edge: straight, wave, slant, curve, zigzag |
+| Layout | Content width (narrow, normal, wide, full), heading position (design, start, centered), heading size (small to huge), cards (design, flat, outline, shadow, glass) |
+| Space and motion | Space above and below (none, small, normal, large, extra), entrance when scrolled to (page setting, none, fade, rise, zoom, slide) |
+
+- "Use this style on all sections" copies the style to every section except the navbar and footer; "Reset style" removes it. Both are one Undo step. Dragging a color picker is grouped into one step.
+- The navbar shows only Background and Space; the footer and divider hide the heading and card choices; the hero has no entrance (it is on screen when the page opens).
+- `render-kit/themes/section-style.ts` turns the style into data attributes for `styles/section-style.css` and, for own colors, gradients and pictures, the `--pk-x-*` colors. It picks white or near-black text, whichever reads better, and keeps the main color only where it still stands out (3:1), so no contrast warning is needed.
+- "Design default" vs "Plain page": some designs color a section by themselves (Bold: navbar and hero; Corporate: hero and footer; Creative: footer). Their rules only match `data-pk-bg="default"`, so "Plain page" always gives the plain page color.
+- Space is a scale: each section type sets `--pk-pad-base` and the choice sets `--pk-pad-scale`, so the navbar, footer, logo strip and stats follow it too.
+- Shaped edges cut the section with a CSS mask; what shows through is the page color.
+- Entrances run in `page-script.ts` on the published page, never in the editor preview. A section's entrance wins over the page's animation setting; reduce-motion visitors see none.
+
 ## Code map
 
 | File | What it does |
@@ -89,6 +107,7 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 | `src/editor/Editor.tsx` | Page layout, preview frame messaging, saving, keyboard |
 | `src/editor/panels.tsx` | Left panel: Sections, Design, Settings |
 | `src/editor/SectionEditor.tsx` | Right panel: Content, Layout, Style of the selected section |
+| `src/editor/SectionStylePanel.tsx` | The Style tab: background, shape, layout, space and motion |
 | `src/editor/fields.tsx` | One form control per field type; builds forms from a section's `fields` |
 | `src/editor/PreviewFrame.tsx` | The page inside the frame (`/preview`); renders what the editor sends, reports clicks |
 | `src/editor/store.ts`, `doc-ops.ts` | State and document changes |

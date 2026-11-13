@@ -114,6 +114,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Dark/light switch for visitors
 - [x] Email the owner when a message arrives (Resend; at most one email per page every 10 minutes)
 - [x] App interface in Arabic (dictionary keyed by the English text, cookie switch, right to left; legal pages stay English until reviewed)
+- [x] Richer section Style tab: 9 backgrounds (own color, gradient, picture with a layer), shaped edges, width, heading position and size, card style, 5 space steps, entrance per section, "use on all sections" and reset; fixes where a design ignored the background, space or corner setting
+- [ ] More layouts per section (every section has 2 today; the catalog in `04-SECTIONS-AND-DESIGNS.md` lists more)
 
 ## Phase 7 - Launch and business
 - [x] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`): 250 EGP or 6 USD a month, prepaid months, Paymob
