@@ -115,7 +115,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Email the owner when a message arrives (Resend; at most one email per page every 10 minutes)
 - [x] App interface in Arabic (dictionary keyed by the English text, cookie switch, right to left; legal pages stay English until reviewed)
 - [x] Richer section Style tab: 9 backgrounds (own color, gradient, picture with a layer), shaped edges, width, heading position and size, card style, 5 space steps, entrance per section, "use on all sections" and reset; fixes where a design ignored the background, space or corner setting
-- [ ] More layouts per section (every section has 2 today; the catalog in `04-SECTIONS-AND-DESIGNS.md` lists more)
+- [x] More layouts: 22 new ones across 15 sections (108 in all), including photo-behind-text and big-name heroes, floating navbar, side-scrolling rows, masonry, text lists and big numbers
+- [x] Pages that look less alike: page-wide photo shape, button style, heading decoration, background pattern, separate heading and body fonts, text and heading size, heading weight and capitals; each starter look has its own touches and layouts, later ideas in a batch get random ones, and Shuffle changes layouts and touches too
 
 ## Phase 7 - Launch and business
 - [x] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`): 250 EGP or 6 USD a month, prepaid months, Paymob

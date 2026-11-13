@@ -73,6 +73,25 @@ This is the catalog. A portfolio is rich when it has 8 to 14 sections; recipes i
 
 Total: 43 types, 39 in version 1. Build order is in the roadmap; the first 12 are enough for a personal portfolio.
 
+### Layouts added later (108 in all)
+| Type | New layouts |
+|---|---|
+| `navbar` | floating bar, name and menu button |
+| `hero` | photo behind the text (`cover`: a dark layer keeps text white; without a photo it falls back to the palette colors), big name (`statement`) |
+| `about` | wide photo and facts card (`banner`) |
+| `work-experience`, `education` | compact list |
+| `skills` | group cards, level dots |
+| `projects` | mixed heights (`masonry`), side-scrolling row (`slider`), text list (`index`) |
+| `gallery`, `team` | side-scrolling row |
+| `testimonials` | side-scrolling row, wall of quotes |
+| `certificates` | badges |
+| `stats` | big numbers |
+| `features` | big numbered cards |
+| `cta` | centered card, big statement |
+| `footer` | big name |
+
+Side-scrolling rows use the shared `.pk-slider` class: CSS scroll snapping, no script, so they work in exported HTML. It is positioned and has `min-width: 0`; without that it widens the page on phones.
+
 ## Content fields example
 
 Every section doc entry follows this pattern. Example for `work-experience`:
@@ -119,6 +138,23 @@ Version 1 shipped 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creativ
 - 15 font pairs (heading + body), each tagged with families it suits.
 - Every pair must have an Arabic partner. Suggested: Cairo, Tajawal, IBM Plex Sans Arabic, Almarai, Readex Pro, Noto Kufi Arabic, Amiri (for elegant).
 - Fonts load from Google Fonts with `font-display: swap`; only the weights in use.
+
+## Page personality
+Optional theme choices on top of a family, so two people with the same family still get different pages. Missing means "as the family does it"; switching family clears them (`PERSONAL_THEME_KEYS`), so the new family shows fully.
+
+| Choice | Values | How |
+|---|---|---|
+| Heading font, text font | any pair's heading or body font | `theme.headingFont` / `bodyFont` hold a pair id; that pair's Arabic partner comes along |
+| Text size | small, large | `font-size` on `<html>` (94% / 110%), because section text is sized in rem; the preview sets it on its own `<html>` |
+| Heading size, weight, letters | small / large; lightest / boldest loaded weight; capitals (never for Arabic) | CSS variables on `.pk-root` and `data-pk-hcase` |
+| Photo shape | square, rounded, circle, arch, blob, tilted | `data-pk-shape`; hero, about and image-beside-text photos |
+| Buttons | solid, outline, soft, underline | `data-pk-buttons` |
+| Section headings | plain, underline, marker, numbered, line | `data-pk-deco`; any value first removes the family's own heading decoration |
+| Background pattern | dots, grid, lines, glow, grain | `data-pk-pattern`; only on sections with the page color |
+
+The CSS is `styles/personality.css`, after the families so the choice wins.
+
+**Starting points:** each of the 16 onboarding looks (`recommend/generate.ts`) has its own touches and signature layouts, and ideas 3 to 6 of a batch get a few random ones (`themes/variety.ts`), so no two ideas in a batch look the same (a test checks this). Shuffle in the Design tab picks colors, fonts, corners, touches and some layouts in one Undo step. Only sections whose layouts all take the same content are varied; contact and about are left alone.
 
 ## Settings a design must respect
 A design family sets defaults, never fixed values, for anything the person can change: corners come from `--pk-radius` and `--pk-radius-control` (a square family sets `radius: "none"` as its default instead of `border-radius: 0`), section colors only through rules on `data-pk-bg="default"`, and section space through `--pk-pad-base`. That way the Corners setting and every choice in a section's Style tab work in all 12 designs. The per-section style choices are listed in `05-EDITOR-AND-PREVIEW.md`.

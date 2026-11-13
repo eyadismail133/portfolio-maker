@@ -32,7 +32,8 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - Colors: ready palettes, brand color picker, light/dark, advanced per-color editing.
 - Fonts: font pairs.
 - Shape and spacing: corner radius, spacing density, animation level.
-- "Shuffle" button: tries a random good combination. Undo brings the old one back.
+- "Shuffle the look" button: random colors, fonts, corners, page touches and some layouts in one step. Undo brings the old one back.
+- Fonts (heading and text separately), text size, heading size, weight and letters; Shapes and decoration (photo shape, buttons, section headings, background pattern). See "Page personality" in `04-SECTIONS-AND-DESIGNS.md`.
 
 **Settings tab**
 - Page title, description, share image, favicon.
@@ -97,7 +98,7 @@ Stored in `section.style`. Every field past `background` and `padding` is option
 - `render-kit/themes/section-style.ts` turns the style into data attributes for `styles/section-style.css` and, for own colors, gradients and pictures, the `--pk-x-*` colors. It picks white or near-black text, whichever reads better, and keeps the main color only where it still stands out (3:1), so no contrast warning is needed.
 - "Design default" vs "Plain page": some designs color a section by themselves (Bold: navbar and hero; Corporate: hero and footer; Creative: footer). Their rules only match `data-pk-bg="default"`, so "Plain page" always gives the plain page color.
 - Space is a scale: each section type sets `--pk-pad-base` and the choice sets `--pk-pad-scale`, so the navbar, footer, logo strip and stats follow it too.
-- Shaped edges cut the section with a CSS mask; what shows through is the page color.
+- Shaped edges cut the section with a CSS mask; what shows through is the page color. The mask would cut an outline too, so the preview draws the selected section's frame as a separate overlay (`.pk-editor-outline`).
 - Entrances run in `page-script.ts` on the published page, never in the editor preview. A section's entrance wins over the page's animation setting; reduce-motion visitors see none.
 
 ## Code map
