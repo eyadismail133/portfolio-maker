@@ -13,6 +13,8 @@ import {
 import { cleanSlugInput, slugProblem, suggestSlug } from "@/lib/slug";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { IconButton, Label, buttonClass, inputClass, primaryButtonClass } from "./ui";
+import { DomainPanel } from "./DomainPanel";
+import { useEditor } from "./store";
 
 type Availability = "unknown" | "checking" | "free" | "taken" | "mine";
 
@@ -189,6 +191,13 @@ export function PublishDialog(props: {
               </p>
             )}
           </div>
+        )}
+
+        {published && (
+          <DomainPanel
+            portfolioId={props.portfolioId}
+            isPro={useEditor.getState().plan === "pro"}
+          />
         )}
 
         {state && (

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { domainPath, isAppHost, slugForDomain } from "@/lib/custom-domain";
 import { isMissingPublishedPage, NOT_FOUND_HTML } from "@/lib/published-check";
 
 /** Pages that need a signed-in account. `/editor` alone stays open: it edits a draft in the browser. */
@@ -9,7 +10,8 @@ export function needsAccount(pathname: string): boolean {
     pathname.startsWith("/dashboard/") ||
     pathname.startsWith("/editor/") ||
     pathname === "/pro/done" ||
-    pathname === "/account"
+    pathname === "/account" ||
+    pathname.startsWith("/account/")
   );
 }
 
@@ -27,6 +29,26 @@ export function safeNext(next: string | null | undefined, fallback = "/dashboard
  * from private pages, and sends signed-in visitors away from the login pages.
  */
 export async function updateSession(request: NextRequest) {
+  // A custom domain shows one published page and nothing of the app.
+  const host = request.headers.get("host") ?? "";
+  if (host && !isAppHost(host)) {
+    const slug = await slugForDomain(host);
+    if (slug) {
+      const path = domainPath(request.nextUrl.pathname, slug);
+      if (path === null)
+        return new NextResponse(NOT_FOUND_HTML, {
+          status: 404,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        });
+      if (path !== "pass") {
+        const target = request.nextUrl.clone();
+        target.pathname = path;
+        return NextResponse.rewrite(target);
+      }
+      return NextResponse.next({ request });
+    }
+  }
+
   let response = NextResponse.next({ request });
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
