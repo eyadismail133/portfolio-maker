@@ -1,0 +1,51 @@
+# Nightly database backup. Needs the repository secret SUPABASE_DB_URL: Supabase dashboard ->
+# Connect -> "Session pooler" connection string, with the database password filled in.
+# The dump is kept as a workflow artifact for 14 days. It contains user data: keep the
+# repository private, and download it only to trusted places.
+name: Nightly database backup
+
+on:
+  schedule:
+    - cron: "23 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - name: Say when there is nothing to back up
+        if: ${{ env.SUPABASE_DB_URL == '' }}
+        run: echo "::notice::SUPABASE_DB_URL is not set, so there is nothing to back up."
+
+      - name: Install the Postgres 17 client
+        if: ${{ env.SUPABASE_DB_URL != '' }}
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Dump the app's data
+        if: ${{ env.SUPABASE_DB_URL != '' }}
+        run: |
+          stamp=$(date -u +%Y-%m-%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+            --schema=public --schema=auth --schema=storage \
+            --no-owner --no-privileges --format=custom \
+            --file="backup-$stamp.dump"
+          ls -lh "backup-$stamp.dump"
+
+      - name: Keep the dump
+        if: ${{ env.SUPABASE_DB_URL != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup
+          path: backup-*.dump
+          retention-days: 14
