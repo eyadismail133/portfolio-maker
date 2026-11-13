@@ -68,3 +68,31 @@ export function EntryCards({ entries, ctx }: { entries: Entry[]; ctx: SectionCon
     </ul>
   );
 }
+
+/** A history as tight rows: dates on one side, role and place on the other. */
+export function EntryCompact({ entries, ctx }: { entries: Entry[]; ctx: SectionContext }) {
+  return (
+    <ul className="pk-entry-compact">
+      {entries.map((entry, i) => (
+        <li key={i} className="pk-entry">
+          <p className="pk-entry__dates">{formatRange(entry.start, entry.end, ctx.lang)}</p>
+          <div>
+            <h3 className="pk-h3">{entry.title}</h3>
+            {(entry.place || entry.location) && (
+              <p className="pk-entry__place">
+                {[entry.place, entry.location]
+                  .filter(Boolean)
+                  .join(ctx.lang === "ar" ? "، " : ", ")}
+              </p>
+            )}
+            {entry.body && (
+              <p className="pk-entry__text">
+                <RichInline text={entry.body} />
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}

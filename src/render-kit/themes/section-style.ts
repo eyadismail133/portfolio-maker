@@ -71,9 +71,7 @@ export function sectionLook(style: SectionStyle | undefined, palette: Palette): 
     const a = style.color ?? palette.primary;
     const b = style.color2 ?? palette.accent;
     Object.assign(vars, ownColors(mix(a, b), readableOnAll([a, b]), palette));
-    vars["--pk-x-image"] = GRADIENTS[style.gradient ?? "diagonal"]
-      .replace("A", a)
-      .replace("B", b);
+    vars["--pk-x-image"] = GRADIENTS[style.gradient ?? "diagonal"].replace("A", a).replace("B", b);
   } else if (background === "image") {
     const overlay = OVERLAYS[style.overlay ?? "dark"];
     const text = readableOn(overlay.color);
@@ -87,7 +85,8 @@ export function sectionLook(style: SectionStyle | undefined, palette: Palette): 
 
   if (style.width && style.width !== "normal") attrs["data-pk-width"] = style.width;
   if (style.align) attrs["data-pk-align"] = style.align;
-  if (style.headingSize && style.headingSize !== "normal") attrs["data-pk-hsize"] = style.headingSize;
+  if (style.headingSize && style.headingSize !== "normal")
+    attrs["data-pk-hsize"] = style.headingSize;
   if (style.cards) attrs["data-pk-cards"] = style.cards;
   const top = style.edgeTop ?? "none";
   const bottom = style.edgeBottom ?? "none";

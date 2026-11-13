@@ -19,3 +19,25 @@
   gap: 16px;
   align-content: space-between;
 }
+
+/* Badges: small centered cards with a round seal. */
+.pk-certs--badges {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+}
+.pk-certs--badges li {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+  text-align: center;
+}
+.pk-certs--badges li::before {
+  content: "";
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px double var(--pk-primary);
+  background: color-mix(in srgb, var(--pk-primary) 12%, transparent);
+}

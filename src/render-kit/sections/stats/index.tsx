@@ -9,7 +9,7 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "row" | "cards"): VariantComponent<Content> =>
+const make = (layout: "row" | "cards" | "big"): VariantComponent<Content> =>
   function Stats({ content, ctx }) {
     return (
       <>
@@ -45,6 +45,7 @@ export const stats = defineSection({
   variants: {
     row: { name: "Row", component: make("row") },
     cards: { name: "Cards", component: make("cards") },
+    big: { name: "Big numbers", component: make("big") },
   },
   defaultVariant: "row",
   fields: [

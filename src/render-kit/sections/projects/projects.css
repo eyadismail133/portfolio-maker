@@ -47,3 +47,45 @@
     font-size: 1.6rem;
   }
 }
+
+/* Mixed heights: a newspaper column layout where pictures change shape. */
+.pk-projects__list--masonry {
+  display: block;
+  columns: 3 280px;
+  column-gap: 28px;
+}
+.pk-projects__list--masonry .pk-project {
+  break-inside: avoid;
+  margin-block-end: clamp(28px, 4vw, 40px);
+}
+.pk-projects__list--masonry .pk-project:nth-child(3n + 1) .pk-project__image {
+  aspect-ratio: 4 / 5;
+}
+.pk-projects__list--masonry .pk-project:nth-child(3n + 2) .pk-project__image {
+  aspect-ratio: 1;
+}
+.pk-root .pk-projects__list--slider {
+  grid-auto-columns: min(84%, 380px);
+}
+/* Text list: no pictures, one line per project. */
+.pk-projects__list--index {
+  gap: 0;
+}
+.pk-projects__list--index .pk-project {
+  display: block;
+  padding-block: 22px;
+  border-block-start: var(--pk-rule);
+}
+.pk-projects__list--index .pk-project:last-child {
+  border-block-end: var(--pk-rule);
+}
+.pk-projects__list--index .pk-project__image {
+  display: none;
+}
+.pk-projects__list--index .pk-h3 {
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 1.9rem);
+}
+.pk-projects__list--index .pk-project__body {
+  display: grid;
+  gap: 8px;
+}

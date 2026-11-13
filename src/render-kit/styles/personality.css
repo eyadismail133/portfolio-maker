@@ -1,0 +1,220 @@
+/*
+ * Page-wide choices from the Design tab that change a family's character: photo shape, button
+ * style, heading decoration, background pattern and capital headings. The Renderer sets them as
+ * data attributes on .pk-root only when chosen, so without them the family look is untouched.
+ * This file comes after the families so a person's choice wins.
+ */
+
+/* Photo shape: the main photos of the hero, about and image-beside-text sections. */
+.pk-root[data-pk-shape] :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  object-fit: cover;
+}
+.pk-root[data-pk-shape="square"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: 0;
+}
+.pk-root[data-pk-shape="rounded"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: clamp(20px, 4vw, 36px);
+}
+.pk-root:is([data-pk-shape="circle"], [data-pk-shape="blob"])
+  :is(.pk-hero__image, .pk-about__image, .pk-it__image) {
+  aspect-ratio: 1;
+  width: min(100%, 440px);
+  justify-self: center;
+  margin-inline: auto;
+}
+.pk-root[data-pk-shape="circle"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: 50%;
+}
+.pk-root[data-pk-shape="blob"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+}
+.pk-root[data-pk-shape="arch"] :is(.pk-hero__image, .pk-about__image, .pk-it__image) {
+  aspect-ratio: 4 / 5;
+  width: min(100%, 420px);
+  justify-self: center;
+  margin-inline: auto;
+}
+.pk-root[data-pk-shape="arch"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: 999px 999px var(--pk-radius) var(--pk-radius);
+}
+.pk-root[data-pk-shape="tilted"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  border-radius: var(--pk-radius);
+  rotate: -2.5deg;
+  box-shadow:
+    0 0 0 8px var(--pk-bg),
+    0 0 0 9px var(--pk-border),
+    0 24px 48px -24px rgb(0 0 0 / 0.4);
+}
+.pk-root[data-pk-shape="tilted"][dir="rtl"]
+  :is(.pk-hero__image, .pk-hero__avatar, .pk-about__image, .pk-it__image) {
+  rotate: 2.5deg;
+}
+
+/* Button style. Hover rules repeat the choice so a family's hover cannot undo it. */
+.pk-root[data-pk-buttons="solid"] .pk-btn--ghost,
+.pk-root[data-pk-buttons="solid"] .pk-btn--ghost:hover {
+  background: var(--pk-surface);
+  border-color: transparent;
+  color: var(--pk-text);
+}
+.pk-root[data-pk-buttons="outline"] .pk-btn--primary,
+.pk-root[data-pk-buttons="outline"] .pk-btn--primary:hover {
+  background: transparent;
+  color: var(--pk-primary);
+  border: 2px solid var(--pk-primary);
+  box-shadow: none;
+}
+.pk-root[data-pk-buttons="outline"] .pk-btn--primary:hover {
+  background: color-mix(in srgb, var(--pk-primary) 8%, transparent);
+}
+.pk-root[data-pk-buttons="outline"] .pk-btn--ghost {
+  border-width: 2px;
+}
+.pk-root[data-pk-buttons="soft"] .pk-btn--primary,
+.pk-root[data-pk-buttons="soft"] .pk-btn--primary:hover {
+  background: color-mix(in srgb, var(--pk-primary) 16%, var(--pk-bg));
+  color: var(--pk-text);
+  border: 0;
+  box-shadow: none;
+}
+.pk-root[data-pk-buttons="soft"] .pk-btn--primary:hover {
+  background: color-mix(in srgb, var(--pk-primary) 26%, var(--pk-bg));
+}
+.pk-root[data-pk-buttons="soft"] .pk-btn--ghost,
+.pk-root[data-pk-buttons="soft"] .pk-btn--ghost:hover {
+  background: var(--pk-surface);
+  border-color: transparent;
+}
+.pk-root[data-pk-buttons="underline"] .pk-btn,
+.pk-root[data-pk-buttons="underline"] .pk-btn:hover {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding-inline: 2px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
+.pk-root[data-pk-buttons="underline"] .pk-btn--primary {
+  color: var(--pk-primary);
+}
+.pk-root[data-pk-buttons="underline"] .pk-btn--ghost {
+  color: var(--pk-text);
+  text-decoration-color: var(--pk-border);
+}
+.pk-root[data-pk-buttons="underline"] .pk-btn:hover {
+  text-underline-offset: 4px;
+}
+
+/* Heading decoration. Any choice first removes what the family draws around section headings. */
+.pk-root[data-pk-deco] :is(.pk-rail__head, .pk-stack__head) .pk-h2 {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  display: block;
+  text-decoration: none;
+}
+.pk-root[data-pk-deco] :is(.pk-rail__head, .pk-stack__head)::before,
+.pk-root[data-pk-deco] :is(.pk-rail__head, .pk-stack__head) .pk-h2::before,
+.pk-root[data-pk-deco] :is(.pk-rail__head, .pk-stack__head) .pk-h2::after {
+  content: none;
+}
+.pk-root[data-pk-deco="underline"] :is(.pk-rail__head, .pk-stack__head) .pk-h2 {
+  text-decoration: underline;
+  text-decoration-color: var(--pk-primary);
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.2em;
+}
+.pk-root[data-pk-deco="marker"] :is(.pk-rail__head, .pk-stack__head) .pk-h2 {
+  display: inline;
+  background: linear-gradient(
+    transparent 60%,
+    color-mix(in srgb, var(--pk-accent) 42%, transparent) 60%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.pk-root[data-pk-deco="number"] {
+  counter-reset: pk-number;
+}
+.pk-root[data-pk-deco="number"] :is(.pk-rail__head, .pk-stack__head) {
+  counter-increment: pk-number;
+}
+.pk-root[data-pk-deco="number"] :is(.pk-rail__head, .pk-stack__head)::before {
+  content: counter(pk-number, decimal-leading-zero);
+  display: block;
+  margin-block-end: 10px;
+  font-family: var(--pk-font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  color: var(--pk-primary);
+}
+.pk-root[data-pk-deco="line"] :is(.pk-rail__head, .pk-stack__head) .pk-h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.8em;
+  height: 0.09em;
+  min-height: 3px;
+  margin-inline-end: 0.35em;
+  vertical-align: middle;
+  background: var(--pk-primary);
+}
+
+/* Background pattern on sections that use the page color. */
+.pk-root[data-pk-pattern]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-color: var(--pk-bg);
+}
+.pk-root[data-pk-pattern="dots"]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--pk-text) 16%, transparent) 1.2px,
+    transparent 1.6px
+  );
+  background-size: 22px 22px;
+}
+.pk-root[data-pk-pattern="grid"]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--pk-text) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--pk-text) 7%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.pk-root[data-pk-pattern="lines"]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--pk-text) 6%, transparent) 0 1px,
+    transparent 1px 14px
+  );
+}
+.pk-root[data-pk-pattern="glow"]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-image:
+    radial-gradient(
+      60% 55% at 12% 0%,
+      color-mix(in srgb, var(--pk-primary) 13%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 45% at 92% 100%,
+      color-mix(in srgb, var(--pk-accent) 11%, transparent),
+      transparent 70%
+    );
+}
+.pk-root[data-pk-pattern="noise"]
+  .pk-section:is([data-pk-bg="default"], [data-pk-bg="page"]):not(.pk-navbar) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Capital headings. Arabic has no capitals, so it is left alone. */
+.pk-root[data-pk-hcase="upper"]:not([lang="ar"]) :is(.pk-h2, .pk-hero__name) {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}

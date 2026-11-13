@@ -13,7 +13,7 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "simple" | "columns"): VariantComponent<Content> =>
+const make = (layout: "simple" | "columns" | "big"): VariantComponent<Content> =>
   function Footer({ content, ctx }) {
     const links = content.links.filter((l) => ctx.t(l.label));
     const logo = safeImageUrl(content.logo?.url);
@@ -30,7 +30,7 @@ const make = (layout: "simple" | "columns"): VariantComponent<Content> =>
             />
           )}
           <p className="pk-footer__name">{ctx.t(content.name)}</p>
-          {layout === "columns" && ctx.t(content.tagline) && (
+          {layout !== "simple" && ctx.t(content.tagline) && (
             <p className="pk-footer__tagline">{ctx.t(content.tagline)}</p>
           )}
         </div>
@@ -67,6 +67,7 @@ export const footer = defineSection({
   variants: {
     simple: { name: "One line", component: make("simple") },
     columns: { name: "With tagline", component: make("columns") },
+    big: { name: "Big name", component: make("big") },
   },
   defaultVariant: "simple",
   fields: [

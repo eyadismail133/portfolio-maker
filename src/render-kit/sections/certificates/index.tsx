@@ -19,13 +19,13 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "cards" | "list"): VariantComponent<Content> =>
+const make = (layout: "cards" | "list" | "badges"): VariantComponent<Content> =>
   function Certificates({ content, ctx }) {
     return (
       <Rail heading={content.heading} ctx={ctx}>
         <ul className={`pk-certs pk-certs--${layout} ${layout === "cards" ? "pk-grid" : ""}`}>
           {content.items.map((item, i) => (
-            <li key={i} className={layout === "cards" ? "pk-card" : undefined}>
+            <li key={i} className={layout === "list" ? undefined : "pk-card"}>
               <div>
                 <h3 className="pk-h3">{ctx.t(item.name)}</h3>
                 <p className="pk-muted">
@@ -77,6 +77,7 @@ export const certificates = defineSection({
   variants: {
     cards: { name: "Cards", component: make("cards") },
     list: { name: "List", component: make("list") },
+    badges: { name: "Badges", component: make("badges") },
   },
   defaultVariant: "list",
   fields: [

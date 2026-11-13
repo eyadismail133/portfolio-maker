@@ -82,6 +82,8 @@ export const navbar = defineSection({
   variants: {
     simple: { name: "Name left, links right", component: Nav },
     centered: { name: "Centered", component: Nav },
+    floating: { name: "Floating bar", component: Nav },
+    menu: { name: "Name and menu button", component: Nav },
   },
   defaultVariant: "simple",
   fields: [

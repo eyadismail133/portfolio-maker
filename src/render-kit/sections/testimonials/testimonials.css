@@ -48,3 +48,17 @@
 .pk-root[lang="ar"] .pk-testi--large blockquote {
   line-height: 1.6;
 }
+
+.pk-root .pk-testis--slider {
+  grid-auto-columns: min(86%, 420px);
+}
+/* Wall: quotes in columns of different heights. */
+.pk-testis--wall {
+  display: block;
+  columns: 3 280px;
+  column-gap: 20px;
+}
+.pk-testis--wall .pk-testi {
+  break-inside: avoid;
+  margin-block-end: 20px;
+}

@@ -33,3 +33,23 @@
     order: 2;
   }
 }
+
+/* Big numbered cards. */
+.pk-features__big {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+.pk-features__big .pk-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: clamp(24px, 4vw, 40px);
+}
+.pk-features__num {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+  line-height: 1;
+  color: var(--pk-primary);
+}

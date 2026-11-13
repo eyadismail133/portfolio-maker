@@ -130,26 +130,45 @@ function stack(face: FontFace, arabic: FontFace, lang: Lang): string {
   return `${names.map((n) => `'${n}'`).join(", ")}, ${face.fallback}`;
 }
 
-export function fontStacks(pairId: string, lang: Lang) {
-  const pair = getFontPair(pairId);
+/** Which fonts a theme uses. Heading and body can each come from another pair. */
+export type FontChoice = string | { fonts: string; headingFont?: string; bodyFont?: string };
+
+function chosen(choice: FontChoice) {
+  const main = typeof choice === "string" ? choice : choice.fonts;
+  const headingPair = getFontPair(typeof choice === "string" ? main : (choice.headingFont ?? main));
+  const bodyPair = getFontPair(typeof choice === "string" ? main : (choice.bodyFont ?? main));
+  return { headingPair, bodyPair };
+}
+
+export function fontStacks(choice: FontChoice, lang: Lang) {
+  const { headingPair, bodyPair } = chosen(choice);
   return {
-    heading: stack(pair.heading, pair.arabic, lang),
-    body: stack(pair.body, pair.arabic, lang),
+    heading: stack(headingPair.heading, headingPair.arabic, lang),
+    body: stack(bodyPair.body, bodyPair.arabic, lang),
   };
 }
 
-/** Google Fonts stylesheet address for a pair, loading only the weights in use. */
-export function googleFontsUrl(pairId: string, languages: readonly Lang[]): string {
-  const pair = getFontPair(pairId);
+/** The lightest and boldest weights the heading font is loaded in. */
+export function headingWeights(choice: FontChoice): { light: number; bold: number } {
+  const weights = chosen(choice).headingPair.heading.weights;
+  return { light: Math.min(...weights), bold: Math.max(...weights) };
+}
+
+/** Google Fonts stylesheet address for the chosen fonts, loading only the weights in use. */
+export function googleFontsUrl(choice: FontChoice, languages: readonly Lang[]): string {
+  const { headingPair, bodyPair } = chosen(choice);
   const faces = new Map<string, Set<number>>();
   const add = (face: FontFace) => {
     const set = faces.get(face.family) ?? new Set<number>();
     face.weights.forEach((w) => set.add(w));
     faces.set(face.family, set);
   };
-  add(pair.heading);
-  add(pair.body);
-  if (languages.includes("ar")) add(pair.arabic);
+  add(headingPair.heading);
+  add(bodyPair.body);
+  if (languages.includes("ar")) {
+    add(headingPair.arabic);
+    add(bodyPair.arabic);
+  }
   const query = [...faces]
     .map(
       ([family, weights]) =>

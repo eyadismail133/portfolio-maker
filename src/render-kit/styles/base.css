@@ -260,7 +260,10 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-style: var(--pk-heading-style);
-  font-size: calc(clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale) * var(--pk-h-size, 1));
+  font-size: calc(
+    clamp(1.6rem, 1.1rem + 1.8vw, 2.25rem) * var(--pk-h2-scale) * var(--pk-h-size, 1) *
+      var(--pk-h-page, 1)
+  );
   line-height: var(--pk-h-leading);
   letter-spacing: var(--pk-h-tracking);
   text-wrap: balance;
@@ -631,4 +634,43 @@
 }
 .pk-root strong {
   font-weight: 700;
+}
+
+/* A row that scrolls sideways with the finger or trackpad. Needs no script. */
+.pk-root .pk-slider {
+  /* Without these the row widens its parent grid instead of scrolling. */
+  min-width: 0;
+  max-width: 100%;
+  /* Positioned so pictures and labels inside are clipped by the row too. */
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: none;
+  grid-auto-columns: min(82%, 340px);
+  gap: 20px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  scroll-padding-inline: 2px;
+  padding-block: 4px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pk-border) transparent;
+}
+.pk-root .pk-slider > * {
+  scroll-snap-align: start;
+}
+
+/* Five dots that show a level. */
+.pk-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.pk-dots > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--pk-primary);
+}
+.pk-dots > span[data-on] {
+  background: var(--pk-primary);
 }

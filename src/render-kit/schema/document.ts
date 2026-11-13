@@ -28,7 +28,39 @@ export const themeSchema = z.object({
   radius: z.enum(["none", "small", "large", "pill"]).default("small"),
   spacing: z.enum(["compact", "normal", "airy"]).default("normal"),
   animation: z.enum(["none", "subtle", "lively"]).default("subtle"),
+  /*
+   * Everything below is optional and was added without a schema version bump: missing means
+   * "as the design family does it". Switching family clears these, so the family shows fully.
+   */
+  /** Font pair whose heading font to use instead of the pair in `fonts`. */
+  headingFont: z.string().optional(),
+  /** Font pair whose body font to use instead of the pair in `fonts`. */
+  bodyFont: z.string().optional(),
+  textSize: z.enum(["small", "large"]).optional(),
+  headingSize: z.enum(["small", "large"]).optional(),
+  /** Lightest or boldest weight the heading font offers. */
+  headingWeight: z.enum(["light", "bold"]).optional(),
+  headingCase: z.enum(["upper"]).optional(),
+  /** Shape of the main photos: hero, about and image beside text. */
+  imageShape: z.enum(["square", "rounded", "circle", "arch", "blob", "tilted"]).optional(),
+  buttons: z.enum(["solid", "outline", "soft", "underline"]).optional(),
+  headingDeco: z.enum(["none", "underline", "marker", "number", "line"]).optional(),
+  pattern: z.enum(["dots", "grid", "lines", "glow", "noise"]).optional(),
 });
+
+/** Theme choices that belong to a family look and are cleared when the family changes. */
+export const PERSONAL_THEME_KEYS = [
+  "headingFont",
+  "bodyFont",
+  "textSize",
+  "headingSize",
+  "headingWeight",
+  "headingCase",
+  "imageShape",
+  "buttons",
+  "headingDeco",
+  "pattern",
+] as const;
 export type Theme = z.infer<typeof themeSchema>;
 
 /**

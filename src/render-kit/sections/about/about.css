@@ -16,3 +16,37 @@
     aspect-ratio: 3 / 2;
   }
 }
+
+/* Wide photo, then the story beside a card of facts. */
+.pk-about__banner {
+  display: grid;
+  gap: var(--pk-gap);
+}
+.pk-about__wide {
+  width: 100%;
+  aspect-ratio: 21 / 8;
+}
+@media (max-width: 639px) {
+  .pk-about__wide {
+    aspect-ratio: 3 / 2;
+  }
+}
+.pk-about__split {
+  display: grid;
+  gap: var(--pk-gap);
+  align-items: start;
+}
+.pk-about__split .pk-h2 {
+  margin-block-end: 20px;
+}
+@media (min-width: 900px) {
+  .pk-about__split {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
+}
+.pk-about__card .pk-facts {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  grid-template-columns: 1fr;
+}

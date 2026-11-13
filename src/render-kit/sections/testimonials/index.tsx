@@ -37,6 +37,19 @@ function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: stri
   );
 }
 
+const make = (layout: "cards" | "slider" | "wall"): VariantComponent<Content> =>
+  function Testimonials({ content, ctx }) {
+    return (
+      <Stack heading={content.heading} ctx={ctx}>
+        <div className={`pk-testis pk-testis--${layout}${layout === "slider" ? " pk-slider" : ""}`}>
+          {content.items.map((item, i) => (
+            <Quote key={i} item={item} ctx={ctx} className="pk-card pk-testi" />
+          ))}
+        </div>
+      </Stack>
+    );
+  };
+
 const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} ctx={ctx}>
     <div className="pk-testis">
@@ -87,6 +100,8 @@ export const testimonials = defineSection({
   variants: {
     cards: { name: "Cards", component: Cards },
     single: { name: "One large quote", component: Single },
+    slider: { name: "Side-scrolling row", component: make("slider") },
+    wall: { name: "Wall of quotes", component: make("wall") },
   },
   defaultVariant: "cards",
   fields: [

@@ -21,7 +21,10 @@
   font-family: var(--pk-font-heading);
   font-weight: var(--pk-heading-weight);
   font-style: var(--pk-heading-style);
-  font-size: calc(clamp(2.6rem, 1.4rem + 6vw, 5.75rem) * var(--pk-display-scale) * var(--pk-h-size, 1));
+  font-size: calc(
+    clamp(2.6rem, 1.4rem + 6vw, 5.75rem) * var(--pk-display-scale) * var(--pk-h-size, 1) *
+      var(--pk-h-page, 1)
+  );
   line-height: calc(var(--pk-h-leading) * 0.94);
   letter-spacing: calc(var(--pk-h-tracking) * 1.4);
   text-wrap: balance;
@@ -89,4 +92,79 @@
   width: 112px;
   aspect-ratio: 1;
   border-radius: 50%;
+}
+
+/* Photo behind the text. Light text on a dark layer, whatever the palette. */
+.pk-hero--cover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  align-items: end;
+  min-height: min(88vh, 760px);
+  --pk-text: #ffffff;
+  --pk-muted: rgb(255 255 255 / 0.84);
+  --pk-primary: #ffffff;
+  --pk-on-primary: #111111;
+  --pk-accent: #ffffff;
+  --pk-border: rgb(255 255 255 / 0.4);
+  color: var(--pk-text);
+}
+.pk-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgb(10 12 16 / 0.25), rgb(10 12 16 / 0.78)),
+    linear-gradient(135deg, var(--pk-c-primary), var(--pk-c-accent));
+}
+.pk-hero__backdrop img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+.pk-hero__cover {
+  max-width: 54rem;
+}
+.pk-hero--cover .pk-hero__title {
+  color: var(--pk-text);
+}
+
+/* Big name: the name fills the width, the rest sits below it. */
+.pk-hero__statement .pk-hero__name {
+  font-size: calc(
+    clamp(3rem, 1rem + 9vw, 8.5rem) * var(--pk-display-scale) * var(--pk-h-size, 1) *
+      var(--pk-h-page, 1)
+  );
+  line-height: 0.95;
+  margin-block: 12px 28px;
+}
+.pk-hero__below {
+  display: grid;
+  gap: 24px 48px;
+  padding-block-start: 28px;
+  border-block-start: var(--pk-rule);
+}
+@media (min-width: 900px) {
+  .pk-hero__below {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+  }
+}
+.pk-hero__below .pk-hero__actions {
+  margin-block-start: 0;
+}
+.pk-hero__banner {
+  margin-block-start: var(--pk-gap);
+  aspect-ratio: 21 / 9;
+  width: 100%;
+}
+@media (max-width: 639px) {
+  .pk-hero__banner {
+    aspect-ratio: 4 / 3;
+  }
 }

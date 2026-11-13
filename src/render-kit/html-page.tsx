@@ -4,6 +4,7 @@ import { pageIcon } from "./page-meta";
 import { Renderer } from "./Renderer";
 import type { PortfolioDoc } from "./schema/document";
 import type { Lang } from "./schema/primitives";
+import { rootFontSize } from "./themes/css-vars";
 import { googleFontsUrl } from "./themes/fonts";
 
 const escapeHtml = (value: string) =>
@@ -66,7 +67,7 @@ export function buildHtmlPage(
   const shareImage = safeImageUrl(doc.meta.shareImage?.url) ?? options.fallbackShareImage ?? null;
   const favicon = pageIcon(doc);
   return `<!doctype html>
-<html lang="${lang}" dir="${dirOf(lang)}">
+<html lang="${lang}" dir="${dirOf(lang)}"${rootFontSize(doc.theme) ? ` style="font-size: ${rootFontSize(doc.theme)}"` : ""}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,7 +79,7 @@ export function buildHtmlPage(
 <meta name="twitter:card" content="${shareImage ? "summary_large_image" : "summary"}">
 ${options.canonical ? `<link rel="canonical" href="${escapeHtml(options.canonical)}">\n<meta property="og:url" content="${escapeHtml(options.canonical)}">\n` : ""}${shareImage ? `<meta property="og:image" content="${escapeHtml(shareImage)}">\n` : ""}${favicon ? `<link rel="icon" href="${escapeHtml(favicon)}">\n` : ""}${alternates ? `${alternates}\n` : ""}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${escapeHtml(googleFontsUrl(doc.theme.fonts, doc.meta.languages))}">
+<link rel="stylesheet" href="${escapeHtml(googleFontsUrl(doc.theme, doc.meta.languages))}">
 <style>html{scroll-behavior:smooth}body{margin:0}</style>
 ${style}
 </head>
@@ -90,4 +91,3 @@ ${script}
 </html>
 `;
 }
-

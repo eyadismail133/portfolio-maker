@@ -10,11 +10,13 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "grid" | "masonry"): VariantComponent<Content> =>
+const make = (layout: "grid" | "masonry" | "slider"): VariantComponent<Content> =>
   function Gallery({ content, ctx }) {
     return (
       <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
-        <ul className={`pk-gallery__list pk-gallery__list--${layout}`}>
+        <ul
+          className={`pk-gallery__list pk-gallery__list--${layout}${layout === "slider" ? " pk-slider" : ""}`}
+        >
           {content.items.map((item, i) => (
             <li key={i}>
               <figure>
@@ -56,6 +58,7 @@ export const gallery = defineSection({
   variants: {
     grid: { name: "Even grid", component: make("grid") },
     masonry: { name: "Mixed sizes", component: make("masonry") },
+    slider: { name: "Side-scrolling row", component: make("slider") },
   },
   defaultVariant: "grid",
   fields: [

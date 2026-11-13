@@ -6,7 +6,7 @@ import { ButtonLink, L } from "../shared";
 const schema = z.object({ heading: textSchema, body: textSchema, button: linkSchema.optional() });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "banner" | "minimal"): VariantComponent<Content> =>
+const make = (layout: "banner" | "minimal" | "card" | "statement"): VariantComponent<Content> =>
   function Cta({ content, ctx }) {
     return (
       <div className={`pk-cta__box pk-cta__box--${layout}`}>
@@ -35,6 +35,8 @@ export const cta = defineSection({
   variants: {
     banner: { name: "Color banner", component: make("banner") },
     minimal: { name: "Plain", component: make("minimal") },
+    card: { name: "Centered card", component: make("card") },
+    statement: { name: "Big statement", component: make("statement") },
   },
   defaultVariant: "banner",
   fields: [

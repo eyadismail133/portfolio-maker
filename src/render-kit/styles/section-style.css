@@ -20,11 +20,11 @@
 
 /* Accent, own color, gradient and picture: colors worked out for readable text. */
 .pk-section:is(
-    [data-pk-bg="accent"],
-    [data-pk-bg="custom"],
-    [data-pk-bg="gradient"],
-    [data-pk-bg="image"]
-  ) {
+  [data-pk-bg="accent"],
+  [data-pk-bg="custom"],
+  [data-pk-bg="gradient"],
+  [data-pk-bg="image"]
+) {
   --pk-bg: var(--pk-x-bg);
   --pk-surface: color-mix(in srgb, var(--pk-x-text) 10%, var(--pk-x-bg));
   --pk-text: var(--pk-x-text);
@@ -35,7 +35,9 @@
   --pk-border: color-mix(in srgb, var(--pk-x-text) 24%, var(--pk-x-bg));
 }
 .pk-root .pk-section:is([data-pk-bg="gradient"], [data-pk-bg="image"]) {
-  background: var(--pk-x-image) center / cover no-repeat, var(--pk-x-bg);
+  background:
+    var(--pk-x-image) center / cover no-repeat,
+    var(--pk-x-bg);
 }
 
 /* Width of the content. */

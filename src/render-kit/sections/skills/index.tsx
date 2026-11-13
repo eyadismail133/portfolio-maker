@@ -64,6 +64,50 @@ const Tags: VariantComponent<Content> = ({ content, ctx }) => (
   </Rail>
 );
 
+const Cards: VariantComponent<Content> = ({ content, ctx }) => (
+  <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <div className="pk-grid pk-skills__cards">
+      {content.groups.map((group, g) => (
+        <div key={g} className="pk-card">
+          {ctx.t(group.name) && <h3 className="pk-h3">{ctx.t(group.name)}</h3>}
+          <ul className="pk-tags pk-tags--small">
+            {group.items.map((item, i) => (
+              <li key={i}>{ctx.t(item.name)}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </Rail>
+);
+
+const Dots: VariantComponent<Content> = ({ content, ctx }) => (
+  <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <div className="pk-skills__groups">
+      {content.groups.map((group, g) => (
+        <div key={g}>
+          {ctx.t(group.name) && <h3 className="pk-h3">{ctx.t(group.name)}</h3>}
+          <ul className="pk-skills__dots">
+            {group.items.map((item, i) => {
+              const level = item.level ?? 3;
+              return (
+                <li key={i}>
+                  <span>{ctx.t(item.name)}</span>
+                  <span className="pk-dots" role="img" aria-label={`${level} / 5`}>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <span key={n} data-on={n <= level ? "" : undefined} />
+                    ))}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </Rail>
+);
+
 export const skills = defineSection({
   type: "skills",
   name: "Skills",
@@ -103,6 +147,8 @@ export const skills = defineSection({
   variants: {
     bars: { name: "Level bars", component: Bars },
     tags: { name: "Tags", component: Tags },
+    cards: { name: "Group cards", component: Cards },
+    dots: { name: "Level dots", component: Dots },
   },
   defaultVariant: "tags",
   fields: [

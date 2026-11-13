@@ -31,3 +31,28 @@
 .pk-stats__list--cards dd {
   color: var(--pk-primary);
 }
+
+/* Big numbers: one per line, huge, with the label beside it. */
+.pk-stats__list--big {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.pk-stats__list--big > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 24px;
+  padding-block: 18px;
+  border-block-start: var(--pk-rule);
+}
+.pk-stats__list--big > div:last-child {
+  border-block-end: var(--pk-rule);
+}
+.pk-stats__list--big dd {
+  font-size: clamp(3rem, 1.6rem + 6vw, 6.5rem);
+  min-width: 2.5ch;
+}
+.pk-stats__list--big dt {
+  font-size: 1.125rem;
+  color: var(--pk-muted);
+}

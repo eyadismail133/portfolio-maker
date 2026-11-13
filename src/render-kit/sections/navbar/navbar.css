@@ -129,3 +129,23 @@
   object-fit: contain;
   flex: none;
 }
+
+/* Floating: the bar is a rounded panel that sits apart from the page edge. */
+.pk-navbar--floating {
+  padding-block: calc(12px * var(--pk-pad-scale));
+}
+.pk-navbar--floating .pk-nav {
+  padding-block: 8px;
+  padding-inline: 20px 8px;
+  background: var(--pk-surface);
+  border: 1px solid var(--pk-border);
+  border-radius: max(var(--pk-radius-control), 14px);
+  box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--pk-text) 45%, transparent);
+}
+/* Name and menu button: the links always live in the menu. */
+.pk-navbar--menu .pk-nav__links {
+  display: none;
+}
+.pk-navbar--menu .pk-nav__menu {
+  display: block;
+}

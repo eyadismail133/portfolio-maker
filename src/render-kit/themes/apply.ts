@@ -1,5 +1,5 @@
 import { getSection } from "../registry";
-import type { PortfolioDoc } from "../schema/document";
+import { PERSONAL_THEME_KEYS, type PortfolioDoc } from "../schema/document";
 import { getFamily } from "./families";
 import { getPalette } from "./palettes";
 
@@ -14,10 +14,13 @@ export function applyFamily(
 ): PortfolioDoc {
   const family = getFamily(familyId);
   const palette = getPalette(family.defaults.palette);
+  // Personal touches (fonts, shapes, buttons...) belong to the old look: the new family shows fully.
+  const theme = { ...doc.theme };
+  for (const key of PERSONAL_THEME_KEYS) delete theme[key];
   return {
     ...doc,
     theme: {
-      ...doc.theme,
+      ...theme,
       family: family.id,
       fonts: family.defaults.fonts,
       radius: family.defaults.radius,

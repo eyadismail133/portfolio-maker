@@ -46,3 +46,7 @@
     padding: 0;
   }
 }
+
+.pk-root .pk-team__list--slider {
+  grid-auto-columns: min(72%, 260px);
+}

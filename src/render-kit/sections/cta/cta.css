@@ -26,3 +26,29 @@
 .pk-cta__box--banner :focus-visible {
   outline-color: var(--pk-c-on-primary);
 }
+
+/* Centered card. */
+.pk-cta__box--card {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 56px);
+  background: var(--pk-surface);
+  border: 1px solid var(--pk-border);
+  border-radius: calc(var(--pk-radius) * 1.5);
+}
+.pk-cta__box--card .pk-sub {
+  margin-inline: auto;
+}
+/* Big statement: the heading as large type, the button under it. */
+.pk-cta__box--statement {
+  flex-direction: column;
+  align-items: start;
+}
+.pk-cta__box--statement .pk-h2 {
+  font-size: calc(clamp(2.2rem, 1rem + 4.5vw, 4.6rem) * var(--pk-h-size, 1) * var(--pk-h-page, 1));
+  line-height: 1.05;
+  max-width: 18ch;
+}

@@ -67,3 +67,29 @@
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
+/* Compact: dates beside each entry, no bullet points. */
+.pk-entry-compact {
+  display: grid;
+}
+.pk-entry-compact .pk-entry {
+  display: grid;
+  gap: 4px 28px;
+  padding-block: 18px;
+  border-block-start: var(--pk-rule);
+}
+.pk-entry-compact .pk-entry:last-child {
+  border-block-end: var(--pk-rule);
+}
+.pk-entry-compact .pk-entry__text {
+  margin-block-start: 6px;
+  color: var(--pk-muted);
+}
+@media (min-width: 640px) {
+  .pk-entry-compact .pk-entry {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+  .pk-entry-compact .pk-entry__dates {
+    white-space: normal;
+    padding-block-start: 0.2em;
+  }
+}

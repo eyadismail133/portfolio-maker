@@ -48,3 +48,19 @@
   object-fit: contain;
   margin-block-end: 10px;
 }
+
+/* Big name: the name as large type across the footer. */
+.pk-footer__inner--big {
+  align-items: end;
+}
+.pk-footer__inner--big > div:first-child {
+  flex-basis: 100%;
+}
+.pk-footer__inner--big .pk-footer__name {
+  font-size: clamp(2.6rem, 1rem + 8vw, 7.5rem);
+  line-height: 1;
+  letter-spacing: var(--pk-h-tracking);
+}
+.pk-footer__inner--big .pk-footer__copy {
+  margin-inline-start: auto;
+}

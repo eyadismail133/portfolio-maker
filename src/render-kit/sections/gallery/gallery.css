@@ -23,3 +23,10 @@
   font-size: 0.875rem;
   margin-block-start: 8px;
 }
+
+.pk-root .pk-gallery__list--slider {
+  grid-auto-columns: min(82%, 420px);
+}
+.pk-gallery__list--slider .pk-gallery__image {
+  aspect-ratio: 4 / 3;
+}

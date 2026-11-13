@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, linkSchema, textSchema } from "../../schema/primitives";
+import { safeImageUrl } from "../../i18n";
 import { ButtonLink, L, Media } from "../shared";
 
 const schema = z.object({
@@ -60,6 +61,58 @@ const Centered: VariantComponent<Content> = (props) => (
   </div>
 );
 
+/** The photo fills the whole section behind the text, under a dark layer. */
+const Cover: VariantComponent<Content> = (props) => {
+  const url = safeImageUrl(props.content.image?.url);
+  return (
+    <>
+      <div className="pk-hero__backdrop" aria-hidden="true">
+        {url && (
+          <img
+            src={url}
+            alt=""
+            width={props.content.image?.width}
+            height={props.content.image?.height}
+          />
+        )}
+      </div>
+      <div className="pk-hero__cover">
+        <Copy {...props} />
+      </div>
+    </>
+  );
+};
+
+/** The name as a huge line of type, the introduction and buttons beside each other below it. */
+const Statement: VariantComponent<Content> = ({ content, ctx }) => {
+  const title = ctx.t(content.title);
+  const status = ctx.t(content.status);
+  return (
+    <div className="pk-hero__statement">
+      {title && <p className="pk-hero__title">{title}</p>}
+      <h1 className="pk-hero__name">{ctx.t(content.name)}</h1>
+      <div className="pk-hero__below">
+        {ctx.t(content.intro) && <p className="pk-hero__intro">{ctx.rich(content.intro)}</p>}
+        <div>
+          <div className="pk-hero__actions">
+            <ButtonLink link={content.primaryCta} ctx={ctx} />
+            <ButtonLink link={content.secondaryCta} ctx={ctx} kind="ghost" />
+          </div>
+          {status && (
+            <p className="pk-hero__status">
+              <span className="pk-hero__dot" aria-hidden="true" />
+              {status}
+            </p>
+          )}
+        </div>
+      </div>
+      {content.image && (
+        <Media asset={content.image} label={ctx.t(content.name)} className="pk-hero__banner" />
+      )}
+    </div>
+  );
+};
+
 export const hero = defineSection({
   type: "hero",
   name: "Hero",
@@ -79,6 +132,8 @@ export const hero = defineSection({
   variants: {
     split: { name: "Text beside image", component: Split },
     centered: { name: "Centered", component: Centered },
+    cover: { name: "Photo behind the text", component: Cover },
+    statement: { name: "Big name", component: Statement },
   },
   defaultVariant: "split",
   fields: [

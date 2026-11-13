@@ -49,3 +49,21 @@
     align-items: baseline;
   }
 }
+
+.pk-skills__cards {
+  --pk-min: 240px;
+}
+.pk-skills__cards .pk-h3 {
+  margin-block-end: 14px;
+}
+.pk-skills__dots {
+  display: grid;
+  gap: 12px;
+  margin-block-start: 14px;
+}
+.pk-skills__dots li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}

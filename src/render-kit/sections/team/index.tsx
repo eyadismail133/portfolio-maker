@@ -20,11 +20,13 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "grid" | "list"): VariantComponent<Content> =>
+const make = (layout: "grid" | "list" | "slider"): VariantComponent<Content> =>
   function Team({ content, ctx }) {
     return (
       <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
-        <ul className={`pk-team__list pk-team__list--${layout}`}>
+        <ul
+          className={`pk-team__list pk-team__list--${layout}${layout === "slider" ? " pk-slider" : ""}`}
+        >
           {content.members.map((member, i) => (
             <li key={i}>
               <Media asset={member.photo} label={ctx.t(member.name)} className="pk-team__photo" />
@@ -100,6 +102,7 @@ export const team = defineSection({
   variants: {
     grid: { name: "Photo grid", component: make("grid") },
     list: { name: "List", component: make("list") },
+    slider: { name: "Side-scrolling row", component: make("slider") },
   },
   defaultVariant: "grid",
   fields: [

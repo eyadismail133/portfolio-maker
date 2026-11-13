@@ -34,6 +34,22 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
   </Stack>
 );
 
+const BigCards: VariantComponent<Content> = ({ content, ctx }) => (
+  <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <ol className="pk-features__big">
+      {content.items.map((item, i) => (
+        <li key={i} className="pk-card">
+          <span className="pk-features__num" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <h3 className="pk-h3">{ctx.t(item.title)}</h3>
+          <p className="pk-muted">{ctx.rich(item.description)}</p>
+        </li>
+      ))}
+    </ol>
+  </Stack>
+);
+
 const Rows: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-features__rows">
@@ -112,6 +128,7 @@ export const features = defineSection({
   variants: {
     grid: { name: "Icon grid", component: Grid },
     rows: { name: "Rows with images", component: Rows },
+    big: { name: "Big numbered cards", component: BigCards },
   },
   defaultVariant: "grid",
   fields: [

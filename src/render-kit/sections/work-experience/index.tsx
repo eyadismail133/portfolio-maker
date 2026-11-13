@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineSection, type SectionContext, type VariantComponent } from "../../registry";
 import { endMonthSchema, monthSchema, textSchema } from "../../schema/primitives";
-import { EntryCards, EntryTimeline, type Entry } from "../entries";
+import { EntryCards, EntryCompact, EntryTimeline, type Entry } from "../entries";
 import { L, Rail } from "../shared";
 
 const schema = z.object({
@@ -44,6 +44,12 @@ const Timeline: VariantComponent<Content> = ({ content, ctx }) => (
 const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <EntryCards entries={toEntries(content, ctx)} ctx={ctx} />
+  </Rail>
+);
+
+const Compact: VariantComponent<Content> = ({ content, ctx }) => (
+  <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <EntryCompact entries={toEntries(content, ctx)} ctx={ctx} />
   </Rail>
 );
 
@@ -111,6 +117,7 @@ export const workExperience = defineSection({
   variants: {
     timeline: { name: "Timeline", component: Timeline },
     cards: { name: "Cards", component: Cards },
+    compact: { name: "Compact list", component: Compact },
   },
   defaultVariant: "timeline",
   fields: [

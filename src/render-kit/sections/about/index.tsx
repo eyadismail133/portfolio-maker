@@ -44,6 +44,25 @@ const TextOnly: VariantComponent<Content> = ({ content, ctx }) => (
   </Rail>
 );
 
+const Banner: VariantComponent<Content> = ({ content, ctx }) => (
+  <div className="pk-about__banner">
+    {content.image && (
+      <Media asset={content.image} label={ctx.t(content.heading)} className="pk-about__wide" />
+    )}
+    <div className="pk-about__split">
+      <div>
+        {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
+        <Paragraphs text={ctx.t(content.body)} className="pk-prose pk-prose--large" />
+      </div>
+      {content.facts.length > 0 && (
+        <div className="pk-card pk-about__card">
+          <Facts content={content} ctx={ctx} />
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 export const about = defineSection({
   type: "about",
   name: "About",
@@ -68,6 +87,7 @@ export const about = defineSection({
   variants: {
     photo: { name: "Text with photo", component: WithPhoto },
     text: { name: "Text only", component: TextOnly },
+    banner: { name: "Wide photo and facts card", component: Banner },
   },
   defaultVariant: "text",
   fields: [

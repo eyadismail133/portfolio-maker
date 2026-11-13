@@ -59,11 +59,15 @@ function Project({
   );
 }
 
-const make = (layout: "grid" | "rows"): VariantComponent<Content> =>
+const make = (
+  layout: "grid" | "rows" | "masonry" | "slider" | "index",
+): VariantComponent<Content> =>
   function Projects({ content, ctx }) {
     return (
       <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
-        <ul className={`pk-projects__list pk-projects__list--${layout}`}>
+        <ul
+          className={`pk-projects__list pk-projects__list--${layout}${layout === "slider" ? " pk-slider" : ""}`}
+        >
           {content.items.map((item, i) => (
             <Project key={i} item={item} ctx={ctx} />
           ))}
@@ -117,6 +121,9 @@ export const projects = defineSection({
   variants: {
     grid: { name: "Grid", component: make("grid") },
     rows: { name: "Large rows", component: make("rows") },
+    masonry: { name: "Mixed heights", component: make("masonry") },
+    slider: { name: "Side-scrolling row", component: make("slider") },
+    index: { name: "Text list", component: make("index") },
   },
   defaultVariant: "grid",
   fields: [

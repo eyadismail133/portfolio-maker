@@ -79,13 +79,16 @@ export function Renderer({
       data-pk-family={getFamily(doc.theme.family).id}
       data-pk-mode={doc.theme.mode}
       data-pk-animation={doc.theme.animation}
+      data-pk-shape={doc.theme.imageShape}
+      data-pk-buttons={doc.theme.buttons}
+      data-pk-deco={doc.theme.headingDeco}
+      data-pk-pattern={doc.theme.pattern}
+      data-pk-hcase={doc.theme.headingCase}
       data-pk-static={standalone ? "" : undefined}
       style={themeToCssVars(doc.theme, language) as CSSProperties}
     >
       {/* A plain link: the page must still show when the font service is slow or blocked. */}
-      {fontLink && (
-        <link rel="stylesheet" href={googleFontsUrl(doc.theme.fonts, doc.meta.languages)} />
-      )}
+      {fontLink && <link rel="stylesheet" href={googleFontsUrl(doc.theme, doc.meta.languages)} />}
       {sorted.map(({ section, def }) => {
         const variant = def.variants[section.variant] ?? def.variants[def.defaultVariant];
         const Component = variant.component;

@@ -407,3 +407,51 @@ describe("section style", () => {
     );
   });
 });
+
+describe("page personality", () => {
+  test("touches reach the page, text size sits on <html>, and fonts mix pairs", () => {
+    const doc = createSampleDoc({ sections: ["navbar", "hero", "footer"] });
+    doc.theme = {
+      ...doc.theme,
+      fonts: "grotesk",
+      headingFont: "caslon",
+      bodyFont: "technical",
+      textSize: "large",
+      headingWeight: "light",
+      imageShape: "arch",
+      buttons: "outline",
+      headingDeco: "number",
+      pattern: "dots",
+      headingCase: "upper",
+    };
+    const html = renderToHtml(doc);
+    for (const part of [
+      'data-pk-shape="arch"',
+      'data-pk-buttons="outline"',
+      'data-pk-deco="number"',
+      'data-pk-pattern="dots"',
+      'data-pk-hcase="upper"',
+      'style="font-size: 110%"',
+      "Libre+Caslon",
+      "IBM+Plex+Sans",
+    ])
+      expect(html).toContain(part);
+    expect(html).not.toContain("Instrument+Sans");
+    expect(normalizeDoc(JSON.parse(JSON.stringify(doc))).theme).toEqual(doc.theme);
+  });
+
+  test("a page without touches has none of their attributes", () => {
+    const html = renderToHtml(createSampleDoc());
+    for (const attr of ["data-pk-shape", "data-pk-buttons", "data-pk-deco", "data-pk-pattern"])
+      expect(html).not.toContain(attr);
+  });
+
+  test("switching family clears the personal touches", () => {
+    const doc = createSampleDoc();
+    doc.theme = { ...doc.theme, imageShape: "blob", headingFont: "caslon", pattern: "grid" };
+    const next = applyFamily(doc, "bold");
+    expect(next.theme.imageShape).toBeUndefined();
+    expect(next.theme.headingFont).toBeUndefined();
+    expect(next.theme.pattern).toBeUndefined();
+  });
+});
