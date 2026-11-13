@@ -376,7 +376,8 @@
     box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.22s ease;
 }
-.pk-card:hover {
+/* Only cards that lead somewhere lift; a card that is just text stays still. */
+.pk-card:has(a[href]):hover {
   transform: translateY(-3px);
 }
 .pk-tags {
@@ -396,9 +397,6 @@
     transform 0.18s ease,
     border-color 0.18s ease,
     background-color 0.18s ease;
-}
-.pk-tags li:hover {
-  transform: translateY(-1px);
 }
 .pk-tags--small li {
   padding: 2px 10px;
@@ -475,7 +473,7 @@
     transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
     background-color 0.25s ease;
 }
-.pk-card:hover .pk-icon {
+.pk-card:has(a[href]):hover .pk-icon {
   transform: scale(1.08);
   background: color-mix(in srgb, var(--pk-primary) 18%, transparent);
 }
@@ -525,6 +523,15 @@
 }
 
 /* Added by page-script.ts. Without the script none of this applies. */
+/* "Subtle": sections fade in. */
+.pk-section.pk-reveal--soft {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.pk-section.pk-reveal--soft.pk-in {
+  opacity: 1;
+}
+/* "Lively": sections rise in, then their cards and entries follow one after another. */
 .pk-section.pk-reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -536,6 +543,19 @@
   opacity: 1;
   transform: none;
 }
+.pk-reveal .pk-stagger {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(120ms + var(--pk-i, 0) * 70ms);
+}
+.pk-reveal.pk-in .pk-stagger {
+  opacity: 1;
+  transform: none;
+}
+
 .pk-lightbox {
   margin: auto;
   max-width: min(1200px, 94vw);

@@ -27,7 +27,9 @@
     translate 0.15s,
     box-shadow 0.15s;
 }
+/* This family has its own press effect, so the shared lift is turned off. */
 .pk-root[data-pk-family="playful"] .pk-btn:hover {
+  transform: none;
   translate: 0 -2px;
 }
 .pk-root[data-pk-family="playful"] .pk-btn:active {

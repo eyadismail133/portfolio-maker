@@ -5,7 +5,8 @@
  * - Contact form: sends without leaving the page and shows the result.
  * - Gallery: opens images large, with arrow keys and Escape.
  * - Numbers in the stats section count up once, when they come into view.
- * - Scroll animation: sections fade and slide in smoothly as they come into view.
+ * - Scroll animation: "subtle" fades sections in; "lively" lifts them in and lets their cards
+ *   follow one after another.
  * - Before and after (slider layout): the two images stack with a handle to drag. Without the
  *   script they are shown side by side.
  * - Pages set to "both" light and dark get a switch in the navbar. Without the script the page
@@ -180,12 +181,22 @@ export const PAGE_SCRIPT = String.raw`(function () {
     apply();
   }
 
-  // Smooth scroll reveal for sections below the fold
+  // Sections below the fold: "subtle" fades them in, "lively" lifts them in and lets their
+  // cards follow one after another.
   if (!calm && animation !== "none") {
+    var lively = animation === "lively";
     var sections = Array.prototype.filter.call(root.querySelectorAll(".pk-section"), function (el) {
       return !el.classList.contains("pk-navbar") && !el.classList.contains("pk-hero") && el.getBoundingClientRect().top > window.innerHeight * 0.92;
     });
-    sections.forEach(function (el) { el.classList.add("pk-reveal"); });
+    sections.forEach(function (el) {
+      el.classList.add(lively ? "pk-reveal" : "pk-reveal--soft");
+      if (!lively) return;
+      var items = el.querySelectorAll(".pk-card, .pk-entry, .pk-project, .pk-grid > li, .pk-tags li");
+      Array.prototype.forEach.call(items, function (item, i) {
+        item.classList.add("pk-stagger");
+        item.style.setProperty("--pk-i", String(Math.min(i, 8)));
+      });
+    });
     onView(sections, function (el) { el.classList.add("pk-in"); });
   }
 })();

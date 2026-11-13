@@ -30,7 +30,9 @@
     translate 0.12s,
     box-shadow 0.12s;
 }
+/* This family has its own press effect, so the shared lift is turned off. */
 .pk-root[data-pk-family="brutalist"] .pk-btn:hover {
+  transform: none;
   translate: 2px 2px;
   box-shadow: 2px 2px 0 var(--pk-text);
 }
