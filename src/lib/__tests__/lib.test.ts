@@ -162,3 +162,39 @@ describe("daily job", () => {
     delete process.env.CRON_SECRET;
   });
 });
+
+describe("screenshot comparison", () => {
+  test("same pictures match, changed ones do not", async () => {
+    const { PNG } = await import("pngjs");
+    const { difference } = await import("../../../scripts/png-diff");
+    const make = (paint: (x: number, y: number) => number) => {
+      const png = new PNG({ width: 10, height: 10 });
+      for (let y = 0; y < 10; y++)
+        for (let x = 0; x < 10; x++) {
+          const i = (y * 10 + x) * 4;
+          png.data[i] = png.data[i + 1] = png.data[i + 2] = paint(x, y);
+          png.data[i + 3] = 255;
+        }
+      return PNG.sync.write(png);
+    };
+    const white = make(() => 255);
+    expect(
+      difference(
+        white,
+        make(() => 255),
+      ).share,
+    ).toBe(0);
+    expect(
+      difference(
+        white,
+        make((x) => (x < 5 ? 0 : 255)),
+      ).share,
+    ).toBe(0.5);
+    expect(
+      difference(
+        white,
+        make(() => 250),
+      ).share,
+    ).toBe(0);
+  });
+});

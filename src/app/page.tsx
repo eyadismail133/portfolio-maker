@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MiniPreview } from "@/components/MiniPreview";
 import { createSampleDoc } from "@/render-kit/samples";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 const EXAMPLES = [
   { family: "minimal", label: "Minimal" },
@@ -46,7 +47,7 @@ const FEATURES = [
     text: "With Pro, download a clean HTML version of your page and host it anywhere you like.",
   },
   {
-    title: "39 sections, 6 designs",
+    title: "43 sections, 12 designs",
     text: "From a CV-style profile to a startup page with pricing, team and FAQ.",
   },
 ];
@@ -57,6 +58,7 @@ export default function Home() {
       <header className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-4">
         <span className="font-semibold">Portfolio Maker</span>
         <nav className="ms-auto flex items-center gap-2 text-sm">
+          <UiLanguageSwitch />
           <Link
             href="/templates"
             className="rounded-md px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900"

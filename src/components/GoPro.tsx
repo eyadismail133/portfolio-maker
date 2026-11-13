@@ -13,6 +13,7 @@ import {
   type Currency,
   type Months,
 } from "@/lib/plans";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 const ERRORS: Record<string, string> = {
   setup: "Payments are not switched on yet. Try again later.",
@@ -72,7 +73,8 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
         <Link href="/" className="font-semibold">
           Portfolio Maker
         </Link>
-        <Link href={account ? "/dashboard" : "/login"} className="ms-auto text-sm hover:underline">
+        <UiLanguageSwitch className="ms-auto" />
+        <Link href={account ? "/dashboard" : "/login"} className="text-sm hover:underline">
           {account ? "My portfolios" : "Log in"}
         </Link>
       </header>
@@ -82,8 +84,7 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
           Free to start. Pro when you need more.
         </h1>
         <p className="mt-3 max-w-xl text-zinc-600 dark:text-zinc-400">
-          Pro is {formatPrice(MONTHLY_PRICE.EGP, "EGP")} or {formatPrice(MONTHLY_PRICE.USD, "USD")}{" "}
-          a month, paid in advance for the months you choose. Nothing renews by itself.
+          {`Pro is ${formatPrice(MONTHLY_PRICE.EGP, "EGP")} or ${formatPrice(MONTHLY_PRICE.USD, "USD")} a month, paid in advance for the months you choose. Nothing renews by itself.`}
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-start">
@@ -174,9 +175,7 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
                         checked={months === m}
                         onChange={() => setMonths(m)}
                       />
-                      <span className="font-medium">
-                        {m} month{m > 1 ? "s" : ""}
-                      </span>
+                      <span className="font-medium">{`${m} month${m > 1 ? "s" : ""}`}</span>
                     </span>
                     <span className="ms-5 text-xs text-zinc-500">
                       {formatPrice(priceFor(m, currency), currency)}

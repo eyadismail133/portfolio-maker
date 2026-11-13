@@ -212,6 +212,13 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 - **Errors:** `src/instrumentation.ts` (`onRequestError`) writes to `error_log` with the server key.
 - **Templates:** `/templates` lists `src/lib/templates.ts` (one per family); "Use this template" opens `/editor?template=<id>`.
 
+## App interface in Arabic (as built)
+- Components keep their English text. `src/lib/i18n/ui.ts` holds an Arabic dictionary keyed by the exact English text (`ar-1.ts`, `ar-2.ts`, `ar-3.ts`) plus patterns for texts with numbers or names ("3 months", "Pro until 1 Dec").
+- The interface language is a cookie (`pm-ui-lang`), switched with `UiLanguageSwitch` (home, templates, sign-in pages, onboarding, dashboard, account, pricing). A small script in `<head>` sets `dir="rtl"` before the first paint.
+- `UiTranslator` (root layout) swaps English text and the placeholder, aria-label, title and alt attributes for Arabic once React has hydrated, then follows changes with a MutationObserver. It never touches portfolio pages (`/p`, `/preview`, `/dev`, anything inside `.pk-root`), elements with `dir="auto"` (where people's own text is shown), form values, or `[data-no-translate]`.
+- **When adding interface text:** write it as one string (use a template string, not text split around `{value}`), and add its Arabic to the dictionary. `src/lib/__tests__/ui-i18n.test.ts` checks the dictionary.
+- The legal pages (terms, privacy, refunds) stay in English until a reviewed Arabic text exists.
+
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.
 - Uploads: images only, 5 MB max, resized to 2000px max, converted to WebP.

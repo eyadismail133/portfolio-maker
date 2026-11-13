@@ -118,8 +118,9 @@ export function ImportCvDialog({ onClose }: { onClose: () => void }) {
             ))}
           </ul>
           <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-            These replace the matching sections ({lang === "ar" ? "Arabic" : "English"} text);
-            missing sections are added. Undo puts everything back.
+            {lang === "ar"
+              ? "These replace the matching sections (Arabic text); missing sections are added. Undo puts everything back."
+              : "These replace the matching sections (English text); missing sections are added. Undo puts everything back."}
           </p>
           <div className="mt-4 flex gap-2">
             <button type="button" className={primaryButtonClass} onClick={apply}>

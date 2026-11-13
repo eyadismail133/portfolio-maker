@@ -24,6 +24,7 @@ import { pickText } from "@/render-kit/i18n";
 import { createSampleDoc } from "@/render-kit/samples";
 import { palettes } from "@/render-kit/themes/palettes";
 import { MiniPreview } from "./MiniPreview";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 const WHO_TEXT: Record<Who, [string, string]> = {
   professional: ["Me, as a professional", "A personal page for your career"],
@@ -243,9 +244,8 @@ export function Onboarding() {
           Portfolio Maker
         </Link>
         <div className="ms-auto flex items-center gap-3">
-          <span className="text-xs text-zinc-500">
-            Question {step + 1} of {STEPS.length}
-          </span>
+          <UiLanguageSwitch />
+          <span className="text-xs text-zinc-500">{`Question ${step + 1} of ${STEPS.length}`}</span>
           <div
             role="progressbar"
             aria-label="Progress"
@@ -493,8 +493,9 @@ export function Onboarding() {
               </div>
               <PicturePicker organisation={organisation} />
               <p className="text-xs text-zinc-500">
-                These go straight into your starter ideas. The {organisation ? "logo" : "photo"} is
-                added when you open one; you can change it later in the editor.
+                {organisation
+                  ? "These go straight into your starter ideas. The logo is added when you open one; you can change it later in the editor."
+                  : "These go straight into your starter ideas. The photo is added when you open one; you can change it later in the editor."}
               </p>
             </div>
           )}

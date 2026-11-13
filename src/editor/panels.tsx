@@ -535,8 +535,8 @@ function ColorEditor({ doc }: { doc: PortfolioDoc }) {
         </div>
         {problems.length > 0 && (
           <p className="text-xs text-amber-700 dark:text-amber-400">
-            Hard to read: {problems.join(", ")}. The page darkens or lightens these text colors so
-            everyone can read them.
+            <span>{`Hard to read: ${problems.join(", ")}.`}</span> The page darkens or lightens
+            these text colors so everyone can read them.
           </p>
         )}
       </div>

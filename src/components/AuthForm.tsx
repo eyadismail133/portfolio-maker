@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { buttonClass, inputClass, Label, primaryButtonClass } from "@/editor/ui";
 import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/supabase/proxy";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 type Mode = "login" | "signup" | "forgot" | "reset";
 
@@ -130,9 +131,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
   return (
     <main className="flex flex-1 items-center justify-center px-5 py-12">
       <div className="w-full max-w-sm">
-        <Link href="/" className="text-sm font-semibold">
-          Portfolio Maker
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/" className="text-sm font-semibold">
+            Portfolio Maker
+          </Link>
+          <UiLanguageSwitch />
+        </div>
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">{copy.title}</h1>
         <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">{copy.lead}</p>
 

@@ -9,6 +9,7 @@ import { friendlyError, getMyAccount, type Account } from "@/lib/portfolios";
 import { listPayments, type PaymentRecord } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { storageUsed } from "@/lib/upload";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 const date = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
@@ -138,6 +139,7 @@ export function AccountPage() {
         <Link href="/dashboard" className="text-sm font-semibold">
           ← My portfolios
         </Link>
+        <UiLanguageSwitch className="ms-auto" />
       </header>
       <main className="mx-auto grid w-full max-w-2xl gap-5 px-5 py-8">
         <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
@@ -151,7 +153,7 @@ export function AccountPage() {
           {used !== null && (
             <div className="mt-3">
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                Images: {mb(used)} of {mb(limit)}
+                {`Images: ${mb(used)} of ${mb(limit)}`}
               </p>
               <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                 <div
@@ -275,7 +277,7 @@ export function AccountPage() {
           <form onSubmit={deleteAccount} className="mt-4 grid gap-3">
             <div className="grid gap-1">
               <Label htmlFor="account-delete">
-                Type <strong>delete</strong> to confirm
+                Type <strong data-no-translate>delete</strong> to confirm
               </Label>
               <input
                 id="account-delete"

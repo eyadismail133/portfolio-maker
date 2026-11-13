@@ -24,3 +24,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* The app interface in Arabic: system Arabic fonts, which every device has. */
+html.pm-ui-ar body {
+  font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", "Arial", sans-serif;
+}

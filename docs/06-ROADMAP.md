@@ -113,7 +113,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] PDF CV download from the same data (Pro: an A4 page at /editor/[id]/cv; the browser's print dialog saves the PDF)
 - [x] Dark/light switch for visitors
 - [x] Email the owner when a message arrives (Resend; at most one email per page every 10 minutes)
-- [ ] App interface in Arabic
+- [x] App interface in Arabic (dictionary keyed by the English text, cookie switch, right to left; legal pages stay English until reviewed)
 
 ## Phase 7 - Launch and business
 - [x] Decide plans, prices and the payment provider (`docs/08-PLANS-AND-PAYMENTS.md`): 250 EGP or 6 USD a month, prepaid months, Paymob

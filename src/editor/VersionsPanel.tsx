@@ -127,8 +127,9 @@ export function VersionsPanel({ portfolioId }: { portfolioId: string }) {
         </ul>
       )}
       <p className="text-xs text-zinc-500">
-        The newest {plan === "pro" ? 30 : 5} versions are kept
-        {plan === "pro" ? "" : " on Free, 30 on Pro"}.
+        {plan === "pro"
+          ? "The newest 30 versions are kept."
+          : "The newest 5 versions are kept on Free, 30 on Pro."}
       </p>
     </div>
   );

@@ -21,6 +21,7 @@ import {
 import { listMessages, viewCounts } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { MiniPreview } from "./MiniPreview";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 function when(iso: string): string {
   const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -169,6 +170,7 @@ export function Dashboard() {
         >
           Account
         </Link>
+        <UiLanguageSwitch />
         <button type="button" className={buttonClass} onClick={signOut}>
           Log out
         </button>
@@ -345,7 +347,7 @@ export function Dashboard() {
         {dialog?.kind === "delete" && (
           <div className="grid gap-4">
             <h2 id="dashboard-dialog-title" className="text-base font-semibold">
-              Delete “{dialog.item.title}”?
+              {`Delete “${dialog.item.title}”?`}
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               The portfolio and its published page are removed for good. This cannot be undone.

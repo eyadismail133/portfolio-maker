@@ -232,7 +232,7 @@ function Signups(props: {
       </ul>
       {props.signups.length > 100 && (
         <p className="mt-2 text-xs text-zinc-500">
-          Showing the newest 100. The CSV has all {props.signups.length}.
+          {`Showing the newest 100. The CSV has all ${props.signups.length}.`}
         </p>
       )}
     </section>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TemplateGallery } from "@/components/TemplateGallery";
 import { TEMPLATES } from "@/lib/templates";
+import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 
 export const metadata: Metadata = {
   title: "Portfolio templates in English and Arabic · Portfolio Maker",
@@ -22,9 +23,10 @@ export default function TemplatesPage() {
         <Link href="/" className="font-semibold">
           Portfolio Maker
         </Link>
+        <UiLanguageSwitch className="ms-auto" />
         <Link
           href="/new"
-          className="ms-auto rounded-md bg-blue-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className=" rounded-md bg-blue-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
           Start free
         </Link>
