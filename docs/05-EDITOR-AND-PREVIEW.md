@@ -72,7 +72,15 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - **Colors one by one:** "Edit each color" in the Design tab, for light and dark colors, with a warning when text would be hard to read.
 - **Settings:** share picture and browser-tab icon.
 - **My images:** every image field can reuse an image uploaded before.
-- **Phones:** below 1024 px wide the left panel slides in from a button, and the section form opens as a bottom sheet. The header scrolls sideways instead of wrapping.
+- **Phones:** below 1024 px wide the left panel slides in from a button, and the section form opens as a bottom sheet. A bottom bar keeps Sections, Design, More (Download HTML, Fill from CV, PDF CV) and Publish in reach; the header keeps only the name, undo and redo, and the save status.
+
+## Added after the test report (docs/09)
+- **Animation** in the Design tab: None, Subtle or Lively, stored in `theme.animation`.
+- **Names for screen readers** on the design family and layout buttons ("Minimal design", "Split layout").
+- **Contact warning:** a Contact section whose layout has no form shows a note and a button to switch to the form layout.
+- **Browser tab** shows the portfolio name.
+- **Publishing on Free:** when the account already has its one live page, the dialog says so at the top, names that page, and the main button becomes "Replace my live page" (one database step). After publishing: share buttons for WhatsApp, LinkedIn and X.
+- **Dashboard:** a "Getting started" checklist (replace the sample text, add a photo or logo, publish, get a first visit) that ticks itself and can be hidden; each card has Edit plus a "…" menu; on phones the header folds into a menu.
 
 ## Code map
 
@@ -96,7 +104,7 @@ The editor and the frame talk with messages: `pk:ready`, `pk:select`, `pk:action
 ## Publish and download (as built)
 
 - **Publish** (saved portfolios): a dialog with the link name, a live check that it is free, and a checklist of warnings: sample text still present, empty sections, images without a description, no contact method, missing or sample page title, missing translations. Warnings never block publishing.
-- After publishing: the link, Copy link, Open the page, a QR code, and Take offline. When the editor has changes visitors do not see, the dialog says so and offers "Update the live page".
+- After publishing: the link, Copy link, Open the page, share buttons (WhatsApp, LinkedIn, X), a QR code, and Take offline. When the editor has changes visitors do not see, the dialog says so and offers "Update the live page".
 - **Download HTML** (also without an account): a zip that works as a plain website.
 - **Version history** in the Settings tab: every publish saves a version; people can save one by hand with a name and restore any of the newest 30. Restoring is a normal change, so Undo brings the page back.
 

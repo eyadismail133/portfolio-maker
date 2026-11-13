@@ -134,6 +134,8 @@ The core. No login, no editor yet; work with JSON files.
 - [ ] Have a lawyer review the terms, privacy and refund texts (owner)
 - [x] Error monitoring and backups (error_log table via instrumentation; nightly pg_dump GitHub Action)
 - [x] Template gallery page for SEO (/templates, plus sitemap.xml and robots.txt)
+- [x] Full test pass and fixes (`docs/09-TEST-REPORT-AND-PLAN.md`): logo in navbar and footer, published pages as complete HTML, share images, animation setting, Free "Replace my live page" (`0007_publish_replacing.sql`), phone layouts, getting-started checklist, accessibility names, short menu names
+- [ ] Run `0007` in the Supabase SQL editor (owner)
 
 ## Risks to watch
 | Risk | How we handle it |
