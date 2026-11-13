@@ -101,3 +101,34 @@ Each step lists the files and the check that proves it. They are ordered so the 
     - **Docs and roadmap:** update both, then commit by area.
 
 **Owner steps, unchanged:** the Paymob keys; the optional settings in `docs/07-SUPABASE-SETUP.md` step 9; deleting the test portfolio "QA Test Portfolio (autosave)" (it is a draft and was never published).
+
+## Status after the fixes (13 November 2026)
+
+All 15 bugs and the 10 improvements above are done, with these notes:
+- **Done as planned:**
+  - **Logo:** navbar (small, medium, large), footer, and the favicon from the logo.
+  - **Published pages:** complete HTML from route handlers. They work without JavaScript.
+  - **Share images:** made per page.
+  - **Animation setting.**
+  - **Accessibility names:** on the design and layout buttons.
+  - **Short menu names.**
+  - **Contact:** the warning (on the Content and Layout tabs), the inbox reasons, and a downloaded form with no `mailto:` action.
+  - **Publishing on Free:** "Replace my live page" in one database step (`0007`), and share buttons.
+  - **Phones:** the editor's bottom bar, the dashboard header menu, and the card "…" menu.
+  - **Getting-started checklist.**
+  - **Small fixes:** B10 to B13 and B15.
+  - **Arabic:** every new text.
+- **Changed from the plan:**
+  - **Menu names:** they come from the section type when the heading is long. A separate "Menu name" field per section is not added (no document change was needed).
+  - **axe scan:** not added to `npm run visual`. It would need a new dependency, so it's left for a later decision.
+- **Checked:**
+  - **Automated:** lint, typecheck and 501 tests, including new database checks for `publish_replacing_live`.
+  - **Browser (local build):** 19 checks covering publish and replace, share buttons, HTML with JavaScript off, the share image, logo upload and size, animation, names, the tab title, the checklist, the card menu, phone dashboard and editor, the contact warning and Arabic.
+  - **Visual baseline:** updated, because shorter menu names make the navbar one row shorter.
+- **Pro features on live** (owner's account, on the test portfolio only):
+  - **Working:** HTML download (zip built), AI "Shorten", CV import from pasted text (preview only, not applied), version history (30 kept, saved one by hand), PDF CV page, a second published page, no badge, and share buttons.
+  - **Custom domain panel:** stays hidden until `VERCEL_TOKEN` and `VERCEL_PROJECT_ID` are set.
+- **Found while testing Pro and fixed:**
+  - **AI prompt:** "Shorten" replaced the real city with "[your city]". The prompt now keeps facts already in the text and uses placeholders only for missing ones.
+  - **Share image:** an undefined font style crashed the image route.
+- **Owner steps:** run `0007_publish_replacing.sql` in the Supabase SQL editor; it is needed for "Replace my live page" on Free.
