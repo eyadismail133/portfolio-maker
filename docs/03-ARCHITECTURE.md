@@ -219,6 +219,14 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 - **When adding interface text:** write it as one string (use a template string, not text split around `{value}`), and add its Arabic to the dictionary. `src/lib/__tests__/ui-i18n.test.ts` checks the dictionary.
 - The legal pages (terms, privacy, refunds) stay in English until a reviewed Arabic text exists.
 
+## Motion (as built)
+- **App screens** use Motion (`motion/react`). All timings come from `src/lib/motion.ts` (eases, springs, `fadeUp`, `staggerParent`, `staggerDelay`, `inView`); do not write durations by hand. `MotionProvider` in the root layout sets `reducedMotion="user"`, so people who ask their system for less motion get fades only.
+- Building blocks: `Reveal` / `RevealList` / `RevealItem` (fade in once on scroll), `TiltCard` (leans toward a mouse pointer, never on touch or with reduced motion), and `Segmented` (the chosen option's chip slides; one `layoutId` per control via `useId`).
+- The home page's one loud moment is `DesignStage`: the same sample portfolio in each design family in turn, a new design wiping across from the reading side (mirrored in Arabic). It pauses on hover, on focus, once someone picks a design and while the tab is hidden; with reduced motion it does not autoplay. Keep everything else on that page quiet.
+- Onboarding questions slide in from the side they come from (`direction`, mirrored in Arabic); the dashboard grid animates its layout when a portfolio is copied or deleted; editor panel tabs crossfade.
+- **Portfolio pages never use Motion**: they must work as plain exported HTML. Their movement is CSS in `render-kit/styles/base.css` plus `page-script.ts`: "subtle" fades sections in, "lively" lifts them and staggers their cards (`.pk-stagger`, `--pk-i`). Only cards that contain a link lift on hover. Families with their own press effect (brutalist, playful) turn the shared button lift off.
+- App styles in `globals.css` must not reach portfolio pages: the app's dialog animation skips `.pk-lightbox`.
+
 ## Security and limits
 - Escape all user text. Sanitize rich text to an allowed list of tags.
 - Uploads: images only, 5 MB max, resized to 2000px max, converted to WebP.

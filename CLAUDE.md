@@ -7,7 +7,7 @@ Read `README.md` first, then the doc for the area you are touching. The plan liv
 - Do not start a later phase while an earlier one has unticked tasks, except where the roadmap says phases can run in parallel.
 
 ## While you work
-- **Stack:** Next.js (App Router), TypeScript strict mode, Tailwind for the app interface, Supabase, Zustand, Zod. Do not add another framework or UI library without asking.
+- **Stack:** Next.js (App Router), TypeScript strict mode, Tailwind and Motion (`motion/react`, timings from `src/lib/motion.ts`) for the app interface, Supabase, Zustand, Zod. Do not add another framework or UI library without asking.
 - **Two separate worlds, never mix them:**
   - `src/app` and `src/components` = the app (dashboard, editor). Styled with Tailwind.
   - `src/render-kit` = the portfolio pages users create. Styled with its own plain CSS and CSS variables only. No Tailwind, no app imports, no Next.js-only features. It must work as plain exported HTML.

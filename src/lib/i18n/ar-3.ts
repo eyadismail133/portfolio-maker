@@ -75,4 +75,6 @@ export const AR_3: Record<string, string> = {
   Type: "اكتب",
   Templates: "القوالب",
   terms: "الشروط",
+  Designs: "التصاميم",
+  "The same portfolio in every design. Nothing was retyped.": "الملف نفسه في كل تصميم، دون إعادة كتابة أي شيء.",
 };

@@ -1,8 +1,10 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { spring, staggerDelay } from "@/lib/motion";
 import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 import { BrandMark, buttonClass, inputClass, Label, primaryButtonClass, UiIcon } from "@/editor/ui";
 import { clearDraft, clearPending, readDraft, readPending } from "@/lib/local-drafts";
@@ -43,6 +45,14 @@ type DialogState =
 export function Dashboard() {
   const router = useRouter();
   const [items, setItems] = useState<PortfolioSummary[] | null>(null);
+  // Cards arrive one after another only when the page first loads, not after every change.
+  const [settled, setSettled] = useState(false);
+  const loaded = items !== null;
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = window.setTimeout(() => setSettled(true), 900);
+    return () => window.clearTimeout(timer);
+  }, [loaded]);
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState("");
   const [busy, setBusy] = useState("");
@@ -140,15 +150,12 @@ export function Dashboard() {
 
   return (
     <div className="pm-aurora-bg flex min-h-dvh flex-col bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 py-3">
           <Link href="/" className="group inline-flex items-center gap-2.5 text-sm font-semibold">
             <BrandMark size="sm" />
-            <span>Portfolio Maker</span>
+            <span className="hidden sm:inline">Portfolio Maker</span>
           </Link>
           <span className="ms-auto truncate text-xs text-zinc-500 sm:text-sm" dir="ltr">
             {email}
@@ -247,99 +254,106 @@ export function Dashboard() {
             </Link>
           </div>
         ) : (
-          <ul className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map((item, idx) => (
-              <li
-                key={item.id}
-                style={{ animationDelay: `${Math.min(idx * 55, 330)}ms` }}
-                className="pm-animate-in pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
-              >
-                <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
-                  <span className="size-2 rounded-full bg-rose-400/80" />
-                  <span className="size-2 rounded-full bg-amber-400/80" />
-                  <span className="size-2 rounded-full bg-emerald-400/80" />
-                </div>
-                <Link
-                  href={`/editor/${item.id}`}
-                  aria-label={`Open ${item.title}`}
-                  className="block overflow-hidden rounded-xl border border-zinc-200/80 focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-800"
+          <motion.ul layout className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Cards make room for a copy and close the gap after a delete instead of jumping. */}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {items.map((item, idx) => (
+                <motion.li
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.2 } }}
+                  transition={{ ...spring.layout, delay: settled ? 0 : staggerDelay(idx, 0.055) }}
+                  className="pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
                 >
-                  {item.doc ? (
-                    <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
-                      <MiniPreview doc={item.doc} />
-                    </div>
-                  ) : (
-                    <div className="flex aspect-[16/11] items-center justify-center p-4 text-center text-xs text-zinc-500">
-                      This portfolio was saved by a newer version and cannot be shown here.
-                    </div>
-                  )}
-                </Link>
-                <div className="flex flex-1 flex-col p-3.5 pt-4">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h2 className="truncate text-sm font-semibold tracking-tight" dir="auto">
-                      {item.title}
-                    </h2>
-                    <span
-                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                        item.status === "published"
-                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-950/60 dark:text-emerald-300"
-                          : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                      }`}
-                    >
+                  <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
+                    <span className="size-2 rounded-full bg-rose-400/80" />
+                    <span className="size-2 rounded-full bg-amber-400/80" />
+                    <span className="size-2 rounded-full bg-emerald-400/80" />
+                  </div>
+                  <Link
+                    href={`/editor/${item.id}`}
+                    aria-label={`Open ${item.title}`}
+                    className="block overflow-hidden rounded-xl border border-zinc-200/80 focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-800"
+                  >
+                    {item.doc ? (
+                      <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
+                        <MiniPreview doc={item.doc} />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-[16/11] items-center justify-center p-4 text-center text-xs text-zinc-500">
+                        This portfolio was saved by a newer version and cannot be shown here.
+                      </div>
+                    )}
+                  </Link>
+                  <div className="flex flex-1 flex-col p-3.5 pt-4">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h2 className="truncate text-sm font-semibold tracking-tight" dir="auto">
+                        {item.title}
+                      </h2>
                       <span
-                        aria-hidden="true"
-                        className={`size-1.5 rounded-full ${item.status === "published" ? "bg-emerald-500" : "bg-zinc-400"}`}
-                      />
-                      <span>{item.status === "published" ? "Published" : "Draft"}</span>
-                    </span>
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          item.status === "published"
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-950/60 dark:text-emerald-300"
+                            : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`size-1.5 rounded-full ${item.status === "published" ? "bg-emerald-500" : "bg-zinc-400"}`}
+                        />
+                        <span>{item.status === "published" ? "Published" : "Draft"}</span>
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Edited {when(item.updatedAt)}
+                      {item.status === "published" && ` · ${views[item.id] ?? 0} visits in 30 days`}
+                    </p>
+                    {item.status === "published" && item.slug && (
+                      <a
+                        href={`/p/${item.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        dir="ltr"
+                        className="mt-1.5 inline-flex items-center gap-1 truncate text-xs font-medium text-blue-700 underline decoration-blue-700/40 underline-offset-2 hover:decoration-blue-700 dark:text-blue-400"
+                      >
+                        <span>/p/{item.slug}</span>
+                        <UiIcon name="external" size={11} />
+                      </a>
+                    )}
+                    <div className="mt-3.5 flex flex-wrap gap-1.5 pt-1">
+                      <Link href={`/editor/${item.id}`} className={primaryButtonClass}>
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        className={buttonClass}
+                        onClick={() => setDialog({ kind: "rename", item, title: item.title })}
+                      >
+                        Rename
+                      </button>
+                      <button
+                        type="button"
+                        className={buttonClass}
+                        disabled={busy === item.id || !item.doc}
+                        onClick={() => run(item.id, () => duplicatePortfolio(item))}
+                      >
+                        Duplicate
+                      </button>
+                      <button
+                        type="button"
+                        className={buttonClass}
+                        onClick={() => setDialog({ kind: "delete", item })}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Edited {when(item.updatedAt)}
-                    {item.status === "published" && ` · ${views[item.id] ?? 0} visits in 30 days`}
-                  </p>
-                  {item.status === "published" && item.slug && (
-                    <a
-                      href={`/p/${item.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      dir="ltr"
-                      className="mt-1.5 inline-flex items-center gap-1 truncate text-xs font-medium text-blue-700 underline decoration-blue-700/40 underline-offset-2 hover:decoration-blue-700 dark:text-blue-400"
-                    >
-                      <span>/p/{item.slug}</span>
-                      <UiIcon name="external" size={11} />
-                    </a>
-                  )}
-                  <div className="mt-3.5 flex flex-wrap gap-1.5 pt-1">
-                    <Link href={`/editor/${item.id}`} className={primaryButtonClass}>
-                      Edit
-                    </Link>
-                    <button
-                      type="button"
-                      className={buttonClass}
-                      onClick={() => setDialog({ kind: "rename", item, title: item.title })}
-                    >
-                      Rename
-                    </button>
-                    <button
-                      type="button"
-                      className={buttonClass}
-                      disabled={busy === item.id || !item.doc}
-                      onClick={() => run(item.id, () => duplicatePortfolio(item))}
-                    >
-                      Duplicate
-                    </button>
-                    <button
-                      type="button"
-                      className={buttonClass}
-                      onClick={() => setDialog({ kind: "delete", item })}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </motion.ul>
         )}
       </main>
 

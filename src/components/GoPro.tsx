@@ -69,15 +69,12 @@ export function GoPro({ currencies }: { currencies: Currency[] }) {
 
   return (
     <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-5xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 font-semibold">
             <BrandMark size="sm" />
-            <span>Portfolio Maker</span>
+            <span className="hidden sm:inline">Portfolio Maker</span>
           </Link>
           <UiLanguageSwitch className="ms-auto" />
           <Link

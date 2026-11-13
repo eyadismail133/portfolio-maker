@@ -1,15 +1,10 @@
 import Link from "next/link";
+import { DesignStage } from "@/components/DesignStage";
 import { MiniPreview } from "@/components/MiniPreview";
+import { Reveal, RevealItem, RevealList } from "@/components/Reveal";
 import { UiLanguageSwitch } from "@/components/UiLanguageSwitch";
 import { BrandMark, UiIcon, type UiIconName } from "@/editor/ui";
 import { createSampleDoc } from "@/render-kit/samples";
-
-const EXAMPLES = [
-  { family: "minimal", label: "Minimal", accent: "from-blue-500/20 to-indigo-500/20" },
-  { family: "tech", label: "Tech", accent: "from-emerald-500/20 to-cyan-500/20" },
-  { family: "elegant", label: "Elegant", accent: "from-amber-500/20 to-rose-500/20" },
-  { family: "creative", label: "Creative", accent: "from-violet-500/20 to-fuchsia-500/20" },
-] as const;
 
 const STEPS: { title: string; text: string; icon: UiIconName }[] = [
   {
@@ -72,42 +67,31 @@ export default function Home() {
   return (
     <div className="pm-aurora-bg min-h-dvh overflow-x-hidden bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       {/* Ambient decorative background grid and floating orbs */}
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="pm-float pointer-events-none fixed -top-28 left-1/4 -z-10 h-80 w-80 rounded-full bg-blue-500/12 blur-3xl dark:bg-blue-500/15"
-      />
-      <div
-        aria-hidden="true"
-        className="pm-float-slow pointer-events-none fixed top-32 right-1/6 -z-10 h-96 w-96 rounded-full bg-violet-500/12 blur-3xl dark:bg-violet-500/15"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
 
       <header className="pm-glass-header sticky top-0 z-40">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 font-semibold">
             <BrandMark />
-            <span className="text-base tracking-tight">Portfolio Maker</span>
+            <span className="hidden text-base tracking-tight sm:inline">Portfolio Maker</span>
           </Link>
           <nav className="ms-auto flex items-center gap-2 text-sm">
             <UiLanguageSwitch />
             <Link
               href="/templates"
-              className="rounded-lg px-3.5 py-2 font-medium text-zinc-700 transition-colors hover:bg-zinc-200/60 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white"
+              className="hidden rounded-lg px-3.5 py-2 font-medium sm:inline-block text-zinc-700 transition-colors hover:bg-zinc-200/60 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white"
             >
               Templates
             </Link>
             <Link
               href="/login"
-              className="rounded-lg px-3.5 py-2 font-medium text-zinc-700 transition-colors hover:bg-zinc-200/60 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white"
+              className="whitespace-nowrap rounded-lg px-3 py-2 font-medium text-zinc-700 transition-colors hover:bg-zinc-200/60 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white"
             >
               Log in
             </Link>
             <Link
               href="/new"
-              className="pm-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 font-medium text-white"
+              className="pm-btn-primary inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3.5 py-2 font-medium text-white"
             >
               <span>Start free</span>
               <UiIcon name="arrowRight" size={14} className="rtl:rotate-180" />
@@ -120,10 +104,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="mx-auto max-w-6xl px-5 pb-20 pt-14 sm:pt-22">
           <div className="pm-animate-in inline-flex items-center gap-2.5 rounded-full border border-blue-200/80 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-blue-700 shadow-2xs backdrop-blur-md dark:border-blue-900/70 dark:bg-zinc-900/80 dark:text-blue-300">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-blue-600 dark:bg-blue-400" />
-            </span>
+            <span className="size-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
             <span>43 sections, 12 designs</span>
           </div>
 
@@ -161,70 +142,23 @@ export default function Home() {
             <span>No account needed to try. Free to publish.</span>
           </p>
 
-          {/* 4 Live Portfolio Previews in Browser Chrome Frames */}
-          <ul className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {EXAMPLES.map((example, idx) => (
-              <li
-                key={example.family}
-                className={`pm-animate-in pm-stagger-${idx + 4} group`}
-              >
-                <figure className="pm-card-interactive relative overflow-hidden rounded-2xl p-2">
-                  <div
-                    aria-hidden="true"
-                    className={`pointer-events-none absolute -inset-x-4 -top-6 h-24 bg-gradient-to-r ${example.accent} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100`}
-                  />
-                  {/* Mini Browser Chrome Bar */}
-                  <div
-                    aria-hidden="true"
-                    className="mb-2 flex items-center gap-1.5 px-2 pt-1"
-                  >
-                    <span className="size-2 rounded-full bg-rose-400/80" />
-                    <span className="size-2 rounded-full bg-amber-400/80" />
-                    <span className="size-2 rounded-full bg-emerald-400/80" />
-                    <span
-                      data-no-translate
-                      className="ms-2 truncate rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[10px] text-zinc-400 dark:bg-zinc-800/80 dark:text-zinc-500"
-                    >
-                      /p/layla
-                    </span>
-                  </div>
-                  <div className="overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800">
-                    <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
-                      <MiniPreview
-                        doc={createSampleDoc({ family: example.family, languages: ["en"] })}
-                      />
-                    </div>
-                  </div>
-                  <figcaption className="mt-2.5 flex items-center justify-between px-1.5 pb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    <span>{example.label}</span>
-                    <span
-                      aria-hidden="true"
-                      className="size-2 rounded-full bg-blue-600/40 transition-transform duration-300 group-hover:scale-125 group-hover:bg-blue-600 dark:bg-blue-400/40 dark:group-hover:bg-blue-400"
-                    />
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-center text-sm text-zinc-500 sm:text-start">
-            The same portfolio, four designs. Nothing was retyped.
-          </p>
+          <DesignStage />
         </section>
 
         {/* 3-Step Workflow Section */}
         <section className="relative border-y border-zinc-200/80 bg-white/75 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-900/50">
           <div className="mx-auto max-w-6xl px-5 py-20">
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            <Reveal as="h2" className="text-2xl font-bold tracking-tight sm:text-3xl">
               From nothing to a live page
-            </h2>
-            <ol className="mt-10 grid gap-6 sm:grid-cols-3">
+            </Reveal>
+            <RevealList as="ol" className="mt-10 grid gap-6 sm:grid-cols-3">
               {STEPS.map((step, i) => (
-                <li
+                <RevealItem
                   key={step.title}
-                  className="pm-card-interactive group relative grid content-start gap-3.5 rounded-2xl p-6"
+                  className="pm-card group relative grid content-start gap-3.5 rounded-2xl p-6"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition-transform duration-300 group-hover:scale-110">
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-md shadow-blue-600/20">
                       {i + 1}
                     </span>
                     <span className="inline-flex size-9 items-center justify-center rounded-xl bg-zinc-100 text-zinc-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600 dark:bg-zinc-800 dark:text-zinc-400 dark:group-hover:bg-blue-950/60 dark:group-hover:text-blue-400">
@@ -235,9 +169,9 @@ export default function Home() {
                   <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                     {step.text}
                   </p>
-                </li>
+                </RevealItem>
               ))}
-            </ol>
+            </RevealList>
           </div>
         </section>
 
@@ -287,15 +221,14 @@ export default function Home() {
 
         {/* Bento Features Grid */}
         <section className="mx-auto max-w-6xl px-5 pb-20">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">What you get</h2>
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Reveal as="h2" className="text-2xl font-bold tracking-tight sm:text-3xl">
+            What you get
+          </Reveal>
+          <RevealList className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" stagger={0.05}>
             {FEATURES.map((feature) => (
-              <li
-                key={feature.title}
-                className="pm-card-interactive group rounded-2xl p-6"
-              >
+              <RevealItem key={feature.title} className="pm-card group rounded-2xl p-6">
                 <div
-                  className={`inline-flex size-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.tint} ring-1 ring-current/15 transition-transform duration-300 group-hover:scale-110`}
+                  className={`inline-flex size-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.tint} ring-1 ring-current/15`}
                 >
                   <UiIcon name={feature.icon} size={20} />
                 </div>
@@ -303,9 +236,9 @@ export default function Home() {
                 <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {feature.text}
                 </p>
-              </li>
+              </RevealItem>
             ))}
-          </ul>
+          </RevealList>
         </section>
 
         {/* Bottom CTA Section */}

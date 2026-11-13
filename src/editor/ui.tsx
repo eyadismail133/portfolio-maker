@@ -34,7 +34,8 @@ const PATHS = {
   user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
   zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
-  fileText: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
+  fileText:
+    "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
 } as const;
 
 export type UiIconName = keyof typeof PATHS;
@@ -68,7 +69,12 @@ export function UiIcon({
 
 /** Signature geometric prism brand mark for Portfolio Maker. */
 export function BrandMark({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-  const dims = size === "sm" ? "size-7 rounded-lg" : size === "lg" ? "size-10 rounded-xl" : "size-8 rounded-xl";
+  const dims =
+    size === "sm"
+      ? "size-7 rounded-lg"
+      : size === "lg"
+        ? "size-10 rounded-xl"
+        : "size-8 rounded-xl";
   const iconSize = size === "sm" ? 15 : size === "lg" ? 20 : 17;
   return (
     <span
@@ -121,41 +127,8 @@ export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: st
 }
 
 /** A row of choices where exactly one is active. */
-export function Segmented<T extends string>(props: {
-  label: string;
-  value: T;
-  options: readonly (readonly [T, string])[];
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div
-      role="group"
-      aria-label={props.label}
-      className="flex rounded-lg border border-zinc-200/90 bg-zinc-100/80 p-1 shadow-inner dark:border-zinc-800 dark:bg-zinc-950/80"
-    >
-      {props.options.map(([value, name]) => (
-        <button
-          key={value}
-          type="button"
-          aria-pressed={props.value === value}
-          onClick={() => props.onChange(value)}
-          className={`flex-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-blue-600 ${
-            props.value === value
-              ? "bg-white text-zinc-950 shadow-xs ring-1 ring-zinc-950/5 dark:bg-zinc-800 dark:text-white dark:ring-white/10"
-              : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-          }`}
-        >
-          {name}
-        </button>
-      ))}
-    </div>
-  );
-}
+export { Segmented } from "./Segmented";
 
 export function PanelHeading({ children }: { children: ReactNode }) {
-  return (
-    <h3 className="text-xs font-semibold tracking-wide text-zinc-900 uppercase dark:text-zinc-100">
-      {children}
-    </h3>
-  );
+  return <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{children}</h3>;
 }

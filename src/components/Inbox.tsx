@@ -59,10 +59,7 @@ export function Inbox() {
 
   return (
     <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-3xl items-center gap-4 px-5 py-3.5">
           <Link

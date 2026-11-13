@@ -130,14 +130,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   return (
     <main className="pm-aurora-bg relative flex flex-1 items-center justify-center overflow-hidden px-5 py-12">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="pm-float pointer-events-none fixed -top-24 left-1/3 -z-10 h-72 w-72 rounded-full bg-blue-500/15 blur-3xl"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <div className="pm-card pm-animate-scale w-full max-w-md rounded-3xl p-7 sm:p-9">
         <div className="flex items-center justify-between">
           <Link href="/" className="group inline-flex items-center gap-2.5 text-sm font-semibold">
@@ -186,15 +179,9 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   <span>Continue with Google</span>
                 </button>
                 <div className="my-5 flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"
-                  />
+                  <span aria-hidden="true" className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                   <p className="text-center text-xs text-zinc-500">or with your email</p>
-                  <span
-                    aria-hidden="true"
-                    className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"
-                  />
+                  <span aria-hidden="true" className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                 </div>
               </>
             )}

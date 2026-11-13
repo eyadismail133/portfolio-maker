@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { MotionProvider } from "@/components/MotionProvider";
 import { UiTranslator } from "@/components/UiTranslator";
 import { UI_LANG_SCRIPT } from "@/lib/i18n/ui";
 
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: UI_LANG_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Suspense fallback={null}>
           <UiTranslator />
         </Suspense>

@@ -12,6 +12,7 @@ import { blankStart, generateIdeas } from "@/recommend/generate";
 import { EMPTY_ANSWERS, type Answers } from "@/recommend/types";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { MiniPreview } from "./MiniPreview";
+import { TiltCard } from "./TiltCard";
 
 /** Six starter portfolios made from the onboarding answers. Choosing one opens it in the editor. */
 export function Ideas() {
@@ -68,15 +69,12 @@ export function Ideas() {
 
   return (
     <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 text-sm font-semibold">
             <BrandMark size="sm" />
-            <span>Portfolio Maker</span>
+            <span className="hidden sm:inline">Portfolio Maker</span>
           </Link>
           <Link href="/new" className={`${buttonClass} ms-auto`}>
             Change my answers
@@ -101,7 +99,7 @@ export function Ideas() {
         )}
         <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {ideas.map((idea, idx) => (
-            <li
+            <TiltCard
               key={`${seed}-${idea.id}`}
               style={{ animationDelay: `${idx * 65}ms` }}
               className="pm-animate-in pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
@@ -141,7 +139,7 @@ export function Ideas() {
                   )}
                 </button>
               </div>
-            </li>
+            </TiltCard>
           ))}
         </ul>
         <div className="mt-10 flex flex-wrap gap-3">

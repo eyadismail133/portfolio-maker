@@ -28,7 +28,7 @@ export default function TemplatesPage() {
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 font-semibold">
             <BrandMark />
-            <span className="text-base tracking-tight">Portfolio Maker</span>
+            <span className="hidden text-base tracking-tight sm:inline">Portfolio Maker</span>
           </Link>
           <UiLanguageSwitch className="ms-auto" />
           <Link

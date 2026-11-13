@@ -15,12 +15,15 @@ export function MiniPreview({
   lang,
   className = "",
   aspect = "aspect-[16/11]",
+  pageWidth = PAGE_WIDTH,
 }: {
   doc: PortfolioDoc;
   lang?: Lang;
   className?: string;
   /** Tailwind aspect class of the visible window. */
   aspect?: string;
+  /** Width the page is laid out at before scaling: 1280 shows the desktop layout, 400 a phone's. */
+  pageWidth?: number;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
@@ -28,12 +31,10 @@ export function MiniPreview({
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) =>
-      setScale(entry.contentRect.width / PAGE_WIDTH),
-    );
+    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / pageWidth));
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [pageWidth]);
 
   return (
     <div
@@ -45,7 +46,7 @@ export function MiniPreview({
       {scale > 0 && (
         <div
           className="absolute left-0 top-0 transition-opacity duration-300"
-          style={{ width: PAGE_WIDTH, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+          style={{ width: pageWidth, transform: `scale(${scale})`, transformOrigin: "0 0" }}
         >
           <Renderer doc={doc} lang={lang} />
         </div>

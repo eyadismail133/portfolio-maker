@@ -18,6 +18,8 @@ import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { canMove } from "./doc-ops";
 import { ImportCvDialog } from "./ImportCvDialog";
+import { motion } from "motion/react";
+import { ease } from "@/lib/motion";
 import { DesignPanel, SectionsPanel, SettingsPanel } from "./panels";
 import type { FromPreview, SectionAction, ToPreview } from "./PreviewFrame";
 import { PublishDialog } from "./PublishDialog";
@@ -588,7 +590,13 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
               ]}
             />
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-3.5">
+          <motion.div
+            key={tab}
+            className="min-h-0 flex-1 overflow-y-auto p-3.5"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: ease.out }}
+          >
             {tab === "sections" && (
               <SectionsPanel
                 doc={doc}
@@ -605,7 +613,7 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
                 {portfolioId && <VersionsPanel portfolioId={portfolioId} />}
               </div>
             )}
-          </div>
+          </motion.div>
         </aside>
 
         <main className="pm-dots-canvas flex min-w-0 flex-1 justify-center overflow-auto p-0 lg:p-5">

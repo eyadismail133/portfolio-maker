@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, type Variants } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -14,6 +15,7 @@ import {
   UiIcon,
 } from "@/editor/ui";
 import { readAnswers, writeAnswers } from "@/lib/local-drafts";
+import { ease, spring } from "@/lib/motion";
 import { clearPicture, readPicture, writePicture } from "@/lib/picture-store";
 import { FIELDS } from "@/recommend/content";
 import { LOOKS } from "@/recommend/generate";
@@ -95,11 +97,13 @@ function Choice(props: {
   disabled?: boolean;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
       aria-pressed={props.selected}
       disabled={props.disabled}
       onClick={props.onClick}
+      whileTap={{ scale: 0.98 }}
+      transition={spring.snappy}
       className={`group relative overflow-hidden rounded-2xl border text-start transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:pointer-events-none disabled:opacity-40 ${
         props.selected
           ? "border-blue-600 bg-gradient-to-br from-blue-50/95 via-white to-indigo-50/80 shadow-md shadow-blue-600/10 ring-2 ring-blue-600 dark:from-blue-950/80 dark:via-zinc-900 dark:to-indigo-950/60"
@@ -124,10 +128,22 @@ function Choice(props: {
               : "scale-95 border-zinc-300 bg-zinc-50 text-transparent group-hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800"
           }`}
         >
-          <UiIcon name="check" size={12} />
+          {/* The tick draws itself when the card is chosen. */}
+          <svg viewBox="0 0 24 24" width={12} height={12} fill="none" aria-hidden="true">
+            <motion.path
+              d="M20 6L9 17l-5-5"
+              stroke="currentColor"
+              strokeWidth={2.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={false}
+              animate={{ pathLength: props.selected ? 1 : 0 }}
+              transition={{ duration: 0.28, ease: ease.out }}
+            />
+          </svg>
         </span>
       </span>
-    </button>
+    </motion.button>
   );
 }
 
@@ -211,6 +227,32 @@ function PicturePicker({ organisation }: { organisation: boolean }) {
 export function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  // +1 moving forward, -1 going back: each question slides in from the side it comes from.
+  const [direction, setDirection] = useState(1);
+  const [rtl, setRtl] = useState(false);
+  useEffect(() => {
+    Promise.resolve().then(() => setRtl(document.documentElement.dir === "rtl"));
+  }, []);
+  const goTo = (next: number) => {
+    setDirection(next > step ? 1 : -1);
+    setStep(next);
+  };
+  const side = rtl ? -1 : 1;
+  const stepVariants: Variants = {
+    enter: (dir: number) => ({ opacity: 0, x: 36 * dir * side, filter: "blur(4px)" }),
+    center: {
+      opacity: 1,
+      x: 0,
+      filter: "blur(0px)",
+      transition: { duration: 0.42, ease: ease.out },
+    },
+    exit: (dir: number) => ({
+      opacity: 0,
+      x: -24 * dir * side,
+      filter: "blur(2px)",
+      transition: { duration: 0.18, ease: ease.inOut },
+    }),
+  };
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
   const set = (patch: Partial<Answers>) => setAnswers((current) => ({ ...current, ...patch }));
 
@@ -246,7 +288,7 @@ export function Onboarding() {
   const last = step === STEPS.length - 1;
   const organisation = isOrganisation(answers.who);
   const next = () => {
-    if (!last) return setStep(step + 1);
+    if (!last) return goTo(step + 1);
     writeAnswers(answers);
     router.push("/new/ideas");
   };
@@ -259,19 +301,16 @@ export function Onboarding() {
 
   return (
     <div className="pm-aurora-bg flex min-h-dvh flex-col bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-30">
         <div className="mx-auto flex max-w-4xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 text-sm font-semibold">
             <BrandMark size="sm" />
-            <span>Portfolio Maker</span>
+            <span className="hidden sm:inline">Portfolio Maker</span>
           </Link>
           <div className="ms-auto flex items-center gap-3">
             <UiLanguageSwitch />
-            <span className="rounded-full border border-zinc-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-zinc-600 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
+            <span className="whitespace-nowrap rounded-full border border-zinc-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-zinc-600 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
               {`Question ${step + 1} of ${STEPS.length}`}
             </span>
             <div
@@ -282,282 +321,289 @@ export function Onboarding() {
               aria-valuenow={step + 1}
               className="hidden h-2 w-32 overflow-hidden rounded-full bg-zinc-200/90 sm:block dark:bg-zinc-800"
             >
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 transition-[width] duration-400 ease-out"
-                style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              <motion.div
+                className="h-full w-full origin-left rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rtl:origin-right"
+                initial={false}
+                animate={{ scaleX: (step + 1) / STEPS.length }}
+                transition={spring.layout}
               />
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-5 pb-12 pt-8 sm:pt-10">
-        <div key={step} className="pm-step-transition">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">{STEPS[step]}</h1>
+      <main className="relative mx-auto w-full max-w-3xl flex-1 px-5 pb-12 pt-8 sm:pt-10">
+        <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+          <motion.div
+            key={step}
+            custom={direction}
+            variants={stepVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+          >
+            <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">{STEPS[step]}</h1>
 
-          <div className="mt-7">
-            {step === 0 && (
-              <div className="grid gap-3.5 sm:grid-cols-2">
-                {WHO.map((who) => (
-                  <Choice
-                    key={who}
-                    selected={answers.who === who}
-                    onClick={() => set({ who })}
-                    title={WHO_TEXT[who][0]}
-                    text={WHO_TEXT[who][1]}
-                  />
-                ))}
-              </div>
-            )}
-
-            {step === 1 && (
-              <>
-                <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-                  We use it to write sample text that sounds like your work.
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {FIELDS.map((field) => (
+            <div className="mt-7">
+              {step === 0 && (
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  {WHO.map((who) => (
                     <Choice
-                      key={field.id}
-                      selected={answers.field === field.id}
-                      onClick={() => set({ field: field.id })}
-                      title={pickText(field.name, "en")}
+                      key={who}
+                      selected={answers.who === who}
+                      onClick={() => set({ who })}
+                      title={WHO_TEXT[who][0]}
+                      text={WHO_TEXT[who][1]}
                     />
                   ))}
-                  <Choice
-                    selected={answers.field === "other"}
-                    onClick={() => set({ field: "other" })}
-                    title="Something else"
-                  />
                 </div>
-              </>
-            )}
+              )}
 
-            {step === 2 && (
-              <div className="grid gap-3.5 sm:grid-cols-2">
-                {(Object.keys(GOAL_TEXT) as Goal[]).map((goal) => (
-                  <Choice
-                    key={goal}
-                    selected={answers.goal === goal}
-                    onClick={() => set({ goal })}
-                    title={GOAL_TEXT[goal][0]}
-                    text={GOAL_TEXT[goal][1]}
-                  />
-                ))}
-              </div>
-            )}
-
-            {step === 3 && (
-              <>
-                <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-                  Pick one or two. You can change the design at any time later.
-                </p>
-                <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-                  {STYLES.map((style) => (
+              {step === 1 && (
+                <>
+                  <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
+                    We use it to write sample text that sounds like your work.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {FIELDS.map((field) => (
+                      <Choice
+                        key={field.id}
+                        selected={answers.field === field.id}
+                        onClick={() => set({ field: field.id })}
+                        title={pickText(field.name, "en")}
+                      />
+                    ))}
                     <Choice
-                      key={style}
-                      selected={answers.styles.includes(style)}
-                      disabled={!answers.styles.includes(style) && answers.styles.length >= 2}
-                      onClick={() => set({ styles: toggle(answers.styles, style, 2) })}
-                      title={STYLE_TEXT[style][0]}
-                      text={STYLE_TEXT[style][1]}
-                    >
-                      <div className="overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
-                        <div className="transition-transform duration-300 group-hover:scale-[1.03]">
-                          <MiniPreview doc={stylePreviews[style]} />
-                        </div>
-                      </div>
-                    </Choice>
+                      selected={answers.field === "other"}
+                      onClick={() => set({ field: "other" })}
+                      title="Something else"
+                    />
+                  </div>
+                </>
+              )}
+
+              {step === 2 && (
+                <div className="grid gap-3.5 sm:grid-cols-2">
+                  {(Object.keys(GOAL_TEXT) as Goal[]).map((goal) => (
+                    <Choice
+                      key={goal}
+                      selected={answers.goal === goal}
+                      onClick={() => set({ goal })}
+                      title={GOAL_TEXT[goal][0]}
+                      text={GOAL_TEXT[goal][1]}
+                    />
                   ))}
                 </div>
-              </>
-            )}
+              )}
 
-            {step === 4 && (
-              <div className="pm-card grid gap-6 rounded-2xl p-5 sm:p-6">
-                <div>
-                  <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-                    Pick a ready set, use your own brand color, or skip and let each idea choose.
+              {step === 3 && (
+                <>
+                  <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
+                    Pick one or two. You can change the design at any time later.
                   </p>
-                  <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
-                    {palettes.map((palette) => {
-                      const selected = !answers.brandColor && answers.palette === palette.id;
-                      return (
-                        <button
-                          key={palette.id}
-                          type="button"
-                          aria-pressed={selected}
-                          onClick={() =>
-                            set({ palette: selected ? null : palette.id, brandColor: null })
-                          }
-                          className={`group grid gap-1.5 rounded-xl p-1.5 text-center transition-all duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
-                            selected
-                              ? "bg-blue-50/80 dark:bg-blue-950/50"
-                              : "hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
-                          }`}
-                        >
-                          <span
-                            className={`mx-auto block aspect-square w-full max-w-13 rounded-full border-2 border-white shadow-sm ring-1 transition-transform duration-200 group-hover:scale-108 dark:border-zinc-900 ${
+                  <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+                    {STYLES.map((style) => (
+                      <Choice
+                        key={style}
+                        selected={answers.styles.includes(style)}
+                        disabled={!answers.styles.includes(style) && answers.styles.length >= 2}
+                        onClick={() => set({ styles: toggle(answers.styles, style, 2) })}
+                        title={STYLE_TEXT[style][0]}
+                        text={STYLE_TEXT[style][1]}
+                      >
+                        <div className="overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
+                          <div className="transition-transform duration-300 group-hover:scale-[1.03]">
+                            <MiniPreview doc={stylePreviews[style]} />
+                          </div>
+                        </div>
+                      </Choice>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {step === 4 && (
+                <div className="pm-card grid gap-6 rounded-2xl p-5 sm:p-6">
+                  <div>
+                    <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+                      Pick a ready set, use your own brand color, or skip and let each idea choose.
+                    </p>
+                    <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
+                      {palettes.map((palette) => {
+                        const selected = !answers.brandColor && answers.palette === palette.id;
+                        return (
+                          <button
+                            key={palette.id}
+                            type="button"
+                            aria-pressed={selected}
+                            onClick={() =>
+                              set({ palette: selected ? null : palette.id, brandColor: null })
+                            }
+                            className={`group grid gap-1.5 rounded-xl p-1.5 text-center transition-all duration-150 focus-visible:outline-2 focus-visible:outline-blue-600 ${
                               selected
-                                ? "scale-108 ring-2 ring-blue-600"
-                                : "ring-zinc-300/80 dark:ring-zinc-700"
+                                ? "bg-blue-50/80 dark:bg-blue-950/50"
+                                : "hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60"
                             }`}
-                            style={{
-                              background: `linear-gradient(135deg, ${palette.light.primary} 50%, ${palette.light.accent} 50%)`,
-                            }}
-                          />
-                          <span className="truncate text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
-                            {palette.name}
-                          </span>
-                        </button>
-                      );
-                    })}
+                          >
+                            <span
+                              className={`mx-auto block aspect-square w-full max-w-13 rounded-full border-2 border-white shadow-sm ring-1 transition-transform duration-200 group-hover:scale-108 dark:border-zinc-900 ${
+                                selected
+                                  ? "scale-108 ring-2 ring-blue-600"
+                                  : "ring-zinc-300/80 dark:ring-zinc-700"
+                              }`}
+                              style={{
+                                background: `linear-gradient(135deg, ${palette.light.primary} 50%, ${palette.light.accent} 50%)`,
+                              }}
+                            />
+                            <span className="truncate text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
+                              {palette.name}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 border-t border-zinc-200/80 pt-4 dark:border-zinc-800">
+                    <input
+                      id="onboarding-brand"
+                      type="color"
+                      value={answers.brandColor ?? "#1f4fd8"}
+                      onChange={(e) => set({ brandColor: e.target.value, palette: null })}
+                      className="size-10 cursor-pointer rounded-lg border border-zinc-300 bg-transparent p-0.5 shadow-2xs dark:border-zinc-700"
+                    />
+                    <Label htmlFor="onboarding-brand">
+                      {answers.brandColor
+                        ? `Using your color ${answers.brandColor}`
+                        : "I have a brand color"}
+                    </Label>
+                    {answers.brandColor && (
+                      <button
+                        type="button"
+                        className={buttonClass}
+                        onClick={() => set({ brandColor: null })}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid max-w-md gap-1.5">
+                    <Label>Light or dark</Label>
+                    <Segmented
+                      label="Light or dark"
+                      value={answers.mode ?? "any"}
+                      onChange={(mode) => set({ mode: mode === "any" ? null : mode })}
+                      options={[
+                        ["any", "No preference"],
+                        ["light", "Light"],
+                        ["dark", "Dark"],
+                        ["both", "Visitor's choice"],
+                      ]}
+                    />
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 border-t border-zinc-200/80 pt-4 dark:border-zinc-800">
-                  <input
-                    id="onboarding-brand"
-                    type="color"
-                    value={answers.brandColor ?? "#1f4fd8"}
-                    onChange={(e) => set({ brandColor: e.target.value, palette: null })}
-                    className="size-10 cursor-pointer rounded-lg border border-zinc-300 bg-transparent p-0.5 shadow-2xs dark:border-zinc-700"
+              )}
+
+              {step === 5 && (
+                <>
+                  <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
+                    Tick everything you already have. Sections for the rest are added switched off,
+                    so you can turn them on later.
+                  </p>
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {ASSETS.map((asset) => (
+                      <label
+                        key={asset}
+                        className="flex cursor-pointer items-center gap-3.5 rounded-xl border border-zinc-200/90 bg-white px-4 py-3.5 text-sm font-medium shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xs has-checked:border-blue-600 has-checked:bg-blue-50/80 has-checked:ring-1 has-checked:ring-blue-600 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:has-checked:bg-blue-950/60"
+                      >
+                        <input
+                          type="checkbox"
+                          className="size-4 accent-blue-600"
+                          checked={answers.assets.includes(asset)}
+                          onChange={() => set({ assets: toggle(answers.assets, asset) })}
+                        />
+                        {ASSET_TEXT[asset]}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {step === 6 && (
+                <div className="grid gap-3.5 sm:grid-cols-3">
+                  <Choice
+                    selected={answers.languages.join() === "en"}
+                    onClick={() => set({ languages: ["en"] })}
+                    title="English"
                   />
-                  <Label htmlFor="onboarding-brand">
-                    {answers.brandColor
-                      ? `Using your color ${answers.brandColor}`
-                      : "I have a brand color"}
-                  </Label>
-                  {answers.brandColor && (
-                    <button
-                      type="button"
-                      className={buttonClass}
-                      onClick={() => set({ brandColor: null })}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-                <div className="grid max-w-md gap-1.5">
-                  <Label>Light or dark</Label>
-                  <Segmented
-                    label="Light or dark"
-                    value={answers.mode ?? "any"}
-                    onChange={(mode) => set({ mode: mode === "any" ? null : mode })}
-                    options={[
-                      ["any", "No preference"],
-                      ["light", "Light"],
-                      ["dark", "Dark"],
-                      ["both", "Visitor's choice"],
-                    ]}
+                  <Choice
+                    selected={answers.languages.join() === "ar"}
+                    onClick={() => set({ languages: ["ar"] })}
+                    title="العربية"
+                    text="Arabic, right to left"
                   />
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <>
-                <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-                  Tick everything you already have. Sections for the rest are added switched off, so
-                  you can turn them on later.
-                </p>
-                <div className="grid gap-2.5 sm:grid-cols-2">
-                  {ASSETS.map((asset) => (
-                    <label
-                      key={asset}
-                      className="flex cursor-pointer items-center gap-3.5 rounded-xl border border-zinc-200/90 bg-white px-4 py-3.5 text-sm font-medium shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xs has-checked:border-blue-600 has-checked:bg-blue-50/80 has-checked:ring-1 has-checked:ring-blue-600 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 dark:has-checked:bg-blue-950/60"
-                    >
-                      <input
-                        type="checkbox"
-                        className="size-4 accent-blue-600"
-                        checked={answers.assets.includes(asset)}
-                        onChange={() => set({ assets: toggle(answers.assets, asset) })}
-                      />
-                      {ASSET_TEXT[asset]}
-                    </label>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {step === 6 && (
-              <div className="grid gap-3.5 sm:grid-cols-3">
-                <Choice
-                  selected={answers.languages.join() === "en"}
-                  onClick={() => set({ languages: ["en"] })}
-                  title="English"
-                />
-                <Choice
-                  selected={answers.languages.join() === "ar"}
-                  onClick={() => set({ languages: ["ar"] })}
-                  title="العربية"
-                  text="Arabic, right to left"
-                />
-                <Choice
-                  selected={answers.languages.length === 2}
-                  onClick={() => set({ languages: ["en", "ar"] })}
-                  title="Both"
-                  text="Visitors can read either; you write each text twice"
-                />
-              </div>
-            )}
-
-            {step === 7 && (
-              <div className="pm-card grid max-w-lg gap-5 rounded-2xl p-6">
-                <div className="grid gap-1.5">
-                  <Label htmlFor="onboarding-name">
-                    {organisation ? "Company name" : "Your name"}
-                  </Label>
-                  <input
-                    id="onboarding-name"
-                    className={inputClass}
-                    dir="auto"
-                    autoComplete={organisation ? "organization" : "name"}
-                    value={answers.name}
-                    onChange={(e) => set({ name: e.target.value })}
+                  <Choice
+                    selected={answers.languages.length === 2}
+                    onClick={() => set({ languages: ["en", "ar"] })}
+                    title="Both"
+                    text="Visitors can read either; you write each text twice"
                   />
                 </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="onboarding-title">
+              )}
+
+              {step === 7 && (
+                <div className="pm-card grid max-w-lg gap-5 rounded-2xl p-6">
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="onboarding-name">
+                      {organisation ? "Company name" : "Your name"}
+                    </Label>
+                    <input
+                      id="onboarding-name"
+                      className={inputClass}
+                      dir="auto"
+                      autoComplete={organisation ? "organization" : "name"}
+                      value={answers.name}
+                      onChange={(e) => set({ name: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="onboarding-title">
+                      {organisation
+                        ? "What you do, in one line"
+                        : "Your job title or one-line description"}
+                    </Label>
+                    <input
+                      id="onboarding-title"
+                      className={inputClass}
+                      dir="auto"
+                      placeholder={
+                        organisation ? "Accounting for small businesses" : "Civil engineer"
+                      }
+                      value={answers.title}
+                      onChange={(e) => set({ title: e.target.value })}
+                    />
+                  </div>
+                  <PicturePicker organisation={organisation} />
+                  <p className="text-xs leading-relaxed text-zinc-500">
                     {organisation
-                      ? "What you do, in one line"
-                      : "Your job title or one-line description"}
-                  </Label>
-                  <input
-                    id="onboarding-title"
-                    className={inputClass}
-                    dir="auto"
-                    placeholder={
-                      organisation ? "Accounting for small businesses" : "Civil engineer"
-                    }
-                    value={answers.title}
-                    onChange={(e) => set({ title: e.target.value })}
-                  />
+                      ? "These go straight into your starter ideas. The logo is added when you open one; you can change it later in the editor."
+                      : "These go straight into your starter ideas. The photo is added when you open one; you can change it later in the editor."}
+                  </p>
                 </div>
-                <PicturePicker organisation={organisation} />
-                <p className="text-xs leading-relaxed text-zinc-500">
-                  {organisation
-                    ? "These go straight into your starter ideas. The logo is added when you open one; you can change it later in the editor."
-                    : "These go straight into your starter ideas. The photo is added when you open one; you can change it later in the editor."}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+              )}
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-zinc-200/80 pt-6 dark:border-zinc-800/80">
           <button
             type="button"
             className={`${buttonClass} px-4 py-2.5`}
             disabled={step === 0}
-            onClick={() => setStep(step - 1)}
+            onClick={() => goTo(step - 1)}
           >
             Back
           </button>
-          <button
-            type="button"
-            className={`${primaryButtonClass} px-6 py-2.5`}
-            onClick={next}
-          >
+          <button type="button" className={`${primaryButtonClass} px-6 py-2.5`} onClick={next}>
             <span>{last ? "Show my ideas" : "Continue"}</span>
             <UiIcon name="arrowRight" size={15} className="rtl:rotate-180" />
           </button>
@@ -565,7 +611,7 @@ export function Onboarding() {
             <button
               type="button"
               className="rounded-lg px-3 py-2 text-sm text-zinc-600 underline decoration-zinc-400 underline-offset-4 transition-colors hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-blue-600 dark:text-zinc-400 dark:hover:text-zinc-100"
-              onClick={() => setStep(step + 1)}
+              onClick={() => goTo(step + 1)}
             >
               Skip this question
             </button>

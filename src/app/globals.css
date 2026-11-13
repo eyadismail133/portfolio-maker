@@ -55,15 +55,10 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  selection-background-color: rgba(37, 99, 235, 0.2);
 }
 
 ::selection {
@@ -128,57 +123,6 @@ html.pm-ui-ar body {
   }
 }
 
-@keyframes pm-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(0, -10px, 0) rotate(1deg);
-  }
-}
-
-@keyframes pm-float-delayed {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(8px, -14px, 0) scale(1.03);
-  }
-}
-
-@keyframes pm-pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(37, 99, 235, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
-  }
-}
-
-@keyframes pm-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes pm-gradient-flow {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
 /* -------------------------------------------------------------------------- */
 /* Animation & Motion Utilities                                               */
 /* -------------------------------------------------------------------------- */
@@ -193,14 +137,6 @@ html.pm-ui-ar body {
 
 .pm-step-transition {
   animation: pm-step-enter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.pm-float {
-  animation: pm-float 7s ease-in-out infinite;
-}
-
-.pm-float-slow {
-  animation: pm-float-delayed 10s ease-in-out infinite;
 }
 
 .pm-stagger-1 {
@@ -296,25 +232,6 @@ html.pm-ui-ar body {
   border-color: rgba(59, 130, 246, 0.38);
 }
 
-.pm-gradient-text {
-  background: linear-gradient(125deg, #2563eb 0%, #4f46e5 45%, #7c3aed 85%, #db2777 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: pm-gradient-flow 8s ease infinite;
-}
-
-@media (prefers-color-scheme: dark) {
-  .pm-gradient-text {
-    background: linear-gradient(125deg, #60a5fa 0%, #818cf8 45%, #c084fc 85%, #f472b6 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-}
-
 /* -------------------------------------------------------------------------- */
 /* Tactile Buttons                                                            */
 /* -------------------------------------------------------------------------- */
@@ -379,14 +296,42 @@ html.pm-ui-ar body {
 /* Dialogs & Modals                                                           */
 /* -------------------------------------------------------------------------- */
 
-dialog[open] {
+/* App dialogs only: a portfolio page's own dialogs (the gallery lightbox) keep their own look. */
+dialog[open]:not(.pk-lightbox) {
   animation: pm-scale-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-dialog::backdrop {
+dialog:not(.pk-lightbox)::backdrop {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: pm-fade-in 0.22s ease both;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Design stage on the home page                                              */
+/* -------------------------------------------------------------------------- */
+
+.pm-stage-frame {
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  box-shadow:
+    0 1px 2px rgba(9, 9, 11, 0.04),
+    0 30px 70px -30px rgba(9, 9, 11, 0.35);
+}
+
+/* The bright line that rides the wipe from one design to the next. */
+.pm-stage-edge {
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(9, 9, 11, 0.12),
+    0 0 18px 4px rgba(255, 255, 255, 0.9);
+}
+
+.pm-no-scrollbar {
+  scrollbar-width: none;
+}
+.pm-no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* -------------------------------------------------------------------------- */

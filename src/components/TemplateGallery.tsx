@@ -5,16 +5,17 @@ import { useMemo } from "react";
 import { UiIcon } from "@/editor/ui";
 import { templateDoc, TEMPLATES } from "@/lib/templates";
 import { MiniPreview } from "./MiniPreview";
+import { TiltCard } from "./TiltCard";
 
 export function TemplateGallery() {
   const docs = useMemo(() => TEMPLATES.map((t) => templateDoc(t.id)!), []);
   return (
     <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {TEMPLATES.map((template, i) => (
-        <li
+        <TiltCard
           key={template.id}
-          style={{ animationDelay: `${Math.min(i * 45, 360)}ms` }}
-          className="pm-animate-in pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
+          reveal={(i % 3) * 0.06}
+          className="pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
         >
           <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
             <span className="size-2 rounded-full bg-rose-400/80" />
@@ -49,7 +50,7 @@ export function TemplateGallery() {
               />
             </Link>
           </div>
-        </li>
+        </TiltCard>
       ))}
     </ul>
   );
