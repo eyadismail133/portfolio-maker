@@ -144,7 +144,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Backend audit fixes, speed part (`0009_scale.sql`): `owner_id` on messages, sign-ups and visits with simpler rules and indexes, missing foreign-key indexes, `unread_message_count()` and `published_languages()`; the dashboard, the page check, `/api/revalidate` (own pages only), the account lookup (login token, no auth-server call) and the daily job (ten emails at a time) use them
 - [x] Run `0009`
 - [x] Spam check on visitor forms with Cloudflare Turnstile (contact, newsletter, report); form functions server-only (`0010_server_only_forms.sql`)
-- [ ] Create the Turnstile widget, set its two keys in Vercel, deploy, then run `0010` (owner; `docs/07`, step 10)
+- [x] Create the Turnstile widget, set its two keys in Vercel, deploy, then run `0010` (checked live on 14 November 2026)
+- [x] Visit counter: one browser counts once per page every 30 minutes
 
 ## Risks to watch
 | Risk | How we handle it |
