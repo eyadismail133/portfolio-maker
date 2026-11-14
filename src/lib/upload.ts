@@ -46,8 +46,10 @@ export async function uploadImage(file: File, portfolioId?: string): Promise<Ass
     throw new Error("This file is larger than 25 MB. Choose a smaller image.");
 
   const supabase = createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) throw new Error("Log in to upload images.");
+  // From the login token: no call to the auth server for every image.
+  const { data: auth } = await supabase.auth.getClaims();
+  const userId = auth?.claims?.sub;
+  if (!userId) throw new Error("Log in to upload images.");
 
   let converted: Awaited<ReturnType<typeof toWebp>>;
   try {
@@ -58,7 +60,7 @@ export async function uploadImage(file: File, portfolioId?: string): Promise<Ass
   }
 
   const id = crypto.randomUUID();
-  const path = `${auth.user.id}/${id}.webp`;
+  const path = `${userId}/${id}.webp`;
   const stored = await supabase.storage
     .from(IMAGE_BUCKET)
     .upload(path, converted.blob, { contentType: "image/webp", cacheControl: "31536000" });

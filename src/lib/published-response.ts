@@ -1,5 +1,6 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { isAppHost } from "@/lib/custom-domain";
-import { getPublished } from "@/lib/published";
+import { getPublished, publishedTag } from "@/lib/published";
 import { NOT_FOUND_HTML } from "@/lib/published-check";
 import { buildHtmlPage } from "@/render-kit/html-page";
 import { PAGE_CSS } from "@/render-kit/generated/page-css";
@@ -33,14 +34,44 @@ const notFound = () =>
 export async function publishedResponse(request: Request, slug: string, wanted?: string) {
   const found = await getPublished(slug);
   if (!found) return notFound();
-  const { doc } = found;
-  const lang = resolveLang(doc.meta.languages, wanted);
+  const lang = resolveLang(found.doc.meta.languages, wanted);
   if (!lang) return notFound();
 
   const url = new URL(request.url);
   const host = request.headers.get("host") ?? url.host;
   const onOwnDomain = !isAppHost(host);
   const origin = `${url.protocol}//${host}`;
+  // Cloudflare's free check only works on our own hostnames (see src/lib/visitor-check.ts).
+  const spamCheckKey = onOwnDomain ? null : turnstileSiteKey();
+  const html = await publishedHtml(slug, lang, origin, onOwnDomain, spamCheckKey);
+  if (html === null) return notFound();
+  return new Response(html, {
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      // Always fresh, so a new publish shows at once; the page itself is cached on the server.
+      "cache-control": "public, max-age=0, must-revalidate",
+    },
+  });
+}
+
+/**
+ * The finished HTML of one page, language and address. Drawing a whole page takes real work, so
+ * it is cached like the page data and thrown away by the same tag when the owner publishes.
+ * Only a few addresses reach this (the app's own and the owner's domain), so few copies exist.
+ */
+async function publishedHtml(
+  slug: string,
+  lang: Lang,
+  origin: string,
+  onOwnDomain: boolean,
+  spamCheckKey: string | null,
+): Promise<string | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(publishedTag(slug));
+  const found = await getPublished(slug);
+  if (!found) return null;
+  const { doc } = found;
   const base = onOwnDomain ? "" : `/p/${slug}`;
   const pathFor = (l: Lang) => (l === doc.meta.languages[0] ? base || "/" : `${base}/${l}`);
   const languageHrefs =
@@ -56,7 +87,7 @@ export async function publishedResponse(request: Request, slug: string, wanted?:
 
   // Loaded here, not at the top: Next.js does not allow react-dom/server in a route's imports.
   const { renderToStaticMarkup } = await import("react-dom/server");
-  const html = buildHtmlPage(renderToStaticMarkup, doc, {
+  return buildHtmlPage(renderToStaticMarkup, doc, {
     lang,
     css: PAGE_CSS,
     script: `${PAGE_SCRIPT}\n${counter}`,
@@ -65,14 +96,6 @@ export async function publishedResponse(request: Request, slug: string, wanted?:
     canonical: `${origin}${pathFor(lang)}`,
     fallbackShareImage: `${origin}/api/og?slug=${encodeURIComponent(slug)}&lang=${lang}`,
     trustedFooter: badge + report,
-    // Cloudflare's free check only works on our own hostnames (see src/lib/visitor-check.ts).
-    spamCheckKey: onOwnDomain ? undefined : (turnstileSiteKey() ?? undefined),
-  });
-  return new Response(html, {
-    headers: {
-      "content-type": "text/html; charset=utf-8",
-      // Always fresh, so a new publish shows at once; the data itself is cached on the server.
-      "cache-control": "public, max-age=0, must-revalidate",
-    },
+    spamCheckKey: spamCheckKey ?? undefined,
   });
 }

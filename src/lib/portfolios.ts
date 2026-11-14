@@ -62,20 +62,47 @@ export function friendlyError(error: unknown): string {
   return message || "Something went wrong. Try again.";
 }
 
+const toSummary = (row: Row): PortfolioSummary => ({
+  id: row.id,
+  title: row.title,
+  status: row.status,
+  slug: row.slug,
+  updatedAt: row.updated_at,
+  doc: readDoc(row.doc),
+});
+
 export async function listPortfolios(): Promise<PortfolioSummary[]> {
   const { data, error } = await createClient()
     .from("portfolios")
     .select(COLUMNS)
     .order("updated_at", { ascending: false });
   if (error) throw error;
-  return (data as Row[]).map((row) => ({
-    id: row.id,
-    title: row.title,
-    status: row.status,
-    slug: row.slug,
-    updatedAt: row.updated_at,
-    doc: readDoc(row.doc),
-  }));
+  return (data as Row[]).map(toSummary);
+}
+
+/** How many portfolios the dashboard loads at a time. */
+export const PORTFOLIO_PAGE_SIZE = 12;
+
+/**
+ * The newest `count` portfolios with their documents (for the previews), and how many the account
+ * has in all. Uses the (user_id, updated_at) index, so it stays quick however many there are.
+ */
+export async function listPortfolioPage(
+  count: number,
+): Promise<{ items: PortfolioSummary[]; total: number }> {
+  const {
+    data,
+    error,
+    count: total,
+  } = await createClient()
+    .from("portfolios")
+    .select(COLUMNS, { count: "exact" })
+    .order("updated_at", { ascending: false })
+    .order("id")
+    .range(0, Math.max(count, 1) - 1);
+  if (error) throw error;
+  const items = (data as Row[]).map(toSummary);
+  return { items, total: total ?? items.length };
 }
 
 /** Names and states only, without the documents: for lists that only show titles. */

@@ -15,7 +15,8 @@ import {
   duplicatePortfolio,
   friendlyError,
   getMyAccount,
-  listPortfolios,
+  listPortfolioPage,
+  PORTFOLIO_PAGE_SIZE,
   renamePortfolio,
   saveOnboardingAnswers,
   type Account,
@@ -254,9 +255,16 @@ export function Dashboard() {
   const plan = account?.plan ?? null;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // Portfolios load a page at a time; after a change the same number is loaded again.
+  const [total, setTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const shownRef = useRef(PORTFOLIO_PAGE_SIZE);
+
   const refresh = useCallback(async () => {
     try {
-      setItems(await listPortfolios());
+      const page = await listPortfolioPage(shownRef.current);
+      setItems(page.items);
+      setTotal(page.total);
       setProblem("");
     } catch (error) {
       setProblem(friendlyError(error));
@@ -264,12 +272,21 @@ export function Dashboard() {
     }
   }, []);
 
+  const showMore = async () => {
+    shownRef.current += PORTFOLIO_PAGE_SIZE;
+    setLoadingMore(true);
+    await refresh();
+    setLoadingMore(false);
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await createClient().auth.getUser();
+      // From the login token: no call to the auth server.
+      const { data } = await createClient().auth.getClaims();
       if (cancelled) return;
-      setEmail(data.user?.email ?? "");
+      const claimedEmail = data?.claims?.email;
+      setEmail(typeof claimedEmail === "string" ? claimedEmail : "");
       // A portfolio chosen before logging in is saved to the account now and opened.
       const pending = readPending();
       if (pending) {
@@ -499,94 +516,112 @@ export function Dashboard() {
             </Link>
           </div>
         ) : (
-          <motion.ul layout className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Cards make room for a copy and close the gap after a delete instead of jumping. */}
-            <AnimatePresence mode="popLayout" initial={false}>
-              {items.map((item, idx) => (
-                <motion.li
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.2 } }}
-                  transition={{ ...spring.layout, delay: settled ? 0 : staggerDelay(idx, 0.055) }}
-                  className="pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
-                >
-                  <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
-                    <span className="size-2 rounded-full bg-rose-400/80" />
-                    <span className="size-2 rounded-full bg-amber-400/80" />
-                    <span className="size-2 rounded-full bg-emerald-400/80" />
-                  </div>
-                  <Link
-                    href={`/editor/${item.id}`}
-                    aria-label={`Open ${item.title}`}
-                    className="block overflow-hidden rounded-xl border border-zinc-200/80 focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-800"
+          <>
+            <motion.ul layout className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Cards make room for a copy and close the gap after a delete instead of jumping. */}
+              <AnimatePresence mode="popLayout" initial={false}>
+                {items.map((item, idx) => (
+                  <motion.li
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.2 } }}
+                    transition={{ ...spring.layout, delay: settled ? 0 : staggerDelay(idx, 0.055) }}
+                    className="pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
                   >
-                    {item.doc ? (
-                      <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
-                        <MiniPreview doc={item.doc} />
-                      </div>
-                    ) : (
-                      <div className="flex aspect-[16/11] items-center justify-center p-4 text-center text-xs text-zinc-500">
-                        This portfolio was saved by a newer version and cannot be shown here.
-                      </div>
-                    )}
-                  </Link>
-                  <div className="flex flex-1 flex-col p-3.5 pt-4">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <h2 className="truncate text-sm font-semibold tracking-tight" dir="auto">
-                        {item.title}
-                      </h2>
-                      <span
-                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                          item.status === "published"
-                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-950/60 dark:text-emerald-300"
-                            : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                        }`}
-                      >
+                    <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
+                      <span className="size-2 rounded-full bg-rose-400/80" />
+                      <span className="size-2 rounded-full bg-amber-400/80" />
+                      <span className="size-2 rounded-full bg-emerald-400/80" />
+                    </div>
+                    <Link
+                      href={`/editor/${item.id}`}
+                      aria-label={`Open ${item.title}`}
+                      className="block overflow-hidden rounded-xl border border-zinc-200/80 focus-visible:outline-2 focus-visible:outline-blue-600 dark:border-zinc-800"
+                    >
+                      {item.doc ? (
+                        <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
+                          <MiniPreview doc={item.doc} />
+                        </div>
+                      ) : (
+                        <div className="flex aspect-[16/11] items-center justify-center p-4 text-center text-xs text-zinc-500">
+                          This portfolio was saved by a newer version and cannot be shown here.
+                        </div>
+                      )}
+                    </Link>
+                    <div className="flex flex-1 flex-col p-3.5 pt-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <h2 className="truncate text-sm font-semibold tracking-tight" dir="auto">
+                          {item.title}
+                        </h2>
                         <span
-                          aria-hidden="true"
-                          className={`size-1.5 rounded-full ${item.status === "published" ? "bg-emerald-500" : "bg-zinc-400"}`}
+                          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            item.status === "published"
+                              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-950/60 dark:text-emerald-300"
+                              : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`size-1.5 rounded-full ${item.status === "published" ? "bg-emerald-500" : "bg-zinc-400"}`}
+                          />
+                          <span>{item.status === "published" ? "Published" : "Draft"}</span>
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        Edited {when(item.updatedAt)}
+                        {item.status === "published" &&
+                          ` · ${views[item.id] ?? 0} visits in 30 days`}
+                      </p>
+                      {item.status === "published" && item.slug && (
+                        <a
+                          href={`/p/${item.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          dir="ltr"
+                          className="mt-1.5 inline-flex items-center gap-1 truncate text-xs font-medium text-blue-700 underline decoration-blue-700/40 underline-offset-2 hover:decoration-blue-700 dark:text-blue-400"
+                        >
+                          <span>/p/{item.slug}</span>
+                          <UiIcon name="external" size={11} />
+                        </a>
+                      )}
+                      <div className="mt-auto flex items-center gap-1.5 pt-4">
+                        <Link
+                          href={`/editor/${item.id}`}
+                          className={`${primaryButtonClass} flex-1 justify-center`}
+                        >
+                          Edit
+                        </Link>
+                        <CardMenu
+                          title={item.title}
+                          disabled={busy === item.id || !item.doc}
+                          onRename={() => setDialog({ kind: "rename", item, title: item.title })}
+                          onDuplicate={() => run(item.id, () => duplicatePortfolio(item))}
+                          onDelete={() => setDialog({ kind: "delete", item })}
                         />
-                        <span>{item.status === "published" ? "Published" : "Draft"}</span>
-                      </span>
+                      </div>
                     </div>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Edited {when(item.updatedAt)}
-                      {item.status === "published" && ` · ${views[item.id] ?? 0} visits in 30 days`}
-                    </p>
-                    {item.status === "published" && item.slug && (
-                      <a
-                        href={`/p/${item.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        dir="ltr"
-                        className="mt-1.5 inline-flex items-center gap-1 truncate text-xs font-medium text-blue-700 underline decoration-blue-700/40 underline-offset-2 hover:decoration-blue-700 dark:text-blue-400"
-                      >
-                        <span>/p/{item.slug}</span>
-                        <UiIcon name="external" size={11} />
-                      </a>
-                    )}
-                    <div className="mt-auto flex items-center gap-1.5 pt-4">
-                      <Link
-                        href={`/editor/${item.id}`}
-                        className={`${primaryButtonClass} flex-1 justify-center`}
-                      >
-                        Edit
-                      </Link>
-                      <CardMenu
-                        title={item.title}
-                        disabled={busy === item.id || !item.doc}
-                        onRename={() => setDialog({ kind: "rename", item, title: item.title })}
-                        onDuplicate={() => run(item.id, () => duplicatePortfolio(item))}
-                        onDelete={() => setDialog({ kind: "delete", item })}
-                      />
-                    </div>
-                  </div>
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </motion.ul>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </motion.ul>
+            {total > items.length && (
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  className={`${buttonClass} px-5 py-2`}
+                  disabled={loadingMore}
+                  onClick={() => void showMore()}
+                >
+                  {loadingMore ? "Loading…" : "Show more portfolios"}
+                </button>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Showing {items.length} of {total}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
 

@@ -146,6 +146,7 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Spam check on visitor forms with Cloudflare Turnstile (contact, newsletter, report); form functions server-only (`0010_server_only_forms.sql`)
 - [x] Create the Turnstile widget, set its two keys in Vercel, deploy, then run `0010` (checked live on 14 November 2026)
 - [x] Visit counter: one browser counts once per page every 30 minutes
+- [x] Dashboard loads portfolios 12 at a time; published pages cache their finished HTML; signed-in pages read the account from the login token
 
 ## Risks to watch
 | Risk | How we handle it |

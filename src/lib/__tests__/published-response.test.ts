@@ -3,7 +3,10 @@ import { createSampleDoc } from "@/render-kit/samples";
 import { normalizeDoc } from "@/render-kit/registry";
 
 const doc = normalizeDoc(createSampleDoc({ languages: ["en", "ar"] }));
+// Outside Next.js the page cache does nothing; every call draws the page.
+vi.mock("next/cache", () => ({ cacheLife: () => undefined, cacheTag: () => undefined }));
 vi.mock("@/lib/published", () => ({
+  publishedTag: (slug: string) => `published:${slug}`,
   getPublished: async (slug: string) =>
     slug === "layla" ? { title: "Layla", doc, publishedAt: "", showBadge: true } : null,
 }));

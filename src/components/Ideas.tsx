@@ -42,7 +42,7 @@ export function Ideas() {
     try {
       let signedIn = false;
       try {
-        signedIn = Boolean((await createClient().auth.getUser()).data.user);
+        signedIn = Boolean((await createClient().auth.getClaims()).data?.claims?.sub);
       } catch {
         // Without a working account service, carry on as a visitor.
       }
