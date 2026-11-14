@@ -114,7 +114,8 @@ export async function listMyImages(): Promise<(AssetRef & { size: number })[]> {
 
 /** Bytes of images the account has stored. */
 export async function storageUsed(): Promise<number> {
-  const { data, error } = await createClient().from("assets").select("size");
+  // Measured from the stored files, the same number the storage limit uses.
+  const { data, error } = await createClient().rpc("storage_used");
   if (error) throw error;
-  return (data as { size: number }[]).reduce((sum, a) => sum + a.size, 0);
+  return Number(data ?? 0);
 }

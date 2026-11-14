@@ -54,6 +54,9 @@ export function friendlyError(error: unknown): string {
   if (/plan_limit_published/.test(message)) {
     return "Free accounts can publish 1 page. Take the other one offline, or go Pro to publish up to 10.";
   }
+  if (/portfolios_doc_size|portfolio_versions_doc_size/.test(message)) {
+    return "This portfolio is too large to save. Remove some sections or long texts and try again.";
+  }
   if (/row-level security|permission denied|jwt/i.test(message))
     return "You are signed out. Log in again.";
   return message || "Something went wrong. Try again.";

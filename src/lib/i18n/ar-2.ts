@@ -447,6 +447,8 @@ export const AR_2: Record<string, string> = {
     "تعذّرت قراءة هذا الملف، لذا لا يمكن نسخه.",
   "This portfolio does not exist, or it belongs to another account.":
     "هذا الملف غير موجود أو يخص حساباً آخر.",
+  "This portfolio is too large to save. Remove some sections or long texts and try again.":
+    "هذا الملف أكبر من أن يُحفظ. احذف بعض الأقسام أو النصوص الطويلة ثم حاول مرة أخرى.",
   "This portfolio was changed in another tab or device.":
     "تم تغيير هذا الملف في تبويب أو جهاز آخر.",
   "This portfolio was saved by a newer version and cannot be shown here.":

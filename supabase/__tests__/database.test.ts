@@ -39,7 +39,7 @@ beforeAll(async () => {
     create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}');
     create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
     create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
-    create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text);
+    create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text, metadata jsonb);
     alter table storage.objects enable row level security;
     create function storage.foldername(name text) returns text[] language sql immutable as $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
     grant usage on schema public, auth, storage to anon, authenticated, service_role;
@@ -268,6 +268,99 @@ beforeAll(async () => {
     "free: 51st message this month is locked",
     (await q("select locked from form_submissions where name = 'Vi'"))[0].locked === true,
   );
+  check(
+    "free: a locked message cannot be read from the table",
+    (await as("authenticated", A, "select * from form_submissions where locked")).rows.length === 0,
+  );
+  const lockedRow = (
+    await as(
+      "authenticated",
+      A,
+      "select name, email, message, locked from list_messages() where locked",
+    )
+  ).rows;
+  check(
+    "free: the inbox lists a locked message without its text",
+    lockedRow.length === 1 &&
+      lockedRow[0].name === "" &&
+      lockedRow[0].email === "" &&
+      lockedRow[0].message === "",
+    JSON.stringify(lockedRow),
+  );
+  check(
+    "free: unlocked messages keep their text in the inbox",
+    (await as("authenticated", A, "select name from list_messages() where not locked limit 1"))
+      .rows[0]?.name === "n",
+  );
+  check(
+    "other accounts get nothing from list_messages",
+    (await as("authenticated", B, "select * from list_messages()")).rows.length === 0,
+  );
+  check(
+    "visitors cannot call list_messages",
+    !!(await as("anon", null, "select * from list_messages()")).error,
+  );
+
+  // 0008: document size limit, and the plan-limit lock
+  const bigDoc = `jsonb_build_object('x', (select string_agg(md5(i::text), '') from generate_series(1, 70000) i))`;
+  check(
+    "a portfolio document over 2 MB is refused",
+    /portfolios_doc_size/.test(
+      (await as("authenticated", A, `update portfolios set doc = ${bigDoc} where id = $1`, [p1]))
+        .error ?? "",
+    ),
+  );
+  check(
+    "a version over 2 MB is refused",
+    /portfolio_versions_doc_size/.test(
+      (
+        await as(
+          "authenticated",
+          A,
+          `insert into portfolio_versions (portfolio_id, doc) values ($1, ${bigDoc})`,
+          [p1],
+        )
+      ).error ?? "",
+    ),
+  );
+  check(
+    "plan-limit checks and replacing the live page take the account lock",
+    (
+      await q(
+        "select count(*)::int n from pg_proc where proname in ('enforce_portfolio_limits', 'publish_replacing_live') and prosrc like '%pg_advisory_xact_lock%'",
+      )
+    )[0].n === 2,
+  );
+
+  // 0008: visit counts spread over rows
+  for (let i = 0; i < 40; i++) await as("anon", null, "select record_page_view('ann')");
+  const views = (
+    await as(
+      "authenticated",
+      A,
+      "select coalesce(sum(views), 0)::int total, count(*)::int n from page_views where portfolio_id = $1",
+      [p1],
+    )
+  ).rows[0];
+  check(
+    "visits are all counted, over more than one row",
+    views.total === 40 && views.n > 1 && views.n <= 16,
+    JSON.stringify(views),
+  );
+  check(
+    "other accounts cannot read the visit counts",
+    (await as("authenticated", B, "select * from page_views")).rows.length === 0,
+  );
+
+  // 0008: only the account itself asks whether it is Pro
+  check(
+    "accounts cannot ask whether another account is Pro",
+    /permission denied/.test((await as("authenticated", A, `select is_pro('${B}')`)).error ?? ""),
+  );
+  check(
+    "an account can ask whether it is Pro itself",
+    (await as("authenticated", A, "select am_i_pro() p")).rows[0]?.p === false,
+  );
 
   // Uploads: free 50 MB
   await db.exec(
@@ -293,10 +386,30 @@ beforeAll(async () => {
       )
     ).error,
   );
-  await as(
-    "authenticated",
-    A,
-    `insert into assets (path, width, height, size) values ('${A}/big.webp', 1, 1, 60000000)`,
+  check(
+    "fake image records do not use up the storage limit",
+    !(
+      await as(
+        "authenticated",
+        A,
+        `insert into assets (path, width, height, size) values ('${A}/fake.webp', 1, 1, 60000000)`,
+      )
+    ).error &&
+      !(
+        await as(
+          "authenticated",
+          A,
+          `insert into storage.objects (bucket_id, name) values ('portfolio-images', '${A}/1b.webp')`,
+        )
+      ).error,
+  );
+  // The storage service records each file's real size.
+  await q(
+    `insert into storage.objects (bucket_id, name, metadata) values ('portfolio-images', '${A}/big.webp', '{"size": 60000000}')`,
+  );
+  check(
+    "storage used is measured from the stored files",
+    Number((await as("authenticated", A, "select storage_used() n")).rows[0]?.n) === 60000000,
   );
   check(
     "free: upload refused over 50 MB",
@@ -307,6 +420,21 @@ beforeAll(async () => {
         `insert into storage.objects (bucket_id, name) values ('portfolio-images', '${A}/2.webp')`,
       )
     ).error,
+  );
+  await as("authenticated", A, "delete from assets");
+  check(
+    "deleting image records does not free storage",
+    !!(
+      await as(
+        "authenticated",
+        A,
+        `insert into storage.objects (bucket_id, name) values ('portfolio-images', '${A}/2.webp')`,
+      )
+    ).error,
+  );
+  check(
+    "other accounts' files do not count toward the limit",
+    Number((await as("authenticated", B, "select storage_used() n")).rows[0]?.n) === 0,
   );
 
   // Payment makes A Pro for 1 month
@@ -345,6 +473,13 @@ beforeAll(async () => {
     )
   ).rows[0];
   check("3 months of Pro granted", until.ok && until.plan === "pro", JSON.stringify(until));
+  check(
+    "pro: locked messages can be read",
+    (await as("authenticated", A, "select message from form_submissions where name = 'Vi'")).rows[0]
+      ?.message === "Hello" &&
+      (await as("authenticated", A, "select message from list_messages() where locked")).rows[0]
+        ?.message === "Hello",
+  );
   check(
     "A sees own payments, B does not",
     (await as("authenticated", A, "select * from payments")).rows.length === 2 &&

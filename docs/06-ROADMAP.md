@@ -139,6 +139,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Template gallery page for SEO (/templates, plus sitemap.xml and robots.txt)
 - [x] Full test pass and fixes (`docs/09-TEST-REPORT-AND-PLAN.md`): logo in navbar and footer, published pages as complete HTML, share images, animation setting, Free "Replace my live page" (`0007_publish_replacing.sql`), phone layouts, getting-started checklist, accessibility names, short menu names
 - [ ] Run `0007` in the Supabase SQL editor (owner)
+- [x] Backend audit fixes, database part (`0008_hardening.sql`): storage limit from the stored files, locked messages hidden by the database, 2 MB document limit, per-account lock for plan limits, private `is_pro`, visit counts spread over 16 rows
+- [ ] Run `0008` in the Supabase SQL editor (owner)
 
 ## Risks to watch
 | Risk | How we handle it |

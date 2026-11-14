@@ -176,12 +176,9 @@ export type Message = {
   createdAt: string;
 };
 
+/** The newest 200 messages. Locked ones come without their text unless the account is Pro. */
 export async function listMessages(): Promise<Message[]> {
-  const { data, error } = await createClient()
-    .from("form_submissions")
-    .select("id, portfolio_id, name, email, message, is_read, locked, created_at")
-    .order("created_at", { ascending: false })
-    .limit(200);
+  const { data, error } = await createClient().rpc("list_messages", { p_limit: 200 });
   if (error) throw error;
   return (data as Record<string, unknown>[]).map((m) => ({
     id: String(m.id),

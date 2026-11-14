@@ -167,7 +167,7 @@ All render-kit classes start with `pk-`, and `base.css` carries its own reset, s
 | `assets` | id, user_id, portfolio_id, path, width, height, size | Uploaded images |
 | `onboarding_answers` | id, user_id, portfolio_id, answers (jsonb) | To improve recommendations later |
 | `form_submissions` | id, portfolio_id, name, email, message, created_at | Contact form inbox (version 2) |
-| `page_views` | portfolio_id, day, count | Simple statistics (version 2) |
+| `page_views` | portfolio_id, day, shard (0 to 15), views | Visit counts. Each visit adds 1 to one of 16 rows for that page and day (`0008`), so a busy page does not make visits wait for each other; readers add the rows up |
 
 Security: row level security on every table. A user can read and write only their own rows. Anyone can read `published_doc` of a published portfolio, through a server route only.
 
@@ -204,7 +204,11 @@ Keeping `doc` and `published_doc` separate means editing never changes the live 
 - In the editor, long text fields offer "Write a first draft", "Improve" and "Shorten"; in two-language portfolios every text field can "Translate from" the other language. Each AI answer is one undo step.
 
 ## Plans and payments (as built)
-- `profiles.plan` and `profiles.pro_until` say who is Pro; the database function `is_pro()` is the single test (plan "pro" and not expired). Limits are enforced by triggers, storage rules and functions in `0004_plans_and_billing.sql`; the app only explains them.
+- `profiles.plan` and `profiles.pro_until` say who is Pro; the database function `is_pro()` is the single test (plan "pro" and not expired). Limits are enforced by triggers, storage rules and functions in `0004_plans_and_billing.sql` (some redefined in `0008_hardening.sql`); the app only explains them.
+- Accounts cannot call `is_pro()` (it would tell them about other accounts); they call `am_i_pro()`. Database functions still use `is_pro()`.
+- The storage limit is measured from the stored files (`storage.objects.metadata.size`, function `storage_used()`), never from the `assets` rows, which the browser writes and could fake or delete.
+- The plan-limit trigger and `publish_replacing_live` first take a per-account lock (`pg_advisory_xact_lock`), so two requests sent at once cannot both pass a limit, and two tabs replacing the live page cannot deadlock.
+- `doc` and `published_doc` in `portfolios`, and `doc` in `portfolio_versions`, are limited to 2 MB each (rows saved before `0008` are not checked).
 - Payments: `/api/billing/checkout` creates a pending row and a Paymob intention; `/api/billing/paymob` verifies the HMAC and calls `apply_paid_payment` with the server-only secret key (`src/lib/supabase/admin.ts`). Details in `docs/08-PLANS-AND-PAYMENTS.md`.
 
 ## Added in Phase 6 (as built)

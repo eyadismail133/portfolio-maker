@@ -8,7 +8,7 @@ Do these steps once in the Supabase dashboard for the project in `.env.local`. U
 3. Check **Table Editor**: `profiles`, `portfolios`, `assets` and `onboarding_answers` exist, each marked "RLS enabled".
 4. Check **Storage**: a public bucket named `portfolio-images` exists.
 
-5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`, then `0006_signups_domains_errors.sql`. Together they add publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views`, `portfolio_versions`, `newsletter_signups`, `custom_domains` and `error_log` exist.
+5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`, then `0006_signups_domains_errors.sql`, then `0007_publish_replacing.sql`, then `0008_hardening.sql`. Together they add publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views`, `portfolio_versions`, `newsletter_signups`, `custom_domains` and `error_log` exist.
 
 Run each file **once, in order**. Never run an older file again after a newer one: newer files change functions that older files create, and running an old file again would undo that. Later database changes will come as new numbered files.
 
@@ -36,7 +36,9 @@ Add the two values from `.env.local` under **Settings**, **Environment Variables
 ## What the security rules do
 - Every table has row level security: an account can read and change only its own rows.
 - Visitors never read tables directly. They go through four functions: read a published page, check a link name, send a contact message (published pages only, 30 an hour), count a visit. None of them can reveal a draft.
-- An account cannot change its own `plan`.
+- An account cannot change its own `plan`, and cannot ask whether another account is Pro.
+- Free accounts cannot read locked messages, even through the API.
+- The image storage limit counts the files actually stored, so it cannot be dodged by skipping or deleting image records.
 - Uploaded images go to the folder named after the account's id; nobody can write into another account's folder. Images are public to read, because published portfolios show them.
 - The bucket accepts only images, 5 MB at most. The app shrinks images to 2000 pixels and converts them to WebP before uploading.
 

@@ -25,7 +25,7 @@ Decided on 13 November 2026 and built. Limits live in `src/lib/plans.ts` and are
 
 **Principle:** nothing is held hostage. When Pro ends the account is Free again: nothing is deleted, published pages stay online, and the free limits only stop new things (a 4th portfolio, a 2nd published page, more uploads).
 
-**Where limits are enforced:** portfolios, published pages, storage, versions, messages, badge, AI (including the CV import) and custom domains are enforced by the database and cannot be bypassed. Download HTML and the PDF CV are built in the browser, so their Pro check is in the app only; someone technical could get around it. Locked messages are hidden by the app; their owner could read them through the API. Both are acceptable for now.
+**Where limits are enforced:** portfolios, published pages, storage, versions, messages, badge, AI (including the CV import) and custom domains are enforced by the database and cannot be bypassed. Download HTML and the PDF CV are built in the browser, so their Pro check is in the app only; someone technical could get around it. That is acceptable for now. Locked messages are hidden by the database too (`0008`): the table shows them only to Pro accounts, and the inbox reads through `list_messages()`, which returns locked messages with their name, email and text left empty for Free accounts.
 
 ## Price and how people pay
 - **250 EGP or 6 USD a month**, bought as prepaid months: 1, 3, 6 or 12. Straight multiples, no discount yet; change `MONTHLY_PRICE` or add a yearly discount in `src/lib/plans.ts` (and the `months` list in the migration if new lengths are added).

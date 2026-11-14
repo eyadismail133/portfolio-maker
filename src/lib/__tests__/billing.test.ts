@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { isGenuineCallback, readOutcome, transactionHmac } from "../billing/paymob";
 import { COMPARISON, effectivePlan, formatPrice, LIMITS, MONTH_OPTIONS, priceFor } from "../plans";
@@ -109,17 +109,31 @@ describe("Paymob callbacks", () => {
 });
 
 describe("limits", () => {
-  const sql = readFileSync("supabase/migrations/0004_plans_and_billing.sql", "utf8");
+  const dir = "supabase/migrations/";
+  const files = readdirSync(dir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort()
+    .map((f) => readFileSync(dir + f, "utf8"));
+  /** The newest migration that (re)defines this function: the one the database runs. */
+  const latest = (fn: string) =>
+    [...files].reverse().find((sql) => sql.includes(`function public.${fn}(`)) ?? "";
 
   test("the app and the database use the same limits", () => {
-    expect(sql).toContain(`if existing >= ${LIMITS.portfolios.free} then`);
-    expect(sql).toContain(
+    const limits = latest("enforce_portfolio_limits");
+    expect(limits).toContain(`if existing >= ${LIMITS.portfolios.free} then`);
+    expect(limits).toContain(
       `case when pro then ${LIMITS.published.pro} else ${LIMITS.published.free} end`,
     );
-    expect(sql).toContain(`then ${LIMITS.storageBytes.pro} else ${LIMITS.storageBytes.free} end`);
-    expect(sql).toContain(`then ${LIMITS.versions.pro} else ${LIMITS.versions.free} end`);
-    expect(sql).toContain(`this_month >= ${LIMITS.messagesPerMonth.free}`);
-    expect(sql).toContain("months in (1, 3, 6, 12)");
+    expect(latest("can_upload")).toContain(
+      `then ${LIMITS.storageBytes.pro} else ${LIMITS.storageBytes.free} end`,
+    );
+    expect(latest("trim_portfolio_versions")).toContain(
+      `then ${LIMITS.versions.pro} else ${LIMITS.versions.free} end`,
+    );
+    expect(latest("submit_contact_message")).toContain(
+      `this_month >= ${LIMITS.messagesPerMonth.free}`,
+    );
+    expect(files.join("\n")).toContain("months in (1, 3, 6, 12)");
   });
 
   test("the comparison table on the Go Pro page names every limit", () => {
