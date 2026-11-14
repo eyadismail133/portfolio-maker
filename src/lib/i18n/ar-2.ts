@@ -419,6 +419,8 @@ export const AR_2: Record<string, string> = {
   "The portfolio and its published page are removed for good. This cannot be undone.":
     "سيُحذف الملف وصفحته المنشورة نهائياً. لا يمكن التراجع عن ذلك.",
   "The report could not be sent. Try again.": "تعذّر إرسال البلاغ. حاول مرة أخرى.",
+  "The spam check did not pass. Wait for it to finish, then send again.":
+    "لم يكتمل التحقق من الرسائل المزعجة. انتظر حتى ينتهي ثم أرسل مرة أخرى.",
   "The result": "النتيجة",
   "The same portfolio, four designs. Nothing was retyped.":
     "الملف نفسه بأربعة تصاميم. دون إعادة كتابة أي شيء.",

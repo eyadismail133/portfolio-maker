@@ -192,6 +192,13 @@ export async function listMessages(): Promise<Message[]> {
   }));
 }
 
+/** How many messages the account has not opened yet, counted in the database. */
+export async function unreadMessageCount(): Promise<number> {
+  const { data, error } = await createClient().rpc("unread_message_count");
+  if (error) throw error;
+  return Number(data ?? 0);
+}
+
 export async function setMessageRead(id: string, isRead: boolean): Promise<void> {
   const { error } = await createClient()
     .from("form_submissions")

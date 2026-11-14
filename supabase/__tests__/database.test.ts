@@ -260,10 +260,34 @@ beforeAll(async () => {
     `insert into form_submissions (portfolio_id, name, email, message, created_at) select '${p1}', 'n', 'e@x.co', 'm', now() - interval '2 hours' from generate_series(1, 50)`,
   );
   check(
-    "visitor message accepted",
-    (await as("anon", null, "select submit_contact_message('ann', 'Vi', 'v@x.co', 'Hello') r"))
-      .rows[0].r === "ok",
+    "a visitor's message sent by the server is accepted",
+    (
+      await as(
+        "service_role",
+        null,
+        "select submit_contact_message('ann', 'Vi', 'v@x.co', 'Hello') r",
+      )
+    ).rows[0].r === "ok",
   );
+  // 0010: the forms go through the server, which runs the spam check first
+  for (const [role, sub] of [
+    ["anon", null],
+    ["authenticated", B],
+  ] as const) {
+    check(
+      `${role}: cannot call the form functions directly`,
+      /permission denied/.test(
+        (await as(role, sub, "select submit_contact_message('ann', 'X', 'x@x.co', 'Hi')")).error ??
+          "",
+      ) &&
+        /permission denied/.test(
+          (await as(role, sub, "select submit_newsletter_signup('ann', 'x@x.co')")).error ?? "",
+        ) &&
+        /permission denied/.test(
+          (await as(role, sub, "select submit_abuse_report('ann', 'spam', '', '')")).error ?? "",
+        ),
+    );
+  }
   check(
     "free: 51st message this month is locked",
     (await q("select locked from form_submissions where name = 'Vi'"))[0].locked === true,
@@ -540,10 +564,10 @@ beforeAll(async () => {
     (await as("authenticated", B, "select use_ai_credit(50) n")).rows[0].n === 49,
   );
   check(
-    "visitor can report a published page",
+    "a visitor's report sent by the server is stored",
     (
       await as(
-        "anon",
+        "service_role",
         null,
         "select submit_abuse_report('ann', 'spam', 'Selling fake followers', 'r@x.co') r",
       )
@@ -551,13 +575,13 @@ beforeAll(async () => {
   );
   check(
     "reports about unknown pages are refused",
-    (await as("anon", null, "select submit_abuse_report('nobody-here', 'spam', '', '') r")).rows[0]
-      ?.r === "not_found",
+    (await as("service_role", null, "select submit_abuse_report('nobody-here', 'spam', '', '') r"))
+      .rows[0]?.r === "not_found",
   );
   check(
     "reports with an unknown reason are refused",
-    (await as("anon", null, "select submit_abuse_report('ann', 'whatever', '', '') r")).rows[0]
-      ?.r === "invalid",
+    (await as("service_role", null, "select submit_abuse_report('ann', 'whatever', '', '') r"))
+      .rows[0]?.r === "invalid",
   );
   check(
     "visitors cannot read reports",
@@ -570,7 +594,7 @@ beforeAll(async () => {
   check("the report was stored", (await q("select count(*)::int n from abuse_reports"))[0].n === 1);
   // 0006: newsletter sign-ups
   const signup = (slug: string, email: string) =>
-    as("anon", null, "select submit_newsletter_signup($1, $2) r", [slug, email]);
+    as("service_role", null, "select submit_newsletter_signup($1, $2) r", [slug, email]);
   check(
     "visitors can sign up on a published page",
     (await signup("ann", "Reader@x.co")).rows[0]?.r === "ok",
@@ -665,6 +689,82 @@ beforeAll(async () => {
   check(
     "the server can write the error log",
     !(await as("service_role", null, "insert into error_log (message) values ('boom')")).error,
+  );
+
+  // 0009: owners on messages, sign-ups and visits; small lookups; indexes
+  check(
+    "every message, sign-up and visit row carries its page owner",
+    Number(
+      (
+        await q(`select
+          (select count(*) from form_submissions s join portfolios p on p.id = s.portfolio_id where s.owner_id <> p.user_id)
+          + (select count(*) from newsletter_signups s join portfolios p on p.id = s.portfolio_id where s.owner_id <> p.user_id)
+          + (select count(*) from page_views s join portfolios p on p.id = s.portfolio_id where s.owner_id <> p.user_id) as n`)
+      )[0].n,
+    ) === 0 && Number((await q("select count(*) n from page_views"))[0].n) > 0,
+  );
+  await q(
+    `insert into form_submissions (portfolio_id, owner_id, name, email, message) values ('${p1}', '${B}', 'Forged', 'f@x.co', 'm')`,
+  );
+  check(
+    "a message's owner comes from its page, not from the insert",
+    (await q("select owner_id from form_submissions where name = 'Forged'"))[0].owner_id === A,
+  );
+  const unreadA = Number(
+    (
+      await q(
+        `select count(*) n from form_submissions where portfolio_id = '${p1}' and not is_read`,
+      )
+    )[0].n,
+  );
+  check(
+    "the unread count includes locked messages",
+    (await as("authenticated", A, "select unread_message_count() n")).rows[0]?.n === unreadA &&
+      unreadA > 50,
+    String(unreadA),
+  );
+  check(
+    "other accounts count no unread messages of others",
+    (await as("authenticated", B, "select unread_message_count() n")).rows[0]?.n === 0,
+  );
+  check(
+    "visitors cannot count messages",
+    !!(await as("anon", null, "select unread_message_count()")).error,
+  );
+  const langs = (await as("anon", null, "select published_languages('ann') l")).rows[0]?.l;
+  check(
+    "a published page's languages come without the page",
+    Array.isArray(langs),
+    JSON.stringify(langs),
+  );
+  check(
+    "an unknown page has no languages",
+    (await as("anon", null, "select published_languages('nobody-here') l")).rows[0]?.l === null,
+  );
+  check(
+    "the owner still reads their visit counts",
+    Number(
+      (await as("authenticated", A, "select coalesce(sum(views), 0) n from page_views")).rows[0]?.n,
+    ) >= 40,
+  );
+  const wanted = [
+    "form_submissions_owner_idx",
+    "newsletter_signups_owner_idx",
+    "page_views_owner_day_idx",
+    "assets_portfolio_id_idx",
+    "onboarding_answers_user_id_idx",
+    "portfolio_versions_user_id_idx",
+    "custom_domains_user_id_idx",
+    "abuse_reports_slug_created_idx",
+    "profiles_pro_until_idx",
+  ];
+  const haveIdx = (await q("select indexname from pg_indexes where schemaname = 'public'")).map(
+    (r) => r.indexname,
+  );
+  check(
+    "the new indexes exist",
+    wanted.every((name) => haveIdx.includes(name)),
+    wanted.filter((name) => !haveIdx.includes(name)).join(", "),
   );
 
   check(

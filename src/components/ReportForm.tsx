@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { BrandMark, inputClass, Label, primaryButtonClass } from "@/editor/ui";
 
 const REASONS = [
@@ -14,14 +14,65 @@ const REASONS = [
   ["other", "Something else"],
 ] as const;
 
-/** Lets a visitor tell the site owner about a published page that breaks the rules. */
-export function ReportForm() {
+type Turnstile = {
+  render: (box: HTMLElement, options: Record<string, unknown>) => string;
+  getResponse: (id: string) => string | undefined;
+  reset: (id: string) => void;
+  remove: (id: string) => void;
+};
+declare global {
+  interface Window {
+    turnstile?: Turnstile;
+  }
+}
+
+const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+
+/** Loads Cloudflare's widget script once. */
+function loadTurnstile(): Promise<Turnstile> {
+  return new Promise((resolve, reject) => {
+    if (window.turnstile) return resolve(window.turnstile);
+    let tag = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SCRIPT}"]`);
+    if (!tag) {
+      tag = document.createElement("script");
+      tag.src = TURNSTILE_SCRIPT;
+      tag.async = true;
+      document.head.appendChild(tag);
+    }
+    tag.addEventListener("load", () => (window.turnstile ? resolve(window.turnstile) : reject()));
+    tag.addEventListener("error", () => reject());
+  });
+}
+
+/**
+ * Lets a visitor tell the site owner about a published page that breaks the rules. With a site
+ * key, the spam check (Cloudflare Turnstile) runs in the form; the server refuses reports without it.
+ */
+export function ReportForm({ siteKey }: { siteKey: string | null }) {
   const slug = useSearchParams().get("page") ?? "";
+  const checkBox = useRef<HTMLDivElement>(null);
+  const checkId = useRef<string | null>(null);
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [problem, setProblem] = useState("");
+
+  useEffect(() => {
+    const box = checkBox.current;
+    if (!siteKey || !box) return;
+    let gone = false;
+    loadTurnstile()
+      .then((turnstile) => {
+        if (!gone) checkId.current = turnstile.render(box, { sitekey: siteKey });
+      })
+      .catch(() => undefined);
+    return () => {
+      gone = true;
+      if (checkId.current && window.turnstile) window.turnstile.remove(checkId.current);
+      checkId.current = null;
+    };
+  }, [siteKey, slug]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,6 +86,7 @@ export function ReportForm() {
         details,
         email,
         website: new FormData(event.currentTarget).get("website"),
+        turnstile: checkId.current ? (window.turnstile?.getResponse(checkId.current) ?? "") : "",
       }),
     }).catch(() => null);
     const body = (await response?.json().catch(() => null)) as {
@@ -42,12 +94,16 @@ export function ReportForm() {
       error?: string;
     } | null;
     if (body?.ok) return setState("sent");
+    // A token works once; get a fresh one for the next try.
+    if (checkId.current) window.turnstile?.reset(checkId.current);
     setProblem(
-      body?.error === "not_found"
-        ? "That page is not online any more, so there is nothing to report."
-        : body?.error === "busy"
-          ? "This page has had many reports in the last hour. Try again later."
-          : "The report could not be sent. Try again.",
+      body?.error === "check"
+        ? "The spam check did not pass. Wait for it to finish, then send again."
+        : body?.error === "not_found"
+          ? "That page is not online any more, so there is nothing to report."
+          : body?.error === "busy"
+            ? "This page has had many reports in the last hour. Try again later."
+            : "The report could not be sent. Try again.",
     );
     setState("error");
   };
@@ -127,6 +183,7 @@ export function ReportForm() {
               Website
               <input name="website" tabIndex={-1} autoComplete="off" />
             </label>
+            {siteKey && <div ref={checkBox} className="min-h-[65px]" />}
             {state === "error" && (
               <p role="alert" className="text-sm text-red-700 dark:text-red-400">
                 {problem}

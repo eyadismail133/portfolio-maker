@@ -5,6 +5,7 @@ import { buildHtmlPage } from "@/render-kit/html-page";
 import { PAGE_CSS } from "@/render-kit/generated/page-css";
 import { PAGE_SCRIPT } from "@/render-kit/page-script";
 import { siteUrl } from "@/lib/site";
+import { turnstileSiteKey } from "@/lib/visitor-check";
 import type { Lang } from "@/render-kit/schema/primitives";
 
 const BADGE_STYLE =
@@ -64,6 +65,8 @@ export async function publishedResponse(request: Request, slug: string, wanted?:
     canonical: `${origin}${pathFor(lang)}`,
     fallbackShareImage: `${origin}/api/og?slug=${encodeURIComponent(slug)}&lang=${lang}`,
     trustedFooter: badge + report,
+    // Cloudflare's free check only works on our own hostnames (see src/lib/visitor-check.ts).
+    spamCheckKey: onOwnDomain ? undefined : (turnstileSiteKey() ?? undefined),
   });
   return new Response(html, {
     headers: {

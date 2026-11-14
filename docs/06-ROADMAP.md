@@ -140,7 +140,11 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Full test pass and fixes (`docs/09-TEST-REPORT-AND-PLAN.md`): logo in navbar and footer, published pages as complete HTML, share images, animation setting, Free "Replace my live page" (`0007_publish_replacing.sql`), phone layouts, getting-started checklist, accessibility names, short menu names
 - [ ] Run `0007` in the Supabase SQL editor (owner)
 - [x] Backend audit fixes, database part (`0008_hardening.sql`): storage limit from the stored files, locked messages hidden by the database, 2 MB document limit, per-account lock for plan limits, private `is_pro`, visit counts spread over 16 rows
-- [ ] Run `0008` in the Supabase SQL editor (owner)
+- [x] Run `0008` (checked live on 14 November 2026: visitors refused by the new functions, `shard` column present, stored files carry their size)
+- [x] Backend audit fixes, speed part (`0009_scale.sql`): `owner_id` on messages, sign-ups and visits with simpler rules and indexes, missing foreign-key indexes, `unread_message_count()` and `published_languages()`; the dashboard, the page check, `/api/revalidate` (own pages only), the account lookup (login token, no auth-server call) and the daily job (ten emails at a time) use them
+- [x] Run `0009`
+- [x] Spam check on visitor forms with Cloudflare Turnstile (contact, newsletter, report); form functions server-only (`0010_server_only_forms.sql`)
+- [ ] Create the Turnstile widget, set its two keys in Vercel, deploy, then run `0010` (owner; `docs/07`, step 10)
 
 ## Risks to watch
 | Risk | How we handle it |

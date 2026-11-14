@@ -78,6 +78,18 @@ export async function listPortfolios(): Promise<PortfolioSummary[]> {
   }));
 }
 
+/** Names and states only, without the documents: for lists that only show titles. */
+export async function listPortfolioNames(): Promise<
+  { id: string; title: string; status: "draft" | "published" }[]
+> {
+  const { data, error } = await createClient()
+    .from("portfolios")
+    .select("id, title, status")
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return data as { id: string; title: string; status: "draft" | "published" }[];
+}
+
 export async function getPortfolio(id: string): Promise<LoadedPortfolio | null> {
   const { data, error } = await createClient()
     .from("portfolios")
@@ -162,18 +174,20 @@ export type Account = { plan: Plan; proUntil: string | null; email: string };
 /** The signed-in account's plan in force, or null when nobody is signed in. */
 export async function getMyAccount(): Promise<Account | null> {
   const supabase = createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
+  // Reads the signed-in account from the login token, without asking the auth server each time.
+  const { data: auth } = await supabase.auth.getClaims();
+  const claims = auth?.claims;
+  if (!claims?.sub) return null;
   const { data } = await supabase
     .from("profiles")
     .select("plan, pro_until")
-    .eq("id", auth.user.id)
+    .eq("id", claims.sub)
     .maybeSingle();
   const row = data as { plan?: string; pro_until?: string | null } | null;
   return {
     plan: effectivePlan(row?.plan, row?.pro_until),
     proUntil: row?.pro_until ?? null,
-    email: auth.user.email ?? "",
+    email: typeof claims.email === "string" ? claims.email : "",
   };
 }
 

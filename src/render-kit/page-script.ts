@@ -2,7 +2,9 @@
  * The only script a portfolio page runs. It is written by us, never by users, and every part is
  * an extra: without it the page still shows everything and the contact form still sends.
  *
- * - Contact form: sends without leaving the page and shows the result.
+ * - Contact form: sends without leaving the page and shows the result. When the site turned
+ *   the spam check on, the form needs this script (the server refuses messages without the
+ *   check's token) and Cloudflare's widget is loaded when a visitor starts using the form.
  * - Gallery: opens images large, with arrow keys and Escape.
  * - Numbers in the stats section count up once, when they come into view.
  * - Scroll animation: "subtle" fades sections in; "lively" lifts them in and lets their cards
@@ -40,10 +42,47 @@ export const PAGE_SCRIPT = String.raw`(function () {
     elements.forEach(function (el) { seen.observe(el); });
   }
 
+  // Spam check (Cloudflare Turnstile) for forms that post to the inbox, only when the site turned
+  // it on (a meta tag carries the key). Cloudflare is loaded when a visitor starts using a form,
+  // not on every visit. Its widget adds the token to the form as "cf-turnstile-response".
+  var checkMeta = document.querySelector('meta[name="pk-turnstile"]');
+  var checkKey = checkMeta ? checkMeta.getAttribute("content") : "";
+  var checks = [];
+  var checkLoading = false;
+  function loadCheck() {
+    if (!checkKey || checkLoading) return;
+    checkLoading = true;
+    window.pkTurnstileReady = function () {
+      checks.forEach(function (check) {
+        check.id = window.turnstile.render(check.box, {
+          sitekey: checkKey,
+          language: root.getAttribute("lang") || "auto",
+          appearance: "interaction-only"
+        });
+      });
+    };
+    var tag = document.createElement("script");
+    tag.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=pkTurnstileReady";
+    tag.async = true;
+    document.head.appendChild(tag);
+  }
+  function checkToken(check) {
+    return check.id !== null && window.turnstile ? window.turnstile.getResponse(check.id) : "";
+  }
+
   // Contact form
   Array.prototype.forEach.call(root.querySelectorAll("form[data-pk-contact]"), function (form) {
     var status = form.querySelector(".pk-form__status");
     var button = form.querySelector("button[type=submit]");
+    var check = null;
+    if (checkKey) {
+      var box = document.createElement("div");
+      box.className = "pk-form__check";
+      form.insertBefore(box, button && button.parentNode === form ? button : null);
+      check = { box: box, id: null };
+      checks.push(check);
+      form.addEventListener("focusin", loadCheck);
+    }
     form.addEventListener("submit", function (event) {
       if (!window.fetch || !window.FormData) return;
       event.preventDefault();
@@ -52,17 +91,30 @@ export const PAGE_SCRIPT = String.raw`(function () {
         status.textContent = status.getAttribute("data-pk-" + key) || "";
         if (state) status.setAttribute("data-pk-state", state); else status.removeAttribute("data-pk-state");
       };
+      var send = function () {
+        fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } })
+          .then(function (response) { return response.ok ? response.json() : Promise.reject(); })
+          .then(function (result) {
+            if (!result || !result.ok) return Promise.reject();
+            form.reset();
+            say("sent");
+          })
+          .catch(function () { say("failed", "error"); })
+          .then(function () {
+            if (button) button.disabled = false;
+            // A token works once; get a fresh one for the next message.
+            if (check && check.id !== null && window.turnstile) window.turnstile.reset(check.id);
+          });
+      };
       say("sending");
       if (button) button.disabled = true;
-      fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } })
-        .then(function (response) { return response.ok ? response.json() : Promise.reject(); })
-        .then(function (result) {
-          if (!result || !result.ok) return Promise.reject();
-          form.reset();
-          say("sent");
-        })
-        .catch(function () { say("failed", "error"); })
-        .then(function () { if (button) button.disabled = false; });
+      if (!check) return send();
+      // Wait up to 8 seconds for the check to finish (it usually needs no click).
+      loadCheck();
+      var tries = 0;
+      (function wait() {
+        if (checkToken(check) || tries++ > 80) send(); else setTimeout(wait, 100);
+      })();
     });
   });
 

@@ -34,6 +34,14 @@
 .pk-form .pk-btn {
   justify-self: start;
 }
+/* Holds the spam check widget, added by the page script; usually it stays invisible. */
+.pk-form__check {
+  max-width: 100%;
+  overflow: hidden;
+}
+.pk-form__check:empty {
+  display: none;
+}
 .pk-contact__info a {
   text-decoration: underline;
   text-decoration-thickness: 1px;

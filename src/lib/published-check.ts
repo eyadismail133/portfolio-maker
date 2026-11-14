@@ -14,17 +14,16 @@ async function publishedLanguages(slug: string): Promise<string[] | null> {
   const now = Date.now();
   const hit = remembered.get(slug);
   if (hit && hit.until > now) return hit.languages;
-  const { data, error } = await createPublicClient().rpc("get_published_portfolio", {
-    p_slug: slug,
-  });
+  // Asks for the language list only, never the whole page.
+  const { data, error } = await createPublicClient().rpc("published_languages", { p_slug: slug });
   // When the database cannot be asked, let the page itself decide.
   if (error) throw error;
-  const doc = (data as { doc?: { meta?: { languages?: unknown } } }[] | null)?.[0]?.doc;
-  const languages = doc
-    ? Array.isArray(doc.meta?.languages) && doc.meta.languages.length > 0
-      ? (doc.meta.languages as string[])
-      : ["en"]
-    : null;
+  const languages =
+    data === null || data === undefined
+      ? null
+      : Array.isArray(data) && data.length > 0
+        ? (data as string[])
+        : ["en"];
   if (remembered.size > 5000) remembered.clear();
   remembered.set(slug, { languages, until: now + (languages ? FOUND_MS : MISSING_MS) });
   return languages;

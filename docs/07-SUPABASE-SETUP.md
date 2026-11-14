@@ -8,7 +8,7 @@ Do these steps once in the Supabase dashboard for the project in `.env.local`. U
 3. Check **Table Editor**: `profiles`, `portfolios`, `assets` and `onboarding_answers` exist, each marked "RLS enabled".
 4. Check **Storage**: a public bucket named `portfolio-images` exists.
 
-5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`, then `0006_signups_domains_errors.sql`, then `0007_publish_replacing.sql`, then `0008_hardening.sql`. Together they add publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views`, `portfolio_versions`, `newsletter_signups`, `custom_domains` and `error_log` exist.
+5. Do the same with `supabase/migrations/0002_publishing.sql`, then `0003_ai_and_permissions.sql`, then `0004_plans_and_billing.sql`, then `0005_reports.sql`, then `0006_signups_domains_errors.sql`, then `0007_publish_replacing.sql`, then `0008_hardening.sql`, then `0009_scale.sql`, then `0010_server_only_forms.sql` (read step 10 first). Together they add publishing, contact messages, visit counts and version history. Then check that `form_submissions`, `page_views`, `portfolio_versions`, `newsletter_signups`, `custom_domains` and `error_log` exist.
 
 Run each file **once, in order**. Never run an older file again after a newer one: newer files change functions that older files create, and running an old file again would undo that. Later database changes will come as new numbered files.
 
@@ -74,6 +74,18 @@ All of these are off until their settings exist; nothing breaks without them. Ad
 - **Custom domains (Pro):** run `0006_signups_domains_errors.sql` (step 1), then set `VERCEL_TOKEN` (Vercel → Account settings → Tokens), `VERCEL_PROJECT_ID` (project → Settings → General) and, if the project is in a team, `VERCEL_TEAM_ID`. Pro owners then connect a domain in the Publish window; it shows the DNS records to add and turns on by itself once the DNS is right. When Pro ends, the domain stops showing the page.
 - **Error log:** after 0006, server errors are written to `error_log` (message, path and kind only). Read them with `select * from public.error_log order by created_at desc limit 50;`.
 - **Backups:** on GitHub, open the repository → Settings → Secrets and variables → Actions → New repository secret named `SUPABASE_DB_URL`, with the "Session pooler" connection string from Supabase (Connect button), password filled in. `.github/workflows/backup.yml` then saves a database dump every night, kept 14 days under the Actions tab. The dump holds user data, so keep the repository private. Run it once by hand (Actions → Nightly database backup → Run workflow) to check it works. Supabase's free plan has no backups of its own.
+
+## 10. Spam check on visitor forms (Cloudflare Turnstile)
+Contact forms, newsletter sign-ups and reports can ask Cloudflare whether the sender is a person. It is off until both keys are set.
+1. In the Cloudflare dashboard open **Turnstile**, **Add widget**. Widget mode: **Managed**. Hostnames: your app's address (for example `yourapp.vercel.app` and your own domain for the app). Owners' custom domains cannot be listed on the free plan; pages there get no check (see below).
+2. Put the site key in `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and the secret key in `TURNSTILE_SECRET_KEY`, in `.env.local` and Vercel, then redeploy.
+3. Make sure `SUPABASE_SECRET_KEY` is set in Vercel too, then run `0010_server_only_forms.sql`. From then on only the server can send messages, sign-ups and reports, so nobody can skip the check by calling the database directly. Run it **after** the new site version is live: the older version sent forms with the public key and would stop working.
+
+How it behaves:
+- On published pages the page script loads Cloudflare's widget when a visitor starts filling a form. It usually decides without a click; sometimes it shows a box to tick.
+- With the check on, the forms need JavaScript. Visitors without it get a page asking them to turn it on or contact the owner another way.
+- On an owner's custom domain there is no widget. A request on such a domain may only send to the page that domain shows, and the per-page limits (30 an hour) still apply.
+- For local testing, Cloudflare's test keys always pass: site key `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`.
 
 ## Check of the live project (13 November 2026)
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { buttonClass, UiIcon } from "@/editor/ui";
-import { friendlyError, getMyAccount, listPortfolios } from "@/lib/portfolios";
+import { friendlyError, getMyAccount, listPortfolioNames, listPortfolios } from "@/lib/portfolios";
 import {
   deleteMessage,
   deleteSignup,
@@ -25,21 +25,43 @@ export function Inbox() {
   /** Why no messages can arrive yet, worked out from the account's portfolios. */
   const [reason, setReason] = useState<{ text: string; editId?: string } | null>(null);
 
+  /** Messages and sign-ups only: what marking, deleting and reloading can change. */
+  const reload = useCallback(async () => {
+    try {
+      setMessages(await listMessages());
+      setProblem("");
+    } catch (error) {
+      setMessages((current) => current ?? []);
+      setProblem(friendlyError(error));
+    }
+    // Sign-ups need migration 0006; without it the inbox still shows messages.
+    listSignups()
+      .then(setSignups)
+      .catch(() => setSignups([]));
+  }, []);
+
   const refresh = useCallback(async () => {
     try {
-      const [list, portfolios, account] = await Promise.all([
+      // Page names only; whole documents are read just when the inbox is empty, to explain why.
+      const [list, names, account] = await Promise.all([
         listMessages(),
-        listPortfolios(),
+        listPortfolioNames(),
         getMyAccount(),
       ]);
       setPlan(account?.plan ?? null);
       setMessages(list);
-      setTitles(Object.fromEntries(portfolios.map((p) => [p.id, p.title])));
-      const published = portfolios.filter((p) => p.status === "published");
-      const withoutForm = published.find(
-        (p) =>
-          !p.doc?.sections.some((s) => s.type === "contact" && !s.hidden && s.variant === "form"),
-      );
+      setTitles(Object.fromEntries(names.map((p) => [p.id, p.title])));
+      const published = names.filter((p) => p.status === "published");
+      const withoutForm =
+        list.length === 0 && published.length > 0
+          ? (await listPortfolios()).find(
+              (p) =>
+                p.status === "published" &&
+                !p.doc?.sections.some(
+                  (s) => s.type === "contact" && !s.hidden && s.variant === "form",
+                ),
+            )
+          : undefined;
       setReason(
         published.length === 0
           ? {
@@ -72,7 +94,7 @@ export function Inbox() {
   const act = async (action: () => Promise<void>) => {
     try {
       await action();
-      await refresh();
+      await reload();
     } catch (error) {
       setProblem(friendlyError(error));
     }

@@ -116,7 +116,9 @@ describe("limits", () => {
     .map((f) => readFileSync(dir + f, "utf8"));
   /** The newest migration that (re)defines this function: the one the database runs. */
   const latest = (fn: string) =>
-    [...files].reverse().find((sql) => sql.includes(`function public.${fn}(`)) ?? "";
+    [...files]
+      .reverse()
+      .find((sql) => new RegExp(`create (or replace )?function public\\.${fn}\\(`).test(sql)) ?? "";
 
   test("the app and the database use the same limits", () => {
     const limits = latest("enforce_portfolio_limits");

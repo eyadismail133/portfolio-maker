@@ -31,6 +31,11 @@ export type HtmlOptions = {
   fallbackShareImage?: string;
   /** Extra markup at the end of the page, written by our own code only (never by users). */
   trustedFooter?: string;
+  /**
+   * Public site key of the spam check (Cloudflare Turnstile) for forms that post to the inbox.
+   * The page script reads it from a meta tag and shows the check when a visitor uses a form.
+   */
+  spamCheckKey?: string;
 };
 
 /**
@@ -82,7 +87,7 @@ ${options.canonical ? `<link rel="canonical" href="${escapeHtml(options.canonica
 <link rel="stylesheet" href="${escapeHtml(googleFontsUrl(doc.theme, doc.meta.languages))}">
 <style>html{scroll-behavior:smooth}body{margin:0}</style>
 ${style}
-</head>
+${options.spamCheckKey ? `<meta name="pk-turnstile" content="${escapeHtml(options.spamCheckKey)}">\n` : ""}</head>
 <body>
 ${body}
 ${options.trustedFooter ?? ""}

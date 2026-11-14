@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
       .gte("pro_until", new Date(now + 3 * day).toISOString())
       .lt("pro_until", new Date(now + 4 * day).toISOString())
       .limit(500);
-    for (const profile of ending ?? []) {
+    const remind = async (profile: { id: string; pro_until: string }) => {
       const to = await accountEmail(String(profile.id));
-      if (!to) continue;
+      if (!to) return false;
       const until = new Date(profile.pro_until).toLocaleDateString("en-GB", { dateStyle: "long" });
-      const sent = await sendEmail({
+      return sendEmail({
         to,
         subject: "Your Pro months end in 3 days",
         paragraphs: [
@@ -43,7 +43,13 @@ export async function GET(request: NextRequest) {
         ],
         action: { label: "Add Pro months", href: `${siteUrl()}/pro` },
       });
-      if (sent) reminded += 1;
+    };
+    // Ten at a time: one by one, 500 accounts would take minutes; all at once would flood the
+    // auth and email services.
+    const list = (ending ?? []) as { id: string; pro_until: string }[];
+    for (let i = 0; i < list.length; i += 10) {
+      const sent = await Promise.all(list.slice(i, i + 10).map(remind));
+      reminded += sent.filter(Boolean).length;
     }
   }
 

@@ -1,6 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { notifyNewMessage } from "@/lib/notify";
-import { createPublicClient } from "@/lib/supabase/public";
+import { formClient, visitorMaySend } from "@/lib/visitor-check";
 
 const escape = (value: string) =>
   value.replace(
@@ -9,15 +9,17 @@ const escape = (value: string) =>
   );
 
 /** A plain page for visitors whose browser sent the form without the page script. */
-function htmlAnswer(ok: boolean, slug: string, status = 200, signup = false) {
+function htmlAnswer(ok: boolean, slug: string, status = 200, signup = false, check = false) {
   const back = /^[a-z0-9-]{3,50}$/.test(slug) ? `/p/${slug}` : "/";
-  const text = ok
-    ? signup
-      ? "Thank you. You are signed up."
-      : "Thank you. Your message was sent."
-    : signup
-      ? "The sign-up did not go through. Go back and try again."
-      : "The message could not be sent. Go back and try again.";
+  const text = check
+    ? "This form checks for spam with JavaScript. Turn JavaScript on and try again, or contact the owner another way."
+    : ok
+      ? signup
+        ? "Thank you. You are signed up."
+        : "Thank you. Your message was sent."
+      : signup
+        ? "The sign-up did not go through. Go back and try again."
+        : "The message could not be sent. Go back and try again.";
   return new NextResponse(
     `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(text)}</title><body style="font-family:system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;line-height:1.5"><p>${escape(text)}</p><p><a href="${escape(back)}">Back to the page</a></p></body></html>`,
     { status, headers: { "content-type": "text/html; charset=utf-8" } },
@@ -32,8 +34,10 @@ export async function POST(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get("slug") ?? "";
   const signup = request.nextUrl.searchParams.get("kind") === "signup";
   const wantsJson = (request.headers.get("accept") ?? "").includes("application/json");
-  const answer = (ok: boolean, status = 200) =>
-    wantsJson ? NextResponse.json({ ok }, { status }) : htmlAnswer(ok, slug, status, signup);
+  const answer = (ok: boolean, status = 200, check = false) =>
+    wantsJson
+      ? NextResponse.json({ ok, ...(check ? { error: "check" } : {}) }, { status })
+      : htmlAnswer(ok, slug, status, signup, check);
 
   let form: FormData;
   try {
@@ -44,11 +48,15 @@ export async function POST(request: NextRequest) {
   const field = (name: string) => String(form.get(name) ?? "").trim();
   // Spam robots fill in the hidden field; pretend it worked and drop the message.
   if (field("website")) return answer(true);
+  // The spam check's token, added to the form by the page script (see src/lib/visitor-check.ts).
+  if (!(await visitorMaySend(request, slug, field("cf-turnstile-response"))))
+    return answer(false, 403, true);
+  const db = await formClient();
 
   if (signup) {
     const address = field("email").slice(0, 200);
     if (!address.includes("@")) return answer(false, 400);
-    const { data, error } = await createPublicClient().rpc("submit_newsletter_signup", {
+    const { data, error } = await db.rpc("submit_newsletter_signup", {
       p_slug: slug,
       p_email: address,
     });
@@ -62,7 +70,7 @@ export async function POST(request: NextRequest) {
   const message = field("message").slice(0, 5000);
   if (!name || !email.includes("@") || !message) return answer(false, 400);
 
-  const { data, error } = await createPublicClient().rpc("submit_contact_message", {
+  const { data, error } = await db.rpc("submit_contact_message", {
     p_slug: slug,
     p_name: name,
     p_email: email,

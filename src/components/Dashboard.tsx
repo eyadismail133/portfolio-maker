@@ -22,7 +22,7 @@ import {
   type PortfolioSummary,
 } from "@/lib/portfolios";
 import { publishChecks } from "@/lib/publish-checks";
-import { listMessages, viewCounts } from "@/lib/publishing";
+import { unreadMessageCount, viewCounts } from "@/lib/publishing";
 import { createClient } from "@/lib/supabase/client";
 import { MiniPreview } from "./MiniPreview";
 
@@ -294,8 +294,8 @@ export function Dashboard() {
       getMyAccount()
         .then((found) => !cancelled && setAccount(found))
         .catch(() => undefined);
-      listMessages()
-        .then((messages) => !cancelled && setUnread(messages.filter((m) => !m.isRead).length))
+      unreadMessageCount()
+        .then((count) => !cancelled && setUnread(count))
         .catch(() => undefined);
     })();
     return () => {

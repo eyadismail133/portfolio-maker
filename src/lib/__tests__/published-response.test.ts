@@ -47,4 +47,25 @@ describe("published pages", () => {
     expect(html).toContain('<link rel="canonical" href="https://layla.dev/">');
     expect(html).toContain('hreflang="ar" href="/ar"');
   });
+
+  test("the spam check key is on our own hostnames only, and only when it is switched on", async () => {
+    const own = () =>
+      publishedResponse(
+        new Request("https://layla.dev/", { headers: { host: "layla.dev" } }),
+        "layla",
+      );
+    expect(await (await publishedResponse(request("/p/layla"), "layla")).text()).not.toContain(
+      '<meta name="pk-turnstile"',
+    );
+    vi.stubEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", "site-key-1");
+    vi.stubEnv("TURNSTILE_SECRET_KEY", "secret-1");
+    try {
+      expect(await (await publishedResponse(request("/p/layla"), "layla")).text()).toContain(
+        '<meta name="pk-turnstile" content="site-key-1">',
+      );
+      expect(await (await own()).text()).not.toContain('<meta name="pk-turnstile"');
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });

@@ -39,6 +39,7 @@
   color: var(--pk-muted);
   font-size: 0.875rem;
 }
-.pk-news__status {
+.pk-news__status,
+.pk-news__form .pk-form__check {
   flex-basis: 100%;
 }

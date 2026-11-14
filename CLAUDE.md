@@ -23,7 +23,7 @@ Read `README.md` first, then the doc for the area you are touching. The plan liv
 - A CSS variable that refers to a section color (for example `--pk-rule`) must be declared on `.pk-section`, not on `.pk-root`.
 - New section: add its folder, add it to `sections/index.ts`, add its CSS to `styles/index.css`. The tests then check it in every variant, in both languages, and with empty content.
 - `src/render-kit/generated/page-css.ts` is made by `npm run css`; never edit it by hand. Commit it together with any CSS change.
-- `render-kit/page-script.ts` is the only script on a portfolio page. Anything it adds must be an extra: the page must work without it.
+- `render-kit/page-script.ts` is the only script on a portfolio page. Anything it adds must be an extra: the page must work without it. The one exception: with the spam check on, inbox forms need it (`docs/03-ARCHITECTURE.md`).
 - Look at the result: `npm run samples` writes plain HTML files, and `/dev/render` shows the same pages with switches.
 
 ## When you finish a task
