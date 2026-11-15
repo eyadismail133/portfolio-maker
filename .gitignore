@@ -43,3 +43,8 @@ next-env.d.ts
 out-samples
 screenshots
 screenshots-baseline
+
+# load test: fake account password and results
+/loadtest/.loadtest-data.json
+/loadtest/results/*
+!/loadtest/results/.gitkeep

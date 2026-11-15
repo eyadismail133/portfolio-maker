@@ -12,10 +12,12 @@ export type Published = {
 
 export const publishedTag = (slug: string) => `published:${slug}`;
 
-/** The public version of a portfolio, or null. Cached for a few minutes and refreshed on publish. */
+/** The public version of a portfolio, or null. Cached for hours and cleared on publish. */
 export async function getPublished(slug: string): Promise<Published | null> {
   "use cache";
-  cacheLife("minutes");
+  // Kept for hours: publishing, unpublishing and replacing clear the tag at once, and a page taken
+  // offline any other way gets a 404 from the proxy's own check within a minute.
+  cacheLife("hours");
   cacheTag(publishedTag(slug));
   if (!/^[a-z0-9-]{3,50}$/.test(slug)) return null;
   const { data, error } = await createPublicClient().rpc("get_published_portfolio", {

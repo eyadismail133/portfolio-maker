@@ -13,6 +13,8 @@
     "samples": "tsx scripts/render-samples.tsx",
     "visual": "tsx scripts/visual-check.tsx",
     "css": "tsx scripts/build-css.ts",
+    "loadtest:seed": "tsx loadtest/seed.ts",
+    "loadtest:cleanup": "tsx loadtest/cleanup.ts",
     "predev": "npm run css",
     "prebuild": "npm run css",
     "pretest": "npm run css"

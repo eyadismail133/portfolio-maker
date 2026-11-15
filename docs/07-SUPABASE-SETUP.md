@@ -65,7 +65,7 @@ Until steps 2 and 3 are filled in, `/pro` says "Payments open soon" and nothing 
 ## 8. Legal pages and reports
 - Add `NEXT_PUBLIC_LEGAL_NAME` (your business or your own name) and `NEXT_PUBLIC_CONTACT_EMAIL` (where people write about privacy, refunds and reports) in `.env.local` and Vercel. Until then the terms, privacy and refund pages show "[business name]" and "[contact email]".
 - The texts in `src/app/terms`, `src/app/privacy` and `src/app/refunds` are a plain-language starting point, not legal advice. Have a lawyer in Egypt review them before taking real payments. The refund rule (full refund within 14 days of the first purchase) is a suggested default: change it if you want something else.
-- Visitors' reports land in the `abuse_reports` table. Read them in the Table Editor; mark them `reviewed` or `actioned` in the `status` column. To take a page offline, set its portfolio's `status` to `draft` in the `portfolios` table.
+- Visitors' reports land in the `abuse_reports` table. Read them in the Table Editor; mark them `reviewed` or `actioned` in the `status` column. To take a page offline, set its portfolio's `status` to `draft` in the `portfolios` table; visitors get "not found" within about a minute.
 
 ## 9. Emails, daily job, custom domains, error log and backups (optional)
 All of these are off until their settings exist; nothing breaks without them. Add each setting in `.env.local` and in Vercel (Settings → Environment Variables), then redeploy.

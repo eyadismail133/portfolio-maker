@@ -147,6 +147,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Create the Turnstile widget, set its two keys in Vercel, deploy, then run `0010` (checked live on 14 November 2026)
 - [x] Visit counter: one browser counts once per page every 30 minutes
 - [x] Dashboard loads portfolios 12 at a time; published pages cache their finished HTML; signed-in pages read the account from the login token
+- [x] Load-test kit (`loadtest/`): fake-data seed and cleanup scripts, k6 test for visitors, editors and spam robots sized for the free plans
+- [ ] Run the load test before launch, then clean up (owner; `loadtest/README.md`)
 
 ## Risks to watch
 | Risk | How we handle it |

@@ -67,7 +67,7 @@ async function publishedHtml(
   spamCheckKey: string | null,
 ): Promise<string | null> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours"); // same rule as getPublished
   cacheTag(publishedTag(slug));
   const found = await getPublished(slug);
   if (!found) return null;
