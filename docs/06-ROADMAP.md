@@ -148,7 +148,8 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Visit counter: one browser counts once per page every 30 minutes
 - [x] Dashboard loads portfolios 12 at a time; published pages cache their finished HTML; signed-in pages read the account from the login token
 - [x] Load-test kit (`loadtest/`): fake-data seed and cleanup scripts, k6 test for visitors, editors and spam robots sized for the free plans
-- [ ] Run the load test before launch, then clean up (owner; `loadtest/README.md`)
+- [x] Run the load test (15 November 2026, twice): all speed targets met on the second run; a 40-second stall of the free database caused 32 failed saves; the page cache did nothing on Vercel
+- [x] Published page data in Vercel's shared Runtime Cache (`use cache: remote`); the HTML is drawn per visit
 
 ## Risks to watch
 | Risk | How we handle it |

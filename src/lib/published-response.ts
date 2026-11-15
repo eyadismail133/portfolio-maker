@@ -1,6 +1,5 @@
-import { cacheLife, cacheTag } from "next/cache";
 import { isAppHost } from "@/lib/custom-domain";
-import { getPublished, publishedTag } from "@/lib/published";
+import { getPublished, type Published } from "@/lib/published";
 import { NOT_FOUND_HTML } from "@/lib/published-check";
 import { buildHtmlPage } from "@/render-kit/html-page";
 import { PAGE_CSS } from "@/render-kit/generated/page-css";
@@ -43,34 +42,29 @@ export async function publishedResponse(request: Request, slug: string, wanted?:
   const origin = `${url.protocol}//${host}`;
   // Cloudflare's free check only works on our own hostnames (see src/lib/visitor-check.ts).
   const spamCheckKey = onOwnDomain ? null : turnstileSiteKey();
-  const html = await publishedHtml(slug, lang, origin, onOwnDomain, spamCheckKey);
-  if (html === null) return notFound();
+  const html = await publishedHtml(found, slug, lang, origin, onOwnDomain, spamCheckKey);
   return new Response(html, {
     headers: {
       "content-type": "text/html; charset=utf-8",
-      // Always fresh, so a new publish shows at once; the page itself is cached on the server.
+      // Always fresh, so a new publish shows at once; the page data is cached on the server.
       "cache-control": "public, max-age=0, must-revalidate",
     },
   });
 }
 
 /**
- * The finished HTML of one page, language and address. Drawing a whole page takes real work, so
- * it is cached like the page data and thrown away by the same tag when the owner publishes.
- * Only a few addresses reach this (the app's own and the owner's domain), so few copies exist.
+ * The finished HTML of one page, language and address. Drawn on every visit from the cached page
+ * data: it takes a few milliseconds of CPU, while caching the result (about 140 KB) in Vercel's
+ * shared cache would use up the Hobby read allowance about 18 times faster than the data alone.
  */
 async function publishedHtml(
+  found: Published,
   slug: string,
   lang: Lang,
   origin: string,
   onOwnDomain: boolean,
   spamCheckKey: string | null,
-): Promise<string | null> {
-  "use cache";
-  cacheLife("hours"); // same rule as getPublished
-  cacheTag(publishedTag(slug));
-  const found = await getPublished(slug);
-  if (!found) return null;
+): Promise<string> {
   const { doc } = found;
   const base = onOwnDomain ? "" : `/p/${slug}`;
   const pathFor = (l: Lang) => (l === doc.meta.languages[0] ? base || "/" : `${base}/${l}`);
