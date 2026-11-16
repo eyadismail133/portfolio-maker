@@ -54,6 +54,9 @@
 @import "../sections/before-after/before-after.css";
 @import "../sections/careers/careers.css";
 @import "../sections/booking/booking.css";
+@import "../sections/showcase-devices/showcase-devices.css";
+@import "../sections/showcase-bento/showcase-bento.css";
+@import "../sections/showcase-marquee/showcase-marquee.css";
 @import "./section-style.css";
 @import "./personality.css";
 @import "./elements.css";

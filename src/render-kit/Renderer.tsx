@@ -32,6 +32,11 @@ type Props = {
    * stay visible (dimmed by the editor). Never set for published pages or downloads.
    */
   editing?: boolean;
+  /**
+   * False for a live page whose owner is no longer Pro: Pro showcase sections draw their plain
+   * fallback layout, so the page stays online and complete. The editor and downloads keep true.
+   */
+  pro?: boolean;
 };
 
 const LANGUAGE_NAMES: Record<Lang, string> = { en: "English", ar: "العربية" };
@@ -45,6 +50,7 @@ export function Renderer({
   formAction,
   standalone,
   editing = false,
+  pro = true,
 }: Props) {
   const language = lang && doc.meta.languages.includes(lang) ? lang : doc.meta.languages[0];
   const visible = doc.sections.flatMap((section) => {
@@ -105,7 +111,7 @@ export function Renderer({
       )}
       {sorted.map(({ section, def }) => {
         const variant = def.variants[section.variant] ?? def.variants[def.defaultVariant];
-        const Component = variant.component;
+        const Component = !pro && def.pro && def.fallback ? def.fallback : variant.component;
         const Tag =
           def.pinned === "top" ? "header" : def.pinned === "bottom" ? "footer" : "section";
         const look = sectionLook(section.style, doc.theme.palette, language);

@@ -67,7 +67,8 @@ export type FieldDef = {
   fields?: FieldDef[];
 };
 
-export type SectionCategory = "start" | "profile" | "work" | "business" | "trust" | "free";
+export type SectionCategory =
+  "start" | "profile" | "work" | "business" | "trust" | "free" | "showcase";
 
 export type SectionDefinition<S extends z.ZodType> = {
   type: string;
@@ -83,6 +84,16 @@ export type SectionDefinition<S extends z.ZodType> = {
   navLabel?: (content: z.output<S>) => LocalizedText | undefined;
   /** Navbar and footer stay pinned to the top and bottom of the page. */
   pinned?: "top" | "bottom";
+  /**
+   * A Pro showcase section: anyone can try it in the editor, only Pro accounts can publish or
+   * download it (the database checks publishing). Lists the types in `src/lib/plans.ts` too.
+   */
+  pro?: true;
+  /**
+   * The plain layout a Pro section shows on a live page whose owner is no longer Pro, so the page
+   * stays online and complete. Required for Pro sections.
+   */
+  fallback?: VariantComponent<z.output<S>>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,6 +104,9 @@ export function defineSection<S extends z.ZodType>(
 ): SectionDefinition<S> {
   if (!def.variants[def.defaultVariant]) {
     throw new Error(`Section "${def.type}" has no variant "${def.defaultVariant}"`);
+  }
+  if (def.pro && !def.fallback) {
+    throw new Error(`Pro section "${def.type}" needs a fallback layout`);
   }
   return def;
 }

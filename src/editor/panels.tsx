@@ -33,6 +33,7 @@ const CATEGORY_NAMES: Record<SectionCategory, string> = {
   business: "Business",
   trust: "Trust and contact",
   free: "Free blocks",
+  showcase: "Pro showcase",
 };
 
 function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
@@ -79,7 +80,14 @@ function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
                         }}
                         className="rounded-xl border border-zinc-200/90 bg-white px-3.5 py-3 text-start text-sm shadow-2xs transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-600 hover:bg-blue-50/70 hover:shadow-xs focus-visible:outline-2 focus-visible:outline-blue-600 disabled:pointer-events-none disabled:opacity-40 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-500 dark:hover:bg-blue-950/60"
                       >
-                        <span className="block font-semibold tracking-tight">{def.name}</span>
+                        <span className="flex items-center gap-1.5 font-semibold tracking-tight">
+                          {def.name}
+                          {def.pro && (
+                            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-900 dark:bg-amber-900/60 dark:text-amber-100">
+                              Pro
+                            </span>
+                          )}
+                        </span>
                         <span className="mt-0.5 block text-xs text-zinc-500">
                           {taken
                             ? "Already on the page"

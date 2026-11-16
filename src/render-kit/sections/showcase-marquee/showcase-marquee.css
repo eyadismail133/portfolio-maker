@@ -1,0 +1,127 @@
+/* Moving band (Pro). The track holds the list twice and moves by half its width, so the loop
+   is seamless. Arabic pages run it the other way. */
+.pk-marquee {
+  --pk-marquee-time: 32s;
+  display: grid;
+  /* The column keeps the visible width; the moving track overflows it, clipped. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.pk-marquee[data-pk-speed="slow"] {
+  --pk-marquee-time: 52s;
+}
+.pk-marquee[data-pk-speed="fast"] {
+  --pk-marquee-time: 18s;
+}
+.pk-marquee__label {
+  color: var(--pk-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+.pk-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: pk-marquee var(--pk-marquee-time) linear infinite;
+}
+.pk-marquee__track--reverse {
+  animation-direction: reverse;
+}
+.pk-root[dir="rtl"] .pk-marquee__track {
+  animation-name: pk-marquee-rtl;
+}
+.pk-marquee:hover .pk-marquee__track {
+  animation-play-state: paused;
+}
+.pk-marquee__list {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+@keyframes pk-marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+@keyframes pk-marquee-rtl {
+  to {
+    translate: 50% 0;
+  }
+}
+
+/* Big words, with a mark in the main color between them. */
+.pk-marquee--words .pk-marquee__list li {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: clamp(2.2rem, 1.2rem + 4.5vw, 5rem);
+  line-height: 1.1;
+  letter-spacing: var(--pk-h-tracking);
+  white-space: nowrap;
+  padding-inline: 0.45em;
+}
+.pk-marquee--words .pk-marquee__list li::after {
+  content: "✦";
+  color: var(--pk-primary);
+  font-size: 0.5em;
+  padding-inline-start: 0.9em;
+  vertical-align: middle;
+}
+.pk-marquee--words .pk-marquee__list li:nth-child(even) {
+  color: transparent;
+  -webkit-text-stroke: max(1px, 0.02em) var(--pk-text);
+}
+
+/* Tags: two rows of pills moving opposite ways. */
+.pk-marquee--tags .pk-marquee__list {
+  gap: 12px;
+  padding-inline-end: 12px;
+}
+.pk-marquee--tags .pk-marquee__list li {
+  white-space: nowrap;
+  padding: 10px 20px;
+  border: var(--pk-tag-border);
+  background: var(--pk-tag-bg);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Standing still: no motion wanted, or the plain layout of a page that is no longer Pro. */
+.pk-marquee--still,
+.pk-root[data-pk-animation="none"] .pk-marquee {
+  mask-image: none;
+}
+.pk-marquee--still .pk-marquee__list,
+.pk-root[data-pk-animation="none"] .pk-marquee__list {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 22px;
+}
+.pk-root[data-pk-animation="none"] .pk-marquee__track {
+  width: auto;
+  animation: none;
+}
+.pk-root[data-pk-animation="none"] .pk-marquee__copy {
+  display: none;
+}
+.pk-marquee--still .pk-marquee__list li {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: clamp(1.4rem, 1rem + 1.6vw, 2.2rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-marquee {
+    mask-image: none;
+  }
+  .pk-marquee__track {
+    width: auto;
+    animation: none !important;
+  }
+  .pk-marquee__list {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pk-marquee__copy {
+    display: none;
+  }
+}

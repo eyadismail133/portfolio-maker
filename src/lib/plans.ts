@@ -24,7 +24,19 @@ export const FEATURES = {
   noBadge: { free: false, pro: true },
   pdfCv: { free: false, pro: true },
   cvImport: { free: false, pro: true },
+  /** Pro showcase sections: Free accounts may try them in the editor, not publish or download them. */
+  showcaseSections: { free: false, pro: true },
 } satisfies Record<string, Record<Plan, boolean>>;
+
+/**
+ * Section types only Pro can publish. The newest migration defining `pro_section_types()` lists
+ * the same types, and the render kit marks them `pro`; a test checks all three agree.
+ */
+export const PRO_SECTION_TYPES = [
+  "showcase-devices",
+  "showcase-bento",
+  "showcase-marquee",
+] as const;
 
 export function hasFeature(plan: Plan | null | undefined, feature: keyof typeof FEATURES): boolean {
   return Boolean(plan && FEATURES[feature][plan]);
@@ -62,7 +74,12 @@ export function effectivePlan(
 export const COMPARISON: { label: string; free: string; pro: string }[] = [
   { label: "Portfolios", free: "3", pro: "Unlimited" },
   { label: "Published pages", free: "1", pro: "10" },
-  { label: "All designs, sections and palettes", free: "Yes", pro: "Yes" },
+  { label: "Designs, sections and palettes", free: "All except showcase", pro: "All" },
+  {
+    label: "Showcase sections (device mockups, bento grid, moving band)",
+    free: "Try only",
+    pro: "Yes",
+  },
   { label: "Arabic and English", free: "Yes", pro: "Yes" },
   { label: '"Made with Portfolio Maker" badge', free: "Shown", pro: "Removed" },
   { label: "Image storage", free: "50 MB", pro: "2 GB" },

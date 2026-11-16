@@ -2,7 +2,15 @@ import { createHmac } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { isGenuineCallback, readOutcome, transactionHmac } from "../billing/paymob";
-import { COMPARISON, effectivePlan, formatPrice, LIMITS, MONTH_OPTIONS, priceFor } from "../plans";
+import {
+  COMPARISON,
+  effectivePlan,
+  formatPrice,
+  LIMITS,
+  MONTH_OPTIONS,
+  priceFor,
+  PRO_SECTION_TYPES,
+} from "../plans";
 
 const SECRET = "test-hmac-secret";
 const callback = {
@@ -152,5 +160,19 @@ describe("limits", () => {
     ]) {
       expect(labels).toContain(word);
     }
+  });
+
+  test("the app, the database and the render kit agree on the Pro section types", async () => {
+    const sql = latest("pro_section_types");
+    const listed = [...sql.matchAll(/'(showcase-[a-z-]+)'/g)].map((m) => m[1]);
+    expect(listed).toEqual([...PRO_SECTION_TYPES]);
+    const { allSections } = await import("@/render-kit/registry");
+    await import("@/render-kit/sections");
+    expect(
+      allSections()
+        .filter((s) => s.pro)
+        .map((s) => s.type),
+    ).toEqual([...PRO_SECTION_TYPES]);
+    expect(COMPARISON.map((row) => row.label).join(" ")).toContain("Showcase");
   });
 });

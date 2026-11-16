@@ -1,0 +1,112 @@
+/* Device mockups (Pro): frames drawn with the section's own colors, so every design and dark
+   mode follow. */
+.pk-dev {
+  display: grid;
+  gap: calc(var(--pk-gap) * 1.2);
+  align-items: center;
+}
+.pk-dev__copy {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+  max-width: 52ch;
+}
+.pk-dev--laptop {
+  justify-items: center;
+  text-align: center;
+}
+.pk-dev--laptop .pk-dev__copy {
+  justify-items: center;
+}
+.pk-dev__laptop {
+  width: min(100%, 860px);
+}
+.pk-dev__screen {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--pk-surface);
+  border: clamp(6px, 1.1vw, 12px) solid var(--pk-text);
+  border-radius: 16px 16px 4px 4px;
+  box-shadow: 0 34px 60px -34px rgb(0 0 0 / 0.5);
+}
+.pk-dev__base {
+  height: clamp(10px, 1.5vw, 18px);
+  margin-inline: -6%;
+  background: linear-gradient(var(--pk-text), color-mix(in srgb, var(--pk-text) 70%, var(--pk-bg)));
+  border-radius: 0 0 16px 16px;
+}
+.pk-dev__phone {
+  position: relative;
+  width: clamp(150px, 22vw, 240px);
+  aspect-ratio: 9 / 19;
+  overflow: hidden;
+  background: var(--pk-surface);
+  border: 8px solid var(--pk-text);
+  border-radius: 34px;
+  box-shadow: 0 30px 50px -28px rgb(0 0 0 / 0.55);
+}
+.pk-dev__phone::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 6px;
+  inset-inline: 36%;
+  height: 12px;
+  border-radius: 10px;
+  background: var(--pk-text);
+}
+.pk-dev__shot,
+.pk-dev__screen .pk-media,
+.pk-dev__phone .pk-media {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+  border-radius: 0;
+}
+.pk-dev__pair {
+  position: relative;
+  padding-block-end: 10%;
+  padding-inline-end: 8%;
+}
+.pk-dev__pair .pk-dev__phone {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: 28%;
+  border-width: 6px;
+  border-radius: 24px;
+}
+.pk-dev--phone {
+  justify-items: center;
+}
+@media (min-width: 900px) {
+  .pk-dev--duo {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .pk-dev--phone {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .pk-dev--phone .pk-dev__copy {
+    justify-self: start;
+  }
+}
+
+/* The phone floats a little; not with reduced motion or the animation setting "none". */
+@keyframes pk-dev-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+.pk-root:not([data-pk-animation="none"]) .pk-dev__phone {
+  animation: pk-dev-float 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-dev__phone {
+    animation: none !important;
+  }
+}

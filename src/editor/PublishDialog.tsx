@@ -12,6 +12,7 @@ import {
   type PublishState,
 } from "@/lib/publishing";
 import { LIMITS } from "@/lib/plans";
+import { getSection } from "@/render-kit/registry";
 import { cleanSlugInput, slugProblem, suggestSlug } from "@/lib/slug";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { IconButton, Label, buttonClass, inputClass, primaryButtonClass } from "./ui";
@@ -45,6 +46,9 @@ export function PublishDialog(props: {
   // Publishing this page would go over the plan's limit of live pages.
   const atLimit = Boolean(state && state.status !== "published" && state.otherLive.length >= limit);
   const canReplace = atLimit && plan === "free";
+  // Pro showcase sections can be tried by anyone but only published by Pro (the database checks).
+  const proSections = props.doc.sections.filter((s) => !s.hidden && getSection(s.type)?.pro);
+  const needsPro = plan !== "pro" && proSections.length > 0;
 
   useEffect(() => {
     ref.current?.showModal();
@@ -110,6 +114,8 @@ export function PublishDialog(props: {
         setProblem(
           "Free accounts can publish 1 page. Take your other page offline, or go Pro to publish up to 10.",
         );
+      } else if (error instanceof Error && error.message === "plan_pro_sections") {
+        setProblem("Showcase sections need Pro. Go Pro, or hide them, to publish this page.");
       } else if (error instanceof Error && error.message === "taken") {
         setAvailability("taken");
         setProblem("Someone else is already using this link name. Choose another.");
@@ -181,6 +187,15 @@ export function PublishDialog(props: {
       <div className="grid max-h-[75vh] gap-5 overflow-y-auto p-5">
         {!state && !problem && <p className="text-sm text-zinc-500">Checking your page…</p>}
 
+        {needsPro && (
+          <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100">
+            Showcase sections are part of Pro. Go Pro to publish this page, or hide or remove{" "}
+            {proSections.map((s) => getSection(s.type)?.name).join(", ")} first.{" "}
+            <a href="/pro" className="font-semibold underline">
+              Go Pro
+            </a>
+          </p>
+        )}
         {atLimit && state && (
           <div className="grid gap-2 rounded-xl border border-blue-200/80 bg-blue-50/90 p-4 text-sm text-blue-950 shadow-sm dark:border-blue-900/60 dark:bg-blue-950/60 dark:text-blue-100">
             <p className="font-semibold">
@@ -381,7 +396,8 @@ export function PublishDialog(props: {
               !slug ||
               availability === "taken" ||
               availability === "checking" ||
-              (atLimit && !canReplace)
+              (atLimit && !canReplace) ||
+              needsPro
             }
             onClick={go}
           >

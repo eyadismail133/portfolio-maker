@@ -43,10 +43,29 @@ describe("document", () => {
     }
   });
 
-  test("all 43 planned sections exist with unique types", () => {
+  test("the 43 planned sections and the 3 Pro showcase sections exist with unique types", () => {
     const types = allSections().map((s) => s.type);
-    expect(types).toHaveLength(43);
-    expect(new Set(types).size).toBe(43);
+    expect(types).toHaveLength(46);
+    expect(new Set(types).size).toBe(46);
+    expect(
+      allSections()
+        .filter((s) => s.pro)
+        .map((s) => s.type),
+    ).toEqual(["showcase-devices", "showcase-bento", "showcase-marquee"]);
+  });
+
+  test("every Pro section has a plain fallback that renders, also with empty content", () => {
+    for (const def of allSections().filter((s) => s.pro)) {
+      expect(def.fallback, def.type).toBeTypeOf("function");
+      for (const content of [def.defaults(), {}]) {
+        const doc = normalizeDoc({
+          ...createSampleDoc({ sections: [] }),
+          sections: [{ id: "s", type: def.type, variant: def.defaultVariant, content }],
+        });
+        const html = renderToStaticMarkup(<Renderer doc={doc} fontLink={false} pro={false} />);
+        expect(html, def.type).toContain(`pk-${def.type}`);
+      }
+    }
   });
 
   test("booking embeds only Calendly; other links become a button", () => {

@@ -85,6 +85,7 @@ export async function publish(
   if (error) {
     if (error.code === "23505") throw new Error("taken");
     if (/plan_limit_published/.test(error.message)) throw new Error("plan_limit_published");
+    if (/plan_pro_sections/.test(error.message)) throw new Error("plan_pro_sections");
     throw error;
   }
   await supabase.from("portfolio_versions").insert({ portfolio_id: id, doc, label: "Published" });
@@ -110,6 +111,7 @@ export async function publishReplacingLive(
   if (error) {
     if (error.code === "23505") throw new Error("taken");
     if (/plan_limit_published/.test(error.message)) throw new Error("plan_limit_published");
+    if (/plan_pro_sections/.test(error.message)) throw new Error("plan_pro_sections");
     throw error;
   }
   const result = data as { published_at: string; offline: string[] };

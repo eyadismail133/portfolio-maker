@@ -767,6 +767,97 @@ beforeAll(async () => {
     wanted.filter((name) => !haveIdx.includes(name)).join(", "),
   );
 
+  // 0011: Pro showcase sections. B is made Free, then Pro, then Pro runs out.
+  const showcase = (hidden = false) =>
+    JSON.stringify({
+      schemaVersion: 2,
+      sections: [
+        { id: "h", type: "hero", variant: "split", content: {} },
+        { id: "s", type: "showcase-bento", variant: "grid", hidden, content: {} },
+      ],
+    });
+  const plain = JSON.stringify({
+    schemaVersion: 2,
+    sections: [{ id: "h", type: "hero", variant: "split", content: {} }],
+  });
+  await q(`update profiles set plan = 'free', pro_until = null where id = '${B}'`);
+  await q(`delete from portfolios where user_id = '${B}'`);
+  const bPage = (
+    await as(
+      "authenticated",
+      B,
+      `insert into portfolios (title, doc) values ('b', $1) returning id`,
+      [plain],
+    )
+  ).rows[0]?.id;
+  const publishB = (doc: string, slug = "bee-page") =>
+    as(
+      "authenticated",
+      B,
+      `update portfolios set slug = $2, status = 'published', published_doc = $3 where id = $1 returning id`,
+      [bPage, slug, doc],
+    );
+  const freeShowcase = await publishB(showcase());
+  check(
+    "free: publishing a showcase section is refused",
+    /plan_pro_sections/.test(freeShowcase.error ?? ""),
+    freeShowcase.error,
+  );
+  check(
+    "free: a hidden showcase section may be published",
+    !(await publishB(showcase(true))).error,
+  );
+  check("free: a page without showcase sections publishes", !(await publishB(plain)).error);
+  const replacing = await as(
+    "authenticated",
+    B,
+    `select publish_replacing_live($1, 'bee-page', $2::jsonb)`,
+    [bPage, showcase()],
+  );
+  check(
+    "free: Replace my live page with a showcase section is refused",
+    /plan_pro_sections/.test(replacing.error ?? ""),
+    replacing.error,
+  );
+  await q(
+    `update profiles set plan = 'pro', pro_until = now() + interval '30 days' where id = '${B}'`,
+  );
+  check("pro: showcase sections publish", !(await publishB(showcase())).error);
+  await q(`update profiles set pro_until = now() - interval '1 day' where id = '${B}'`);
+  const stillLive = await q(
+    `select status, has_pro_sections(published_doc) shows from portfolios where id = '${bPage}'`,
+  );
+  check(
+    "Pro ended: the live page with showcase sections stays online",
+    stillLive[0]?.status === "published" && stillLive[0]?.shows === true,
+    JSON.stringify(stillLive),
+  );
+  const republish = await publishB(showcase());
+  check(
+    "Pro ended: publishing the showcase again is refused",
+    /plan_pro_sections/.test(republish.error ?? ""),
+    republish.error,
+  );
+  check(
+    "Pro ended: taking the page offline still works",
+    !(
+      await as(
+        "authenticated",
+        B,
+        `update portfolios set status = 'draft', published_doc = null where id = $1`,
+        [bPage],
+      )
+    ).error,
+  );
+  check(
+    "odd documents are not Pro sections",
+    (
+      await q(
+        `select has_pro_sections('{"sections": "x"}'::jsonb) a, has_pro_sections('{}'::jsonb) b`,
+      )
+    ).every((r) => r.a === false && r.b === false),
+  );
+
   check(
     "visitor slug lookup after 0004 still blocked",
     /permission denied/.test((await as("anon", null, "select is_slug_available('x')")).error ?? ""),

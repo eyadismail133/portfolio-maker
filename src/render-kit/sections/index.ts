@@ -18,6 +18,9 @@ import { gallery } from "./gallery";
 import { hero } from "./hero";
 import { howItWorks } from "./how-it-works";
 import { imageText } from "./image-text";
+import { showcaseBento } from "./showcase-bento";
+import { showcaseDevices } from "./showcase-devices";
+import { showcaseMarquee } from "./showcase-marquee";
 import { interests } from "./interests";
 import { languages } from "./languages";
 import { logoStrip } from "./logo-strip";
@@ -92,6 +95,9 @@ export const sections: AnySectionDefinition[] = [
   text,
   imageText,
   quote,
+  showcaseDevices,
+  showcaseBento,
+  showcaseMarquee,
   divider,
   footer,
 ];
