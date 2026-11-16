@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { linkSchema, textSchema } from "../../schema/primitives";
+import { linkSchema, textSchema, listItem } from "../../schema/primitives";
 import { ButtonLink, L, Stack } from "../shared";
 
 const schema = z.object({
@@ -8,7 +8,7 @@ const schema = z.object({
   subheading: textSchema,
   plans: z
     .array(
-      z.object({
+      listItem({
         name: textSchema,
         price: textSchema,
         period: textSchema,
@@ -26,7 +26,11 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-grid pk-pricing__cards">
       {content.plans.map((plan, i) => (
-        <li key={i} className="pk-card pk-plan" data-featured={plan.featured ? "" : undefined}>
+        <li
+          key={i}
+          {...ctx.el(plan.id, "pk-card pk-plan")}
+          data-featured={plan.featured ? "" : undefined}
+        >
           {plan.featured && <p className="pk-plan__badge">{ctx.ui("popular")}</p>}
           <h3 className="pk-h3">{ctx.t(plan.name)}</h3>
           <p className="pk-plan__price">
@@ -49,7 +53,7 @@ const Table: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-pricing__table">
       {content.plans.map((plan, i) => (
-        <li key={i} className="pk-plan" data-featured={plan.featured ? "" : undefined}>
+        <li key={i} {...ctx.el(plan.id, "pk-plan")} data-featured={plan.featured ? "" : undefined}>
           <div>
             <h3 className="pk-h3">
               {ctx.t(plan.name)}

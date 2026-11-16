@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { videoEmbedUrl } from "../../i18n";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   subheading: textSchema,
-  items: z.array(z.object({ url: z.string().default(""), title: textSchema })).default([]),
+  items: z.array(listItem({ url: z.string().default(""), title: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -21,7 +21,7 @@ const make = (layout: "single" | "grid"): VariantComponent<Content> =>
             const src = videoEmbedUrl(item.url);
             const title = ctx.t(item.title);
             return (
-              <li key={i}>
+              <li key={i} {...ctx.el(item.id)}>
                 {src ? (
                   <iframe
                     className="pk-embed"

@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Paragraphs, Rail, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   subheading: textSchema,
-  items: z.array(z.object({ question: textSchema, answer: textSchema })).default([]),
+  items: z.array(listItem({ question: textSchema, answer: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -14,7 +14,7 @@ const Accordion: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <div className="pk-faq__accordion">
       {content.items.map((item, i) => (
-        <details key={i} open={i === 0 || undefined}>
+        <details key={i} {...ctx.el(item.id)} open={i === 0 || undefined}>
           <summary>
             <h3 className="pk-h3">{ctx.t(item.question)}</h3>
           </summary>
@@ -29,7 +29,7 @@ const Columns: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <dl className="pk-faq__columns">
       {content.items.map((item, i) => (
-        <div key={i}>
+        <div key={i} {...ctx.el(item.id)}>
           <dt className="pk-h3">{ctx.t(item.question)}</dt>
           <dd className="pk-muted">{ctx.rich(item.answer)}</dd>
         </div>

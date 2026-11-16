@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Rail } from "../shared";
 
 const schema = z.object({
@@ -8,10 +8,10 @@ const schema = z.object({
   subheading: textSchema,
   groups: z
     .array(
-      z.object({
+      listItem({
         name: textSchema,
         items: z
-          .array(z.object({ name: textSchema, level: z.number().int().min(1).max(5).optional() }))
+          .array(listItem({ name: textSchema, level: z.number().int().min(1).max(5).optional() }))
           .default([]),
       }),
     )
@@ -29,7 +29,7 @@ const Bars: VariantComponent<Content> = ({ content, ctx }) => (
             {group.items.map((item, i) => {
               const level = item.level ?? 3;
               return (
-                <li key={i}>
+                <li key={i} {...ctx.el(item.id)}>
                   <span>{ctx.t(item.name)}</span>
                   <span
                     className="pk-meter"
@@ -55,7 +55,9 @@ const Tags: VariantComponent<Content> = ({ content, ctx }) => (
           {ctx.t(group.name) && <h3 className="pk-h3">{ctx.t(group.name)}</h3>}
           <ul className="pk-tags">
             {group.items.map((item, i) => (
-              <li key={i}>{ctx.t(item.name)}</li>
+              <li key={i} {...ctx.el(item.id)}>
+                {ctx.t(item.name)}
+              </li>
             ))}
           </ul>
         </div>
@@ -72,7 +74,9 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
           {ctx.t(group.name) && <h3 className="pk-h3">{ctx.t(group.name)}</h3>}
           <ul className="pk-tags pk-tags--small">
             {group.items.map((item, i) => (
-              <li key={i}>{ctx.t(item.name)}</li>
+              <li key={i} {...ctx.el(item.id)}>
+                {ctx.t(item.name)}
+              </li>
             ))}
           </ul>
         </div>
@@ -91,7 +95,7 @@ const Dots: VariantComponent<Content> = ({ content, ctx }) => (
             {group.items.map((item, i) => {
               const level = item.level ?? 3;
               return (
-                <li key={i}>
+                <li key={i} {...ctx.el(item.id)}>
                   <span>{ctx.t(item.name)}</span>
                   <span className="pk-dots" role="img" aria-label={`${level} / 5`}>
                     {[1, 2, 3, 4, 5].map((n) => (

@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, Media, Paragraphs, Rail } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   body: textSchema,
   image: assetRefSchema.optional(),
-  facts: z.array(z.object({ label: textSchema, value: textSchema })).default([]),
+  facts: z.array(listItem({ label: textSchema, value: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -16,7 +16,7 @@ function Facts({ content, ctx }: Parameters<VariantComponent<Content>>[0]) {
   return (
     <dl className="pk-facts">
       {content.facts.map((fact, i) => (
-        <div key={i}>
+        <div key={i} {...ctx.el(fact.id)}>
           <dt>{ctx.t(fact.label)}</dt>
           <dd>{ctx.t(fact.value)}</dd>
         </div>

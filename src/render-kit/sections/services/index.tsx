@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { Icon } from "../icons";
 import { L, Rail, Stack } from "../shared";
 
@@ -9,7 +9,7 @@ const schema = z.object({
   subheading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         icon: z.string().default("star"),
         title: textSchema,
         description: textSchema,
@@ -24,7 +24,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-grid pk-services__cards">
       {content.items.map((item, i) => (
-        <li key={i} className="pk-card">
+        <li key={i} {...ctx.el(item.id, "pk-card")}>
           <Icon name={item.icon} />
           <h3 className="pk-h3">{ctx.t(item.title)}</h3>
           <p className="pk-muted">{ctx.rich(item.description)}</p>
@@ -39,7 +39,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-services__list">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <div>
             <h3 className="pk-h3">{ctx.t(item.title)}</h3>
             <p className="pk-muted">{ctx.rich(item.description)}</p>

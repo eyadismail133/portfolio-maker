@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { formatMonth } from "../../i18n";
 import { defineSection, type VariantComponent } from "../../registry";
-import { monthSchema, textSchema } from "../../schema/primitives";
+import { monthSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Rail } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         name: textSchema,
         issuer: textSchema,
         date: monthSchema,
@@ -25,7 +25,7 @@ const make = (layout: "cards" | "list" | "badges"): VariantComponent<Content> =>
       <Rail heading={content.heading} ctx={ctx}>
         <ul className={`pk-certs pk-certs--${layout} ${layout === "cards" ? "pk-grid" : ""}`}>
           {content.items.map((item, i) => (
-            <li key={i} className={layout === "list" ? undefined : "pk-card"}>
+            <li key={i} {...ctx.el(item.id, layout === "list" ? undefined : "pk-card")}>
               <div>
                 <h3 className="pk-h3">{ctx.t(item.name)}</h3>
                 <p className="pk-muted">

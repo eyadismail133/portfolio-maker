@@ -70,3 +70,9 @@
   border-radius: 4px;
   cursor: text;
 }
+/* An element the owner hid: still shown in the editor, faded, so it can be shown again. */
+.pk-root [data-pk-el-hidden] {
+  opacity: 0.35;
+  outline: 1px dashed currentColor;
+  outline-offset: 2px;
+}

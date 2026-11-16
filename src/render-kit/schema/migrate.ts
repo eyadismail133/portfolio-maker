@@ -1,4 +1,5 @@
 import { SCHEMA_VERSION } from "./document";
+import { fillItemIds } from "./item-ids";
 
 type RawDoc = Record<string, unknown>;
 
@@ -6,7 +7,23 @@ type RawDoc = Record<string, unknown>;
  * One function per old version: `migrations[1]` turns a version 1 document into version 2.
  * Add an entry every time SCHEMA_VERSION is bumped. Never edit an old entry.
  */
-export const migrations: Record<number, (doc: RawDoc) => RawDoc> = {};
+export const migrations: Record<number, (doc: RawDoc) => RawDoc> = {
+  /**
+   * Version 2: every list item in section content gets an id ("i1", "i2"... inside its section),
+   * and sections may carry element styles. Old documents have none, which means "as the design
+   * does it", so only the ids are added.
+   */
+  1: (doc) => ({
+    ...doc,
+    sections: Array.isArray(doc.sections)
+      ? doc.sections.map((section: unknown) =>
+          typeof section === "object" && section !== null && "content" in section
+            ? { ...section, content: fillItemIds((section as { content: unknown }).content) }
+            : section,
+        )
+      : doc.sections,
+  }),
+};
 
 /** Brings a saved document of any older version up to the current shape. */
 export function migrateDoc(raw: unknown, steps = migrations, target = SCHEMA_VERSION): RawDoc {

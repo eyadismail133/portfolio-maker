@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   items: z
     .array(
-      z.object({ label: textSchema, handle: z.string().default(""), href: z.string().default("") }),
+      listItem({ label: textSchema, handle: z.string().default(""), href: z.string().default("") }),
     )
     .default([]),
 });
@@ -22,7 +22,7 @@ const make = (layout: "row" | "cards"): VariantComponent<Content> =>
           className={`pk-social__list pk-social__list--${layout} ${layout === "cards" ? "pk-grid" : ""}`}
         >
           {content.items.map((item, i) => (
-            <li key={i}>
+            <li key={i} {...ctx.el(item.id)}>
               <a className={layout === "cards" ? "pk-card" : undefined} {...linkProps(item.href)}>
                 <strong>{ctx.t(item.label)}</strong>
                 {item.handle && <bdi dir="ltr">{item.handle}</bdi>}

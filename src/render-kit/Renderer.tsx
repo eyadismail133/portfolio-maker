@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { elementProps } from "./elements";
 import { dirOf, pickText, menuLabel, uiText } from "./i18n";
 import { getSection, type SectionContext } from "./registry";
 import { RichInline } from "./rich-text";
@@ -26,6 +27,11 @@ type Props = {
    * that only work with it are hidden and their plain fallbacks shown.
    */
   standalone?: boolean;
+  /**
+   * The editor preview: elements carry `data-pk-el` so they can be picked, and hidden elements
+   * stay visible (dimmed by the editor). Never set for published pages or downloads.
+   */
+  editing?: boolean;
 };
 
 const LANGUAGE_NAMES: Record<Lang, string> = { en: "English", ar: "العربية" };
@@ -38,6 +44,7 @@ export function Renderer({
   languageHrefs,
   formAction,
   standalone,
+  editing = false,
 }: Props) {
   const language = lang && doc.meta.languages.includes(lang) ? lang : doc.meta.languages[0];
   const visible = doc.sections.flatMap((section) => {
@@ -59,6 +66,8 @@ export function Renderer({
         : [];
     }),
     formAction,
+    // Replaced for each section below, with that section's element styles.
+    el: (key, className) => elementProps(undefined, editing, key, className),
     nav: visible.flatMap(({ section, def }) => {
       const heading = def.navLabel ? pickText(def.navLabel(section.content), language) : "";
       const label = heading ? menuLabel(section.type, heading, language) : "";
@@ -95,6 +104,10 @@ export function Renderer({
         const Tag =
           def.pinned === "top" ? "header" : def.pinned === "bottom" ? "footer" : "section";
         const look = sectionLook(section.style, doc.theme.palette);
+        const sectionCtx: SectionContext = {
+          ...ctx,
+          el: (key, className) => elementProps(section.elements, editing, key, className),
+        };
         return (
           <Tag
             key={section.id}
@@ -104,7 +117,7 @@ export function Renderer({
             style={Object.keys(look.vars).length ? (look.vars as CSSProperties) : undefined}
           >
             <div className="pk-container">
-              <Component content={section.content} ctx={ctx} />
+              <Component content={section.content} ctx={sectionCtx} />
             </div>
           </Tag>
         );

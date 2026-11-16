@@ -112,6 +112,16 @@ type Section = {
     background?: "default" | "surface" | "primary";   // "image" comes with uploads in Phase 3
     padding?: "small" | "normal" | "large";
   };
+  elements?: Record<string, ElementStyle>;   // version 2: styles of single elements, by element key
+};
+
+// Version 2. Only choices that work in every family, in dark mode and right to left.
+type ElementStyle = {
+  color?: "text" | "muted" | "primary" | "accent";   // the section's own colors
+  size?: "small" | "large" | "huge";
+  weight?: "normal" | "bold";
+  align?: "start" | "center" | "end";
+  hidden?: boolean;
 };
 
 type LocalizedText = string | { en?: string; ar?: string };
@@ -125,6 +135,9 @@ Rules:
 - Every text field shown to visitors is `LocalizedText`.
 - Long text is plain text for now; line breaks become paragraphs. Rich text arrives with the editor and will need a schema migration.
 - Saved JSON always goes through `normalizeDoc` before rendering. It migrates old versions, checks the shape, fills defaults, repairs unknown variants, and drops sections it cannot read.
+- **Item ids (version 2):** every object inside a list of section content (a project, a team member, a link...) has an `id` such as `"i3"`, unique inside its section and kept when items move. Section schemas declare list items with `listItem({...})` from `schema/primitives.ts`, which adds the optional `id`. `fillItemIds` (`schema/item-ids.ts`) gives missing ids and renumbers copied ones; it runs in the version 1 to 2 migration and in `parseContent`, which every way content enters a document goes through (`normalizeDoc`, `addSection`, `setContent`). Lists of plain texts (tags, bullet points) and translated texts (`{ en, ar }`) never get ids. A test checks that every section schema keeps the ids.
+- **Element styles (version 2):** `section.elements` maps an element key to an `ElementStyle`. A key is a content path (`"heading"`, `"body"`), an item id (`"i3"`), or an item id with a path inside it (`"i3.title"`). Bad keys and values are dropped one by one, never failing the document. Sections spread `ctx.el(key, className)` on an element: it adds the `pk-e-*` classes (`render-kit/elements.ts`, CSS in `styles/elements.css`, loaded last and `!important` because the owner chose it for that element). Colors are the section variables; size uses CSS `zoom` so it scales whatever size the design gave the element. A hidden element gets the `hidden` attribute. Today the heading and subheading of `Stack`/`Rail` and the items of every list are marked; more elements follow in Phase 8B.
+- **Editor marks:** the Renderer's `editing` prop (set only by the editor preview) adds `data-pk-el="<key>"` to marked elements and keeps hidden ones visible but faded (`data-pk-el-hidden`). Published and downloaded pages never carry these marks (tested).
 
 ## How a section is defined
 

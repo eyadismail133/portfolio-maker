@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { safeImageUrl } from "../../i18n";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, Rail, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   subheading: textSchema,
   items: z
-    .array(z.object({ name: textSchema, description: textSchema, logo: assetRefSchema.optional() }))
+    .array(listItem({ name: textSchema, description: textSchema, logo: assetRefSchema.optional() }))
     .default([]),
 });
 type Content = z.output<typeof schema>;
@@ -34,7 +34,7 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-grid pk-partners__grid">
       {content.items.map((item, i) => (
-        <li key={i} className="pk-card">
+        <li key={i} {...ctx.el(item.id, "pk-card")}>
           <Mark item={item} name={ctx.t(item.name)} />
           {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>
@@ -47,7 +47,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-partners__list">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <Mark item={item} name={ctx.t(item.name)} />
           {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>

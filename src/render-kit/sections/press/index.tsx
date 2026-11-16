@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   items: z
-    .array(z.object({ outlet: textSchema, quote: textSchema, url: z.string().default("") }))
+    .array(listItem({ outlet: textSchema, quote: textSchema, url: z.string().default("") }))
     .default([]),
 });
 type Content = z.output<typeof schema>;
@@ -16,7 +16,7 @@ const Logos: VariantComponent<Content> = ({ content, ctx }) => (
     {ctx.t(content.heading) && <p className="pk-muted">{ctx.t(content.heading)}</p>}
     <ul className="pk-logos">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           {item.url ? <a {...linkProps(item.url)}>{ctx.t(item.outlet)}</a> : ctx.t(item.outlet)}
         </li>
       ))}
@@ -28,7 +28,7 @@ const Quotes: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} ctx={ctx}>
     <ul className="pk-grid pk-press__quotes">
       {content.items.map((item, i) => (
-        <li key={i} className="pk-card">
+        <li key={i} {...ctx.el(item.id, "pk-card")}>
           <blockquote>{ctx.rich(item.quote)}</blockquote>
           <p className="pk-press__outlet">{ctx.t(item.outlet)}</p>
           {item.url && (

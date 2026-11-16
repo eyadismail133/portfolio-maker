@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, Media, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         quote: textSchema,
         name: textSchema,
         role: textSchema,
@@ -22,7 +22,7 @@ type Ctx = Parameters<VariantComponent<Content>>[0]["ctx"];
 
 function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: string }) {
   return (
-    <figure className={className}>
+    <figure {...ctx.el(item.id, className)}>
       <blockquote>
         <p>{ctx.rich(item.quote)}</p>
       </blockquote>

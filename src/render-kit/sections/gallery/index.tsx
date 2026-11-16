@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, Media, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   subheading: textSchema,
-  items: z.array(z.object({ image: assetRefSchema.optional(), caption: textSchema })).default([]),
+  items: z.array(listItem({ image: assetRefSchema.optional(), caption: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -18,7 +18,7 @@ const make = (layout: "grid" | "masonry" | "slider"): VariantComponent<Content> 
           className={`pk-gallery__list pk-gallery__list--${layout}${layout === "slider" ? " pk-slider" : ""}`}
         >
           {content.items.map((item, i) => (
-            <li key={i}>
+            <li key={i} {...ctx.el(item.id)}>
               <figure>
                 <Media
                   asset={item.image}

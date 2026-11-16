@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Stack } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   subheading: textSchema,
   items: z
-    .array(z.object({ date: textSchema, title: textSchema, description: textSchema }))
+    .array(listItem({ date: textSchema, title: textSchema, description: textSchema }))
     .default([]),
 });
 type Content = z.output<typeof schema>;
@@ -18,7 +18,7 @@ const make = (layout: "vertical" | "horizontal"): VariantComponent<Content> =>
       <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
         <ol className={`pk-milestones pk-milestones--${layout}`}>
           {content.items.map((item, i) => (
-            <li key={i}>
+            <li key={i} {...ctx.el(item.id)}>
               <p className="pk-milestones__date">{ctx.t(item.date)}</p>
               <div>
                 <h3 className="pk-h3">{ctx.t(item.title)}</h3>

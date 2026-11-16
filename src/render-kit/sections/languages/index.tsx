@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Rail } from "../shared";
 
 const LEVELS = ["basic", "intermediate", "advanced", "fluent", "native"] as const;
@@ -8,7 +8,7 @@ const LEVELS = ["basic", "intermediate", "advanced", "fluent", "native"] as cons
 const schema = z.object({
   heading: textSchema,
   items: z
-    .array(z.object({ name: textSchema, level: z.enum(LEVELS).default("fluent") }))
+    .array(listItem({ name: textSchema, level: z.enum(LEVELS).default("fluent") }))
     .default([]),
 });
 type Content = z.output<typeof schema>;
@@ -19,7 +19,7 @@ const Dots: VariantComponent<Content> = ({ content, ctx }) => (
       {content.items.map((item, i) => {
         const score = LEVELS.indexOf(item.level) + 1;
         return (
-          <li key={i}>
+          <li key={i} {...ctx.el(item.id)}>
             <span className="pk-langs__name">{ctx.t(item.name)}</span>
             <span className="pk-dots" aria-hidden="true">
               {LEVELS.map((_, d) => (
@@ -38,7 +38,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
     <ul className="pk-langs pk-langs--list">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <span className="pk-langs__name">{ctx.t(item.name)}</span>
           <span className="pk-langs__level">{ctx.ui(item.level)}</span>
         </li>

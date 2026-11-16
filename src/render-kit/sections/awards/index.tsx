@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, Rail } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         title: textSchema,
         organization: textSchema,
         year: z.string().default(""),
@@ -26,7 +26,7 @@ const make = (layout: "list" | "cards"): VariantComponent<Content> =>
           className={`pk-awards__list pk-awards__list--${layout} ${layout === "cards" ? "pk-grid" : ""}`}
         >
           {content.items.map((item, i) => (
-            <li key={i} className={layout === "cards" ? "pk-card" : undefined}>
+            <li key={i} {...ctx.el(item.id, layout === "cards" ? "pk-card" : undefined)}>
               {item.year && <span className="pk-awards__year">{item.year}</span>}
               <div>
                 <h3 className="pk-h3">{ctx.t(item.title)}</h3>

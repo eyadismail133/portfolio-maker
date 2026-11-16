@@ -2,7 +2,7 @@ import { z } from "zod";
 import { assetRefSchema, hexColorSchema, langSchema } from "./primitives";
 
 /** Bump this and add a migration in migrate.ts whenever the document shape changes. */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const paletteSchema = z.object({
   background: hexColorSchema,
@@ -110,6 +110,45 @@ export const sectionStyleSchema = z.object({
 });
 export type SectionStyle = z.infer<typeof sectionStyleSchema>;
 
+/** Colors an element can take: the section's own colors, so colored sections keep working. */
+export const ELEMENT_COLORS = ["text", "muted", "primary", "accent"] as const;
+export const ELEMENT_SIZES = ["small", "large", "huge"] as const;
+export const ELEMENT_WEIGHTS = ["normal", "bold"] as const;
+export const ELEMENT_ALIGNS = ["start", "center", "end"] as const;
+
+/**
+ * How one element inside a section looks (a heading, a card, a photo...). Only choices that work
+ * in every design family, in dark mode and right to left. Missing means "as the design does it".
+ */
+export const elementStyleSchema = z.object({
+  color: z.enum(ELEMENT_COLORS).optional(),
+  size: z.enum(ELEMENT_SIZES).optional(),
+  weight: z.enum(ELEMENT_WEIGHTS).optional(),
+  align: z.enum(ELEMENT_ALIGNS).optional(),
+  hidden: z.boolean().optional(),
+});
+export type ElementStyle = z.infer<typeof elementStyleSchema>;
+
+/**
+ * Key of an element inside its section: a content path ("heading"), an item id ("i3"), or an
+ * item id followed by a path inside the item ("i3.title", "i3.tags.0").
+ */
+export const ELEMENT_KEY = /^[A-Za-z0-9_-]{1,40}(\.[A-Za-z0-9_-]{1,40}){0,5}$/;
+
+/**
+ * Element styles of a section, by element key. Bad keys and bad values are dropped one by one
+ * instead of failing the whole document.
+ */
+export const sectionElementsSchema = z.record(z.string(), z.unknown()).transform((raw) => {
+  const clean: Record<string, ElementStyle> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!ELEMENT_KEY.test(key)) continue;
+    const style = elementStyleSchema.safeParse(value);
+    if (style.success && Object.keys(style.data).length > 0) clean[key] = style.data;
+  }
+  return clean;
+});
+
 export const sectionSchema = z.object({
   id: z.string().min(1),
   type: z.string().min(1),
@@ -118,6 +157,8 @@ export const sectionSchema = z.object({
   /** Checked against the schema of the section type by `normalizeDoc`. */
   content: z.unknown(),
   style: sectionStyleSchema.optional(),
+  /** Styles of single elements inside the section (version 2). */
+  elements: sectionElementsSchema.optional(),
 });
 export type Section = z.infer<typeof sectionSchema>;
 

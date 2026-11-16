@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type SectionProps, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, Media, Paragraphs } from "../shared";
 
 const schema = z.object({
@@ -13,7 +13,7 @@ const schema = z.object({
   solution: textSchema,
   result: textSchema,
   image: assetRefSchema.optional(),
-  stats: z.array(z.object({ value: textSchema, label: textSchema })).default([]),
+  stats: z.array(listItem({ value: textSchema, label: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -64,7 +64,7 @@ function Stats({ content, ctx }: SectionProps<Content>) {
   return (
     <dl className="pk-case__stats">
       {content.stats.map((stat, i) => (
-        <div key={i}>
+        <div key={i} {...ctx.el(stat.id)}>
           <dd>{ctx.t(stat.value)}</dd>
           <dt>{ctx.t(stat.label)}</dt>
         </div>

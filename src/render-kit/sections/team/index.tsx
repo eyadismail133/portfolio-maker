@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, linkSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, linkSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Media, Stack } from "../shared";
 
 const schema = z.object({
@@ -8,7 +8,7 @@ const schema = z.object({
   subheading: textSchema,
   members: z
     .array(
-      z.object({
+      listItem({
         name: textSchema,
         role: textSchema,
         bio: textSchema,
@@ -28,7 +28,7 @@ const make = (layout: "grid" | "list" | "slider"): VariantComponent<Content> =>
           className={`pk-team__list pk-team__list--${layout}${layout === "slider" ? " pk-slider" : ""}`}
         >
           {content.members.map((member, i) => (
-            <li key={i}>
+            <li key={i} {...ctx.el(member.id)}>
               <Media asset={member.photo} label={ctx.t(member.name)} className="pk-team__photo" />
               <div>
                 <h3 className="pk-h3">{ctx.t(member.name)}</h3>

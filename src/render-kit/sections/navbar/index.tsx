@@ -19,8 +19,12 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
   const brand = ctx.t(content.brand);
   const logo = safeImageUrl(content.logo?.url);
   const links = [
-    ...(content.autoLinks ? ctx.nav.map((n) => ({ label: n.label, href: `#${n.id}` })) : []),
-    ...content.links.map((l) => ({ label: ctx.t(l.label), href: l.href })).filter((l) => l.label),
+    ...(content.autoLinks
+      ? ctx.nav.map((n) => ({ id: undefined, label: n.label, href: `#${n.id}` }))
+      : []),
+    ...content.links
+      .map((l) => ({ id: l.id, label: ctx.t(l.label), href: l.href }))
+      .filter((l) => l.label),
   ];
   const cta = ctx.t(content.cta?.label);
   const switches = ctx.languageLinks.map((l) => (
@@ -29,7 +33,7 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
     </a>
   ));
   const items = links.map((l, i) => (
-    <li key={i}>
+    <li key={i} {...ctx.el(l.id)}>
       <a {...linkProps(l.href)}>{l.label}</a>
     </li>
   ));

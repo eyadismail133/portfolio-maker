@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type SectionProps, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { Icon } from "../icons";
 import { L } from "../shared";
 
@@ -10,7 +10,7 @@ const schema = z.object({
   vision: textSchema,
   values: z
     .array(
-      z.object({ icon: z.string().default("heart"), title: textSchema, description: textSchema }),
+      listItem({ icon: z.string().default("heart"), title: textSchema, description: textSchema }),
     )
     .default([]),
 });
@@ -21,7 +21,7 @@ function Values({ content, ctx }: SectionProps<Content>) {
   return (
     <ul className="pk-grid pk-mv__values">
       {content.values.map((value, i) => (
-        <li key={i} className="pk-card">
+        <li key={i} {...ctx.el(value.id, "pk-card")}>
           <Icon name={value.icon} />
           <h3 className="pk-h3">{ctx.t(value.title)}</h3>
           <p className="pk-muted">{ctx.rich(value.description)}</p>

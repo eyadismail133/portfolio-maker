@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Media, Stack } from "../shared";
 
 const schema = z.object({
@@ -8,7 +8,7 @@ const schema = z.object({
   subheading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         title: textSchema,
         description: textSchema,
         image: assetRefSchema.optional(),
@@ -31,7 +31,7 @@ function Project({
   const title = ctx.t(item.title);
   const tags = item.tags.map((tag) => ctx.t(tag)).filter(Boolean);
   return (
-    <li className="pk-project">
+    <li {...ctx.el(item.id, "pk-project")}>
       <Media asset={item.image} label={title} className="pk-project__image" />
       <div className="pk-project__body">
         <div className="pk-project__top">

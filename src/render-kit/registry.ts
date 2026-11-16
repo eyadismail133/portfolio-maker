@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import type { z } from "zod";
 import type { UiKey } from "./i18n";
+import { fillItemIds } from "./schema/item-ids";
 import { migrateDoc } from "./schema/migrate";
 import { portfolioDocSchema, type PortfolioDoc } from "./schema/document";
 import type { Lang, LocalizedText } from "./schema/primitives";
@@ -23,6 +24,20 @@ export type SectionContext = {
   languageLinks: { lang: Lang; label: string; href: string }[];
   /** Where the contact form sends messages on a published page. Missing elsewhere: then it opens an email. */
   formAction?: string;
+  /**
+   * Props for one element of the section: its own class names plus the element's style classes
+   * (`pk-e-*`). In the editor preview it also marks the element with `data-pk-el`; published
+   * and downloaded pages never carry that mark. Spread it on the element:
+   * `<h2 {...ctx.el("heading", "pk-h2")}>`. Items use their id: `ctx.el(item.id, "pk-card")`.
+   */
+  el: (key: string | undefined, className?: string) => ElementProps;
+};
+
+export type ElementProps = {
+  className?: string;
+  hidden?: boolean;
+  "data-pk-el"?: string;
+  "data-pk-el-hidden"?: "";
 };
 
 export type SectionProps<C> = { content: C; ctx: SectionContext };
@@ -105,10 +120,19 @@ export function normalizeDoc(raw: unknown): PortfolioDoc {
   const sections = doc.sections.flatMap((section) => {
     const def = getSection(section.type);
     if (!def) return [];
-    const content = def.schema.safeParse(section.content ?? {});
-    if (!content.success) return [];
+    const content = parseContent(def, section.content ?? {});
+    if (content === null) return [];
     const variant = def.variants[section.variant] ? section.variant : def.defaultVariant;
-    return [{ ...section, variant, content: content.data }];
+    return [{ ...section, variant, content }];
   });
   return { ...doc, sections };
+}
+
+/**
+ * Checks content against the section's schema, fills in what is missing (list item ids too) and
+ * returns it, or null when it is not valid. Every way content enters a document goes through here.
+ */
+export function parseContent(def: AnySectionDefinition, content: unknown): unknown | null {
+  const parsed = def.schema.safeParse(content);
+  return parsed.success ? fillItemIds(parsed.data) : null;
 }

@@ -1,0 +1,51 @@
+/*
+ * Element styles: choices the owner made for one element (a heading, a card, a photo...).
+ * Loaded last, and marked !important, because the owner picked them for this element and they
+ * must win over any design family rule. Colors are the section variables, so colored sections
+ * and dark mode keep working. Size uses `zoom`, which scales the element whatever font size the
+ * design gave it.
+ */
+
+.pk-root [hidden] {
+  display: none !important;
+}
+
+.pk-e-c-text {
+  color: var(--pk-text) !important;
+}
+.pk-e-c-muted {
+  color: var(--pk-muted) !important;
+}
+.pk-e-c-primary {
+  color: var(--pk-primary) !important;
+}
+.pk-e-c-accent {
+  color: var(--pk-accent) !important;
+}
+
+.pk-e-s-small {
+  zoom: 0.85;
+}
+.pk-e-s-large {
+  zoom: 1.2;
+}
+.pk-e-s-huge {
+  zoom: 1.5;
+}
+
+.pk-e-w-normal {
+  font-weight: 400 !important;
+}
+.pk-e-w-bold {
+  font-weight: 700 !important;
+}
+
+.pk-e-a-start {
+  text-align: start !important;
+}
+.pk-e-a-center {
+  text-align: center !important;
+}
+.pk-e-a-end {
+  text-align: end !important;
+}

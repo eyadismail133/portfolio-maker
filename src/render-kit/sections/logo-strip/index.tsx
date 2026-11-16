@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineSection, type SectionProps, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { safeImageUrl } from "../../i18n";
 import { L } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
-  items: z.array(z.object({ name: textSchema, logo: assetRefSchema.optional() })).default([]),
+  items: z.array(listItem({ name: textSchema, logo: assetRefSchema.optional() })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -16,7 +16,7 @@ function Logos({ content, ctx, hidden }: SectionProps<Content> & { hidden?: bool
       {content.items.map((item, i) => {
         const url = safeImageUrl(item.logo?.url);
         return (
-          <li key={i}>
+          <li key={i} {...ctx.el(item.id)}>
             {url && item.logo ? (
               <img
                 src={url}

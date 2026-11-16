@@ -37,7 +37,7 @@ const make = (layout: "simple" | "columns" | "big"): VariantComponent<Content> =
         {links.length > 0 && (
           <ul className="pk-footer__links">
             {links.map((l, i) => (
-              <li key={i}>
+              <li key={i} {...ctx.el(l.id)}>
                 <a {...linkProps(l.href)}>{ctx.t(l.label)}</a>
               </li>
             ))}

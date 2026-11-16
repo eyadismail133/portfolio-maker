@@ -206,7 +206,7 @@ export function PreviewFrame() {
       onDoubleClick={onDoubleClick}
       onSubmitCapture={(event) => event.preventDefault()}
     >
-      <Renderer doc={state.doc} lang={state.lang} />
+      <Renderer doc={state.doc} lang={state.lang} editing />
       {selectedId && outline && (
         <div
           className="pk-editor-outline"

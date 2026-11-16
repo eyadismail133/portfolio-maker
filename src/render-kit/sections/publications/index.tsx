@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Rail, Stack } from "../shared";
 
 const KINDS = ["article", "paper", "talk", "book", "podcast"] as const;
@@ -10,7 +10,7 @@ const schema = z.object({
   subheading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         title: textSchema,
         venue: textSchema,
         year: z.string().default(""),
@@ -64,7 +64,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ol className="pk-publications__list">
       {content.items.map((item, i) => (
-        <li key={i} data-pk-kind={item.kind}>
+        <li key={i} {...ctx.el(item.id)} data-pk-kind={item.kind}>
           <Entry item={item} ctx={ctx} />
         </li>
       ))}
@@ -76,7 +76,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-grid pk-publications__cards">
       {content.items.map((item, i) => (
-        <li key={i} className="pk-card" data-pk-kind={item.kind}>
+        <li key={i} {...ctx.el(item.id, "pk-card")} data-pk-kind={item.kind}>
           <Entry item={item} ctx={ctx} />
         </li>
       ))}

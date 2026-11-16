@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { assetRefSchema, textSchema } from "../../schema/primitives";
+import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { Icon } from "../icons";
 import { L, Media, Stack } from "../shared";
 
@@ -9,7 +9,7 @@ const schema = z.object({
   subheading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         icon: z.string().default("check"),
         title: textSchema,
         description: textSchema,
@@ -24,7 +24,7 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-grid pk-features__grid">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <Icon name={item.icon} />
           <h3 className="pk-h3">{ctx.t(item.title)}</h3>
           <p className="pk-muted">{ctx.rich(item.description)}</p>
@@ -38,7 +38,7 @@ const BigCards: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ol className="pk-features__big">
       {content.items.map((item, i) => (
-        <li key={i} className="pk-card">
+        <li key={i} {...ctx.el(item.id, "pk-card")}>
           <span className="pk-features__num" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>
@@ -54,7 +54,7 @@ const Rows: VariantComponent<Content> = ({ content, ctx }) => (
   <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
     <ul className="pk-features__rows">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <Media asset={item.image} label={ctx.t(item.title)} className="pk-features__image" />
           <div>
             <h3 className="pk-h3">{ctx.t(item.title)}</h3>

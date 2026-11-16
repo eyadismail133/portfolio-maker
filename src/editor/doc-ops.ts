@@ -1,4 +1,4 @@
-import { getSection, type AnySectionDefinition } from "@/render-kit/registry";
+import { getSection, parseContent, type AnySectionDefinition } from "@/render-kit/registry";
 import { plainText } from "@/render-kit/rich-text";
 import type { PortfolioDoc, Section, SectionStyle } from "@/render-kit/schema/document";
 import type { Lang, LocalizedText } from "@/render-kit/schema/primitives";
@@ -62,14 +62,14 @@ export function addSection(
 ): { doc: PortfolioDoc; id: string } | null {
   const def = getSection(type);
   if (!def) return null;
-  const content = def.schema.safeParse(def.defaults());
-  if (!content.success) return null;
+  const content = parseContent(def, def.defaults());
+  if (content === null) return null;
   const section: Section = {
     id: uniqueId(doc, type),
     type,
     variant: variant && def.variants[variant] ? variant : def.defaultVariant,
     hidden: false,
-    content: content.data,
+    content,
   };
   const sections = [...doc.sections];
   const firstBottom = sections.findIndex((s) => pinnedOf(s) === "bottom");
@@ -194,9 +194,9 @@ export function setContent(doc: PortfolioDoc, id: string, content: unknown): Por
   const section = doc.sections.find((s) => s.id === id);
   const def = section && getSection(section.type);
   if (!def) return null;
-  const parsed = def.schema.safeParse(content);
-  if (!parsed.success) return null;
-  return replaceSection(doc, id, (s) => ({ ...s, content: parsed.data }));
+  const parsed = parseContent(def, content);
+  if (parsed === null) return null;
+  return replaceSection(doc, id, (s) => ({ ...s, content: parsed }));
 }
 
 /** The text of one language exactly as stored, without falling back to the other language. */
@@ -279,7 +279,7 @@ export function findTextPath(content: unknown, lang: Lang, shown: string): Path 
         return typeof raw === "string" && normalize(raw) === wanted ? path : null;
       }
       for (const key of keys) {
-        if (key === "url" || key === "href" || key === "assetId") continue;
+        if (key === "id" || key === "url" || key === "href" || key === "assetId") continue;
         const found = walk(record[key], [...path, key]);
         if (found) return found;
       }

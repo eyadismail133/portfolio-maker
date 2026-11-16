@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
-  items: z.array(z.object({ value: textSchema, label: textSchema })).default([]),
+  items: z.array(listItem({ value: textSchema, label: textSchema })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -18,7 +18,7 @@ const make = (layout: "row" | "cards" | "big"): VariantComponent<Content> =>
         )}
         <dl className={`pk-stats__list pk-stats__list--${layout}`}>
           {content.items.map((item, i) => (
-            <div key={i} className={layout === "cards" ? "pk-card" : undefined}>
+            <div key={i} {...ctx.el(item.id, layout === "cards" ? "pk-card" : undefined)}>
               <dd>{ctx.t(item.value)}</dd>
               <dt>{ctx.t(item.label)}</dt>
             </div>

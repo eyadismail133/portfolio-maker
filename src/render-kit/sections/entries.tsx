@@ -4,6 +4,8 @@ import type { SectionContext } from "../registry";
 
 /** One row of a work or education history. */
 export type Entry = {
+  /** Item id of the entry, for element styles. */
+  id?: string;
   title: string;
   place: string;
   placeUrl?: string;
@@ -48,7 +50,7 @@ export function EntryTimeline({ entries, ctx }: { entries: Entry[]; ctx: Section
   return (
     <ol className="pk-history">
       {entries.map((entry, i) => (
-        <li key={i} className="pk-entry">
+        <li key={i} {...ctx.el(entry.id, "pk-entry")}>
           <EntryBody entry={entry} ctx={ctx} />
         </li>
       ))}
@@ -61,7 +63,7 @@ export function EntryCards({ entries, ctx }: { entries: Entry[]; ctx: SectionCon
   return (
     <ul className="pk-entry-cards">
       {entries.map((entry, i) => (
-        <li key={i} className="pk-card pk-entry">
+        <li key={i} {...ctx.el(entry.id, "pk-card pk-entry")}>
           <EntryBody entry={entry} ctx={ctx} />
         </li>
       ))}
@@ -74,7 +76,7 @@ export function EntryCompact({ entries, ctx }: { entries: Entry[]; ctx: SectionC
   return (
     <ul className="pk-entry-compact">
       {entries.map((entry, i) => (
-        <li key={i} className="pk-entry">
+        <li key={i} {...ctx.el(entry.id, "pk-entry")}>
           <p className="pk-entry__dates">{formatRange(entry.start, entry.end, ctx.lang)}</p>
           <div>
             <h3 className="pk-h3">{entry.title}</h3>

@@ -158,11 +158,11 @@ Portfolios stay plain HTML: no SPA, no React or Motion on published pages. Every
 
 ### 8A - Document version 2 (foundation, about 1 week)
 The riskiest step: it touches every section. Nothing visible changes for users.
-- [ ] Stable `id` on every repeated item (cards, projects, team members, entries...), made by the migration for old documents and by the editor for new items
-- [ ] Element styles: `section.elements` keyed by element id or content path, holding only theme-safe choices (palette color, size step, weight, alignment, hidden); missing means "as the design does it"
-- [ ] Bump `schemaVersion` to 2, add the migration in `schema/migrate.ts`, test it on every sample and on saved versions
-- [ ] Renderer applies element styles as `pk-` classes and section variables, never inline colors or fonts
-- [ ] The editor preview marks elements with `data-pk-el`; published and downloaded HTML never carry it (test)
+- [x] Stable `id` on every repeated item (cards, projects, team members, entries...), made by the migration for old documents and by the editor for new items
+- [x] Element styles: `section.elements` keyed by element id or content path, holding only theme-safe choices (palette color, size step, weight, alignment, hidden); missing means "as the design does it"
+- [x] Bump `schemaVersion` to 2, add the migration in `schema/migrate.ts`, test it on every sample and on saved versions
+- [x] Renderer applies element styles as `pk-e-*` classes and section variables, never inline colors or fonts (marked so far: section heading and subheading, and every list item; 8B marks the rest as it makes them selectable)
+- [x] The editor preview marks elements with `data-pk-el`; published and downloaded HTML never carry it (test)
 
 ### 8B - Direct editing in the preview (about 2 weeks, needs 8A)
 Click and drag inside the layout, like a document editor. Not a free canvas: things move between the places a layout offers, so pages keep working from 360px to desktop, right to left, and through a design switch.

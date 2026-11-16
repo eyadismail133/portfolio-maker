@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { L, linkProps, Paragraphs, Rail, Stack } from "../shared";
 
 const schema = z.object({
@@ -8,7 +8,7 @@ const schema = z.object({
   subheading: textSchema,
   jobs: z
     .array(
-      z.object({
+      listItem({
         title: textSchema,
         location: textSchema,
         type: textSchema,
@@ -59,7 +59,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
     ) : (
       <ul className="pk-careers__list">
         {content.jobs.map((job, i) => (
-          <li key={i}>
+          <li key={i} {...ctx.el(job.id)}>
             <Job job={job} ctx={ctx} />
           </li>
         ))}
@@ -78,7 +78,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
     ) : (
       <ul className="pk-grid pk-careers__cards">
         {content.jobs.map((job, i) => (
-          <li key={i} className="pk-card">
+          <li key={i} {...ctx.el(job.id, "pk-card")}>
             <Job job={job} ctx={ctx} />
           </li>
         ))}

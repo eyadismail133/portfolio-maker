@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
-import { textSchema } from "../../schema/primitives";
+import { textSchema, listItem } from "../../schema/primitives";
 import { Icon } from "../icons";
 import { L, Rail } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
-  items: z.array(z.object({ name: textSchema, icon: z.string().default("star") })).default([]),
+  items: z.array(listItem({ name: textSchema, icon: z.string().default("star") })).default([]),
 });
 type Content = z.output<typeof schema>;
 
@@ -14,7 +14,7 @@ const Icons: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
     <ul className="pk-interests__list">
       {content.items.map((item, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(item.id)}>
           <Icon name={item.icon} />
           <span>{ctx.t(item.name)}</span>
         </li>
@@ -27,7 +27,9 @@ const Tags: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
     <ul className="pk-tags">
       {content.items.map((item, i) => (
-        <li key={i}>{ctx.t(item.name)}</li>
+        <li key={i} {...ctx.el(item.id)}>
+          {ctx.t(item.name)}
+        </li>
       ))}
     </ul>
   </Rail>

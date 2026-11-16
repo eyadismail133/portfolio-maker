@@ -50,7 +50,7 @@ function Socials({ content, ctx }: Props) {
   return (
     <ul className="pk-socials">
       {links.map((s, i) => (
-        <li key={i}>
+        <li key={i} {...ctx.el(s.id)}>
           <a {...linkProps(s.href)}>{ctx.t(s.label)}</a>
         </li>
       ))}
@@ -61,7 +61,7 @@ function Socials({ content, ctx }: Props) {
 const WithForm: VariantComponent<Content> = (props) => {
   const { content, ctx } = props;
   return (
-    <Rail heading={content.heading} subheading={content.body} ctx={ctx}>
+    <Rail heading={content.heading} subheading={content.body} subheadingKey="body" ctx={ctx}>
       <div className="pk-contact__grid">
         {/* With an inbox the form posts there. Without one (previews, downloaded pages) the page
             script opens the visitor's email app with the message filled in, and a plain email
@@ -129,7 +129,7 @@ const WithForm: VariantComponent<Content> = (props) => {
 const Cards: VariantComponent<Content> = (props) => {
   const { content, ctx } = props;
   return (
-    <Stack heading={content.heading} subheading={content.body} ctx={ctx}>
+    <Stack heading={content.heading} subheading={content.body} subheadingKey="body" ctx={ctx}>
       <ul className="pk-contact__cards">
         {details(props).map((d, i) => (
           <li key={i} className="pk-card">

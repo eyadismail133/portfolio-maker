@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineSection, type SectionContext, type VariantComponent } from "../../registry";
-import { endMonthSchema, monthSchema, textSchema } from "../../schema/primitives";
+import { endMonthSchema, monthSchema, textSchema, listItem } from "../../schema/primitives";
 import { EntryCards, EntryCompact, EntryTimeline, type Entry } from "../entries";
 import { L, Rail } from "../shared";
 
@@ -9,7 +9,7 @@ const schema = z.object({
   subheading: textSchema,
   items: z
     .array(
-      z.object({
+      listItem({
         degree: textSchema,
         school: textSchema,
         location: textSchema,
@@ -25,6 +25,7 @@ type Content = z.output<typeof schema>;
 
 function toEntries(content: Content, ctx: SectionContext): Entry[] {
   return content.items.map((item) => ({
+    id: item.id,
     title: ctx.t(item.degree),
     place: ctx.t(item.school),
     location: ctx.t(item.location),

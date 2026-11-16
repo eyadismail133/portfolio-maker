@@ -10,20 +10,28 @@ export const L = (en: string, ar: string) => ({ en, ar });
 type HeadProps = {
   heading?: LocalizedText;
   subheading?: LocalizedText;
+  /** Content key the subheading comes from, for element styles. */
+  subheadingKey?: string;
   ctx: SectionContext;
   children: ReactNode;
 };
 
 /** Section layout with the heading in a side column on wide screens. */
-export function Rail({ heading, subheading, ctx, children }: HeadProps) {
+export function Rail({
+  heading,
+  subheading,
+  subheadingKey = "subheading",
+  ctx,
+  children,
+}: HeadProps) {
   const title = ctx.t(heading);
   const sub = ctx.t(subheading);
   return (
     <div className="pk-rail">
       {(title || sub) && (
         <div className="pk-rail__head">
-          {title && <h2 className="pk-h2">{title}</h2>}
-          {sub && <p className="pk-sub">{sub}</p>}
+          {title && <h2 {...ctx.el("heading", "pk-h2")}>{title}</h2>}
+          {sub && <p {...ctx.el(subheadingKey, "pk-sub")}>{sub}</p>}
         </div>
       )}
       <div className="pk-rail__body">{children}</div>
@@ -32,15 +40,21 @@ export function Rail({ heading, subheading, ctx, children }: HeadProps) {
 }
 
 /** Section layout with the heading above the content. */
-export function Stack({ heading, subheading, ctx, children }: HeadProps) {
+export function Stack({
+  heading,
+  subheading,
+  subheadingKey = "subheading",
+  ctx,
+  children,
+}: HeadProps) {
   const title = ctx.t(heading);
   const sub = ctx.t(subheading);
   return (
     <div className="pk-stack">
       {(title || sub) && (
         <div className="pk-stack__head">
-          {title && <h2 className="pk-h2">{title}</h2>}
-          {sub && <p className="pk-sub">{sub}</p>}
+          {title && <h2 {...ctx.el("heading", "pk-h2")}>{title}</h2>}
+          {sub && <p {...ctx.el(subheadingKey, "pk-sub")}>{sub}</p>}
         </div>
       )}
       {children}
