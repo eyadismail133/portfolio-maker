@@ -335,6 +335,42 @@ dialog:not(.pk-lightbox)::backdrop {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Route transitions (RouteTransition.tsx). Timings match src/lib/motion.ts:  */
+/* the old screen leaves fast, the new one rises in with ease.out.            */
+/* -------------------------------------------------------------------------- */
+
+::view-transition-old(.pm-route-out) {
+  animation: 150ms cubic-bezier(0.22, 1, 0.36, 1) both pm-route-fade reverse;
+}
+::view-transition-new(.pm-route-in) {
+  animation:
+    260ms cubic-bezier(0.22, 1, 0.36, 1) 90ms both pm-route-fade,
+    450ms cubic-bezier(0.22, 1, 0.36, 1) both pm-route-rise;
+}
+@keyframes pm-route-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pm-route-rise {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+/* Less motion asked for: keep the fade, drop the movement (as MotionProvider does). */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(.pm-route-in) {
+    animation: 200ms ease-out both pm-route-fade;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* Reduced Motion                                                             */
 /* -------------------------------------------------------------------------- */
 
