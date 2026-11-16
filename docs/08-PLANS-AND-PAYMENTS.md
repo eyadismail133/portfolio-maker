@@ -52,4 +52,5 @@ The refund page (`/refunds`) offers a full refund within 14 days of the first pu
 - Receipts (the account page already lists payments).
 - Emails: receipt, "Pro ends in 7 days".
 - Per-day visit charts for Pro.
+- Pro showcase sections (roadmap Phase 8D): finished, animated sections that Free accounts can try in the editor but not publish or download. The database refuses to publish them from a Free account. When Pro ends the page stays online and those sections draw a plain free layout, so nothing goes offline.
 - International buyers through a merchant of record (Lemon Squeezy) if USD through Paymob is not enough.

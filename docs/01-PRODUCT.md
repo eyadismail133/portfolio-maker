@@ -56,7 +56,7 @@ We do not try to beat Canva at free-form graphic design. We beat it at one job: 
 - Extra pages (for example, a page per project).
 
 ### Not building
-- Free-form canvas with drag-anywhere elements.
+- Free-form canvas with drag-anywhere elements. Direct editing (roadmap Phase 8B) clicks and drags inside the layout instead: things move between the places a layout offers, so pages keep working on phones, in Arabic and through a design switch.
 - Online shop or payments inside user portfolios.
 - A blog system.
 

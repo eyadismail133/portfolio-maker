@@ -151,6 +151,52 @@ The core. No login, no editor yet; work with JSON files.
 - [x] Run the load test (15 November 2026, twice): all speed targets met on the second run; a 40-second stall of the free database caused 32 failed saves; the page cache did nothing on Vercel
 - [x] Published page data in Vercel's shared Runtime Cache (`use cache: remote`); the HTML is drawn per visit
 
+## Phase 8 - Richer designs, direct editing, Pro showcase (4 to 6 weeks)
+Portfolios stay plain HTML: no SPA, no React or Motion on published pages. Every change made in the editor is still a change to the document, and the Renderer turns it into HTML and CSS. This phase can run while the owner-only Phase 7 tasks are open; they touch no code. Order: 8A first; 8B and 8C side by side; 8D after 8A; 8E last.
+
+- [x] App screens animate when moving between them (React `<ViewTransition>`, `template.tsx`; fade only with reduced motion)
+
+### 8A - Document version 2 (foundation, about 1 week)
+The riskiest step: it touches every section. Nothing visible changes for users.
+- [ ] Stable `id` on every repeated item (cards, projects, team members, entries...), made by the migration for old documents and by the editor for new items
+- [ ] Element styles: `section.elements` keyed by element id or content path, holding only theme-safe choices (palette color, size step, weight, alignment, hidden); missing means "as the design does it"
+- [ ] Bump `schemaVersion` to 2, add the migration in `schema/migrate.ts`, test it on every sample and on saved versions
+- [ ] Renderer applies element styles as `pk-` classes and section variables, never inline colors or fonts
+- [ ] The editor preview marks elements with `data-pk-el`; published and downloaded HTML never carry it (test)
+
+### 8B - Direct editing in the preview (about 2 weeks, needs 8A)
+Click and drag inside the layout, like a document editor. Not a free canvas: things move between the places a layout offers, so pages keep working from 360px to desktop, right to left, and through a design switch.
+- [ ] Click any element (heading, text, card, photo, button) to select it; the side panel jumps to its fields
+- [ ] Floating element toolbar: edit text (the existing double-click), color, size, weight, alignment, hide, reset
+- [ ] Photos: click to replace or crop through the upload helper and `CropDialog`
+- [ ] Drag to reorder sections on the page and items inside a list; the same moves from the keyboard
+- [ ] Positions a layout offers: image side, button above or below text, columns; stored in `section.elements`
+- [ ] Every action is one Undo step; works in English and Arabic previews
+
+### 8C - Better designs per kind of user (about 1.5 weeks, side by side with 8B)
+- [ ] Screenshot audit with `npm run visual`; list the weak sections and layouts for each kind of user (professional, student, freelancer, creative, company, agency, startup)
+- [ ] New layouts for the sections with the fewest or weakest ones
+- [ ] New section style choices: columns, image proportions, shadow strength, text effects, a font for one section
+- [ ] Pages carry only the CSS for the sections and layouts they use (keeps the inline stylesheet small as layouts grow)
+
+### 8D - Pro showcase sections (about 1.5 weeks, needs 8A)
+Finished, animated sections (device mockups, bento grid, animated hero, marquee, scroll story). Their movement is CSS and `page-script.ts` only, and each works with no script.
+- [ ] Showcase sections in the registry with a `pro: true` mark, schemas, default content and every family
+- [ ] `showcaseSections` in `src/lib/plans.ts` and the Free/Pro comparison; the "All designs, sections and palettes" row changes
+- [ ] Free accounts can add and try them in the editor with a Pro badge; publishing and download need Pro
+- [ ] The database refuses to publish a document with showcase sections from a Free account (new migration, check in `database.test.ts`)
+- [ ] When Pro ends, live pages stay online and showcase sections draw a plain free layout instead; the owner is warned by email
+- [ ] Document the rule in `docs/08-PLANS-AND-PAYMENTS.md`
+
+### 8E - New looks and new ways to start (about 1 week, after 8C and 8D)
+- [ ] New design families (for example luxury, retro, Swiss grid, bento, magazine)
+- [ ] Start from a logo or brand color: palette taken from the picture
+- [ ] Start from a mood board: pick three looks, get ideas that mix them
+- [ ] Start blank
+- [ ] Pro page presets built from showcase sections, shown in the ideas and the template gallery
+
+**Result:** people edit their page by clicking on it, have more and better designs to start from, and Pro has showcase content worth paying for, while every page is still one plain HTML file.
+
 ## Risks to watch
 | Risk | How we handle it |
 |---|---|
