@@ -92,13 +92,13 @@ On phones the editor shows the preview full screen with a bottom bar that opens 
 - **Dashboard:** a "Getting started" checklist (replace the sample text, add a photo or logo, publish, get a first visit) that ticks itself and can be hidden; each card has Edit plus a "…" menu; on phones the header folds into a menu.
 
 ## Section style (Style tab)
-Stored in `section.style`. Every field past `background` and `padding` is optional, so saved portfolios need no migration and `schemaVersion` stays 1. Missing means "as the design does it".
+Stored in `section.style`. Every field past `background` and `padding` is optional, so saved portfolios need no migration. Missing means "as the design does it".
 
 | Group | Choices |
 |---|---|
 | Background | Design default, Plain page, Soft tint, Main color, Accent, Inverted, My color (`color`), Gradient (`color`, `color2`, direction down / diagonal / glow), Picture (`image`, layer dark / darker / light / lighter) |
 | Shape | Top and bottom edge: straight, wave, slant, curve, zigzag |
-| Layout | Content width (narrow, normal, wide, full), text alignment (design, start, centered), heading size (small to huge), cards (design, flat, outline, shadow, glass) |
+| Layout | Content width (narrow, normal, wide, full), text alignment (design, start, centered), heading size (small to huge), cards (design, flat, outline, shadow, glass), card shadow (design, none, soft, strong), columns (design, 2, 3, 4; sections with a list), photo shape (design, square, portrait, landscape, wide; sections with photos), heading look (design, gradient, outline, shadow), font for this section (any font pair) |
 | Space and motion | Space above and below (none, small, normal, large, extra), entrance when scrolled to (page setting, none, fade, rise, zoom, slide) |
 
 - Text alignment moves the standard section heading; sections with their own text block (hero, call to action, text, quote, CV download, newsletter, booking...) align all their text instead. In two-column layouts the text centers in its own column.
@@ -109,6 +109,7 @@ Stored in `section.style`. Every field past `background` and `padding` is option
 - Space is a scale: each section type sets `--pk-pad-base` and the choice sets `--pk-pad-scale`, so the navbar, footer, logo strip and stats follow it too.
 - Shaped edges cut the section with a CSS mask; what shows through is the page color. The mask would cut an outline too, so the preview draws the selected section's frame as a separate overlay (`.pk-editor-outline`).
 - Entrances run in `page-script.ts` on the published page, never in the editor preview. A section's entrance wins over the page's animation setting; reduce-motion visitors see none.
+- **Phase 8C choices** (`columns`, `ratio`, `shadow`, `headingEffect`, `font`), added without a version bump like the rest. Columns set `--pk-cols` on the card and list grids named in `section-style.css`, from 760px up; phones keep one column. Photo shape sets `aspect-ratio` and `object-fit: cover` on the section's `.pk-media`. Shadow overrides `--pk-card-shadow`. Heading look styles `.pk-h2` and the hero name. A section font sets `--pk-font-heading` and `--pk-font-body` on the section (Arabic face first on Arabic pages), and the page loads that pair too (`googleFontsUrl(..., sectionFontIds(doc.sections))`).
 
 ## Code map
 

@@ -107,6 +107,22 @@ export const sectionStyleSchema = z.object({
   edgeBottom: z.enum(SECTION_EDGES).optional(),
   /** How the section appears when scrolled to. Missing: the page's animation setting. */
   entrance: z.enum(["none", "fade", "rise", "zoom", "slide"]).optional(),
+  /*
+   * Phase 8C, also without a bump. Missing means "as the design does it".
+   */
+  /** Columns of the section's cards or list on wide screens (one column on phones). */
+  columns: z.enum(["2", "3", "4"]).optional(),
+  /** Shape of the section's photos. */
+  ratio: z.enum(["square", "portrait", "landscape", "wide"]).optional(),
+  /** Shadow under the section's cards. */
+  shadow: z.enum(["none", "soft", "strong"]).optional(),
+  /** A look for the section's main heading. */
+  headingEffect: z.enum(["gradient", "outline", "shadow"]).optional(),
+  /** Id of a font pair (themes/fonts.ts) for this section only. */
+  font: z
+    .string()
+    .regex(/^[a-z0-9-]{1,40}$/)
+    .optional(),
 });
 export type SectionStyle = z.infer<typeof sectionStyleSchema>;
 

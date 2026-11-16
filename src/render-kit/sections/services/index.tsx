@@ -51,6 +51,24 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
   </Rail>
 );
 
+/** Big numbers over a thin line, three across on wide screens. */
+const Numbered: VariantComponent<Content> = ({ content, ctx }) => (
+  <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <ol className="pk-services__numbered">
+      {content.items.map((item, i) => (
+        <li key={i} {...ctx.el(item.id)}>
+          <span className="pk-services__index" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <h3 className="pk-h3">{ctx.t(item.title)}</h3>
+          <p className="pk-muted">{ctx.rich(item.description)}</p>
+          {ctx.t(item.price) && <p className="pk-services__price">{ctx.t(item.price)}</p>}
+        </li>
+      ))}
+    </ol>
+  </Stack>
+);
+
 export const services = defineSection({
   type: "services",
   name: "Services",
@@ -96,6 +114,7 @@ export const services = defineSection({
   variants: {
     cards: { name: "Cards", component: Cards },
     list: { name: "List with prices", component: List },
+    numbered: { name: "Big numbers", component: Numbered },
   },
   defaultVariant: "cards",
   fields: [

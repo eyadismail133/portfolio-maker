@@ -10,6 +10,9 @@ async function Frame({ searchParams }: { searchParams: Search }) {
   const q = await searchParams;
   const mode = q.mode === "dark" || q.mode === "both" ? q.mode : "light";
   const doc = createSampleDoc({
+    // `sections=contact:form,services` shows only those sections; `family=bold` picks the design.
+    sections: q.sections ? q.sections.split(",").filter(Boolean) : undefined,
+    family: q.family,
     palette: q.palette,
     fonts: q.fonts,
     mode,

@@ -253,4 +253,16 @@ export const AR_3: Record<string, string> = {
   Crop: "قص",
   "This image cannot be cropped here. Upload it again to crop it.":
     "لا يمكن قص هذه الصورة هنا. ارفعها مرة أخرى لتقصها.",
+  // Section style: Phase 8C choices and new layouts.
+  "Card shadow": "ظل البطاقات",
+  Columns: "الأعمدة",
+  "On wide screens. Phones show one column.": "على الشاشات الواسعة. الهواتف تعرض عموداً واحداً.",
+  Portrait: "طولي",
+  Landscape: "عرضي",
+  "Heading look": "شكل العنوان",
+  "Font for this section": "خط هذا القسم",
+  "Same as the page": "مثل باقي الصفحة",
+  Strong: "قوي",
+  "Step cards": "بطاقات الخطوات",
+  "Big email": "بريد كبير",
 };

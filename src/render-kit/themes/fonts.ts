@@ -154,8 +154,18 @@ export function headingWeights(choice: FontChoice): { light: number; bold: numbe
   return { light: Math.min(...weights), bold: Math.max(...weights) };
 }
 
+/** Font pairs chosen for single sections of a page. */
+export function sectionFontIds(sections: readonly { style?: { font?: string } }[]): string[] {
+  return sections.flatMap((s) => (s.style?.font ? [s.style.font] : []));
+}
+
 /** Google Fonts stylesheet address for the chosen fonts, loading only the weights in use. */
-export function googleFontsUrl(choice: FontChoice, languages: readonly Lang[]): string {
+export function googleFontsUrl(
+  choice: FontChoice,
+  languages: readonly Lang[],
+  /** Font pairs chosen for single sections (`style.font`), loaded too. */
+  more: readonly string[] = [],
+): string {
   const { headingPair, bodyPair } = chosen(choice);
   const faces = new Map<string, Set<number>>();
   const add = (face: FontFace) => {
@@ -168,6 +178,12 @@ export function googleFontsUrl(choice: FontChoice, languages: readonly Lang[]): 
   if (languages.includes("ar")) {
     add(headingPair.arabic);
     add(bodyPair.arabic);
+  }
+  for (const id of new Set(more)) {
+    const pair = getFontPair(id);
+    add(pair.heading);
+    add(pair.body);
+    if (languages.includes("ar")) add(pair.arabic);
   }
   const query = [...faces]
     .map(

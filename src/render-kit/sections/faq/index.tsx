@@ -38,6 +38,20 @@ const Columns: VariantComponent<Content> = ({ content, ctx }) => (
   </Stack>
 );
 
+/** Each question in its own card, answers always open. */
+const Cards: VariantComponent<Content> = ({ content, ctx }) => (
+  <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
+    <ul className="pk-faq__cards">
+      {content.items.map((item, i) => (
+        <li key={i} {...ctx.el(item.id, "pk-card")}>
+          <h3 className="pk-h3">{ctx.t(item.question)}</h3>
+          <Paragraphs text={ctx.t(item.answer)} className="pk-prose pk-muted" />
+        </li>
+      ))}
+    </ul>
+  </Stack>
+);
+
 export const faq = defineSection({
   type: "faq",
   name: "Questions and answers",
@@ -80,6 +94,7 @@ export const faq = defineSection({
   variants: {
     accordion: { name: "Open and close", component: Accordion },
     columns: { name: "Two columns", component: Columns },
+    cards: { name: "Cards", component: Cards },
   },
   defaultVariant: "accordion",
   fields: [

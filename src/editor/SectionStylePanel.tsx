@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { getSection } from "@/render-kit/registry";
+import { fontPairs } from "@/render-kit/themes/fonts";
 import {
   SECTION_EDGES,
   type Palette,
@@ -118,6 +119,11 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
   const isNavbar = section.type === "navbar";
   const isDivider = section.type === "divider";
   const framed = Boolean(def?.pinned);
+  // Columns and photo shape are offered only where the section has a list or photos.
+  const hasList = !!def?.fields.some((f) => f.type === "list");
+  const hasPhotos = !!def?.fields.some(
+    (f) => f.type === "image" || f.fields?.some((sub) => sub.type === "image"),
+  );
   const set = (next: Partial<SectionStyle>, group?: string) =>
     setSectionStyle(section.id, next, group ? `${section.id}:style:${group}` : undefined);
 
@@ -313,7 +319,91 @@ export function SectionStylePanel({ section, ctx }: { section: Section; ctx: For
                   ]}
                 />
               </div>
+              <div className="grid gap-1.5">
+                <Label>Card shadow</Label>
+                <Segmented
+                  label="Card shadow"
+                  value={style?.shadow ?? "design"}
+                  onChange={(shadow) => set({ shadow: shadow === "design" ? undefined : shadow })}
+                  options={[
+                    ["design", "Design"],
+                    ["none", "None"],
+                    ["soft", "Soft"],
+                    ["strong", "Strong"],
+                  ]}
+                />
+              </div>
+              {hasList && (
+                <div className="grid gap-1.5">
+                  <Label>Columns</Label>
+                  <Segmented
+                    label="Columns"
+                    value={style?.columns ?? "design"}
+                    onChange={(columns) =>
+                      set({ columns: columns === "design" ? undefined : columns })
+                    }
+                    options={[
+                      ["design", "Design"],
+                      ["2", "2"],
+                      ["3", "3"],
+                      ["4", "4"],
+                    ]}
+                  />
+                  <p className="text-xs text-zinc-500">On wide screens. Phones show one column.</p>
+                </div>
+              )}
+              {hasPhotos && (
+                <div className="grid gap-1.5">
+                  <Label>Photo shape</Label>
+                  <Segmented
+                    label="Photo shape"
+                    value={style?.ratio ?? "design"}
+                    onChange={(ratio) => set({ ratio: ratio === "design" ? undefined : ratio })}
+                    options={[
+                      ["design", "Design"],
+                      ["square", "Square"],
+                      ["portrait", "Portrait"],
+                      ["landscape", "Landscape"],
+                      ["wide", "Wide"],
+                    ]}
+                  />
+                </div>
+              )}
+              <div className="grid gap-1.5">
+                <Label>Heading look</Label>
+                <Segmented
+                  label="Heading look"
+                  value={style?.headingEffect ?? "design"}
+                  onChange={(effect) =>
+                    set({ headingEffect: effect === "design" ? undefined : effect })
+                  }
+                  options={[
+                    ["design", "Design"],
+                    ["gradient", "Gradient"],
+                    ["outline", "Outline"],
+                    ["shadow", "Shadow"],
+                  ]}
+                />
+              </div>
             </>
+          )}
+          {!isDivider && (
+            <div className="grid gap-1.5">
+              <Label htmlFor="style-font">Font for this section</Label>
+              <select
+                id="style-font"
+                className={inputClass}
+                value={style?.font ?? ""}
+                onChange={(e) => set({ font: e.target.value || undefined })}
+              >
+                <option value="">Same as the page</option>
+                {fontPairs.map((pair) => (
+                  <option key={pair.id} value={pair.id}>
+                    {pair.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </Group>
       )}

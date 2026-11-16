@@ -276,3 +276,85 @@
 .pk-section[data-pk-align="center"] .pk-hero__cover {
   margin-inline: auto;
 }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Phase 8C choices. Missing means the design decides.                                        */
+/* ------------------------------------------------------------------------------------------ */
+
+/* Columns of the section's cards or list, from tablet width up; phones keep one column. */
+.pk-section[data-pk-columns="2"] {
+  --pk-cols: 2;
+}
+.pk-section[data-pk-columns="3"] {
+  --pk-cols: 3;
+}
+.pk-section[data-pk-columns="4"] {
+  --pk-cols: 4;
+}
+@media (min-width: 760px) {
+  .pk-section[data-pk-columns]
+    :is(
+      .pk-grid,
+      .pk-projects__list--grid,
+      .pk-team__list--grid,
+      .pk-gallery__list,
+      .pk-testis,
+      .pk-stats__list,
+      .pk-skills__groups,
+      .pk-entry-cards,
+      .pk-faq__cards,
+      .pk-faq__columns,
+      .pk-contact__cards,
+      .pk-certs--badges,
+      .pk-steps--cards,
+      .pk-steps--horizontal,
+      .pk-services__numbered,
+      .pk-video__list--grid
+    ) {
+    grid-template-columns: repeat(var(--pk-cols), minmax(0, 1fr));
+  }
+}
+
+/* Shape of the section's photos (and of their placeholders). */
+.pk-section[data-pk-ratio] .pk-media {
+  height: auto;
+  object-fit: cover;
+}
+.pk-section[data-pk-ratio="square"] .pk-media {
+  aspect-ratio: 1;
+}
+.pk-section[data-pk-ratio="portrait"] .pk-media {
+  aspect-ratio: 4 / 5;
+}
+.pk-section[data-pk-ratio="landscape"] .pk-media {
+  aspect-ratio: 4 / 3;
+}
+.pk-section[data-pk-ratio="wide"] .pk-media {
+  aspect-ratio: 16 / 9;
+}
+
+/* Shadow under the section's cards. */
+.pk-section[data-pk-shadow="none"] {
+  --pk-card-shadow: none !important;
+}
+.pk-section[data-pk-shadow="soft"] {
+  --pk-card-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px -10px rgb(0 0 0 / 0.22) !important;
+}
+.pk-section[data-pk-shadow="strong"] {
+  --pk-card-shadow: 0 2px 4px rgb(0 0 0 / 0.08), 0 22px 48px -14px rgb(0 0 0 / 0.42) !important;
+}
+
+/* A look for the section's main heading. */
+.pk-section[data-pk-heffect="gradient"] :is(.pk-h2, .pk-hero__name) {
+  background: linear-gradient(100deg, var(--pk-primary), var(--pk-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.pk-section[data-pk-heffect="outline"] :is(.pk-h2, .pk-hero__name) {
+  color: transparent;
+  -webkit-text-stroke: max(1px, 0.025em) var(--pk-text);
+}
+.pk-section[data-pk-heffect="shadow"] :is(.pk-h2, .pk-hero__name) {
+  text-shadow: 0.07em 0.07em 0 color-mix(in srgb, var(--pk-primary) 38%, transparent);
+}

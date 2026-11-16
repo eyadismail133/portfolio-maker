@@ -32,3 +32,29 @@
   flex: 1 1 320px;
   max-width: 56ch;
 }
+
+/* Big numbers: each service under a thin line, its number large in the main color. */
+.pk-services__numbered {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 40px var(--pk-gap);
+}
+.pk-services__numbered li {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding-block-start: 18px;
+  border-block-start: var(--pk-rule);
+}
+.pk-services__index {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: clamp(2.4rem, 1.8rem + 2vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: var(--pk-h-tracking);
+  color: var(--pk-primary);
+  font-variant-numeric: tabular-nums;
+}
+.pk-services__numbered .pk-services__price {
+  margin-block-start: 4px;
+}

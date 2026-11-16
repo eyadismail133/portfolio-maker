@@ -7,7 +7,7 @@ import { PAGE_CSS } from "@/render-kit/generated/page-css";
 import { PAGE_SCRIPT } from "@/render-kit/page-script";
 import { normalizeDoc } from "@/render-kit/registry";
 import { createSampleDoc } from "@/render-kit/samples";
-import { renderKitCss } from "../../../scripts/bundle-css";
+import { cssModule, minifyCss, renderKitCss } from "../../../scripts/bundle-css";
 import { publishChecks } from "../publish-checks";
 import { signupsCsv } from "../publishing";
 import { cleanSlugInput, RESERVED_SLUGS, slugProblem, suggestSlug } from "../slug";
@@ -216,13 +216,12 @@ describe("HTML export", () => {
     expect(pageFileNames(["ar", "en"])).toEqual({ ar: "index.html", en: "en.html" });
   });
 
-  test("the generated stylesheet is up to date", () => {
-    const fresh =
-      renderKitCss()
-        .replace(/\/\*[\s\S]*?\*\//g, "")
-        .replace(/\n\s*\n+/g, "\n")
-        .trim() + "\n";
-    expect(PAGE_CSS).toBe(fresh);
+  test("the generated stylesheet is up to date", async () => {
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync("src/render-kit/generated/page-css.ts", "utf8")).toBe(cssModule());
+    // Its parts hold every rule of the whole stylesheet (compared without white space).
+    const flat = (css: string) => css.replace(/\s+/g, "");
+    expect(flat(PAGE_CSS)).toBe(flat(minifyCss(renderKitCss())));
   });
 
   test("the page script parses", () => {

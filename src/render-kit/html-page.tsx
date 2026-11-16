@@ -5,7 +5,7 @@ import { Renderer } from "./Renderer";
 import type { PortfolioDoc } from "./schema/document";
 import type { Lang } from "./schema/primitives";
 import { rootFontSize } from "./themes/css-vars";
-import { googleFontsUrl } from "./themes/fonts";
+import { googleFontsUrl, sectionFontIds } from "./themes/fonts";
 
 const escapeHtml = (value: string) =>
   value.replace(
@@ -84,7 +84,7 @@ export function buildHtmlPage(
 <meta name="twitter:card" content="${shareImage ? "summary_large_image" : "summary"}">
 ${options.canonical ? `<link rel="canonical" href="${escapeHtml(options.canonical)}">\n<meta property="og:url" content="${escapeHtml(options.canonical)}">\n` : ""}${shareImage ? `<meta property="og:image" content="${escapeHtml(shareImage)}">\n` : ""}${favicon ? `<link rel="icon" href="${escapeHtml(favicon)}">\n` : ""}${alternates ? `${alternates}\n` : ""}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${escapeHtml(googleFontsUrl(doc.theme, doc.meta.languages))}">
+<link rel="stylesheet" href="${escapeHtml(googleFontsUrl(doc.theme, doc.meta.languages, sectionFontIds(doc.sections)))}">
 <style>html{scroll-behavior:smooth}body{margin:0}</style>
 ${style}
 ${options.spamCheckKey ? `<meta name="pk-turnstile" content="${escapeHtml(options.spamCheckKey)}">\n` : ""}</head>

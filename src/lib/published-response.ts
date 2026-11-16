@@ -2,7 +2,7 @@ import { isAppHost } from "@/lib/custom-domain";
 import { getPublished, type Published } from "@/lib/published";
 import { NOT_FOUND_HTML } from "@/lib/published-check";
 import { buildHtmlPage } from "@/render-kit/html-page";
-import { PAGE_CSS } from "@/render-kit/generated/page-css";
+import { pageCss } from "@/render-kit/page-css";
 import { PAGE_SCRIPT } from "@/render-kit/page-script";
 import { siteUrl } from "@/lib/site";
 import { turnstileSiteKey } from "@/lib/visitor-check";
@@ -83,7 +83,7 @@ async function publishedHtml(
   const { renderToStaticMarkup } = await import("react-dom/server");
   return buildHtmlPage(renderToStaticMarkup, doc, {
     lang,
-    css: PAGE_CSS,
+    css: pageCss(doc),
     script: `${PAGE_SCRIPT}\n${counter}`,
     languageHrefs,
     formAction: `/api/contact?slug=${slug}`,

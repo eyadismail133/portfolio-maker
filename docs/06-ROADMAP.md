@@ -175,10 +175,10 @@ Click and drag inside the layout, like a document editor. Not a free canvas: thi
 - [x] Every action is one Undo step; works in English and Arabic previews
 
 ### 8C - Better designs per kind of user (about 1.5 weeks, side by side with 8B)
-- [ ] Screenshot audit with `npm run visual`; list the weak sections and layouts for each kind of user (professional, student, freelancer, creative, company, agency, startup)
-- [ ] New layouts for the sections with the fewest or weakest ones
-- [ ] New section style choices: columns, image proportions, shadow strength, text effects, a font for one section
-- [ ] Pages carry only the CSS for the sections and layouts they use (keeps the inline stylesheet small as layouts grow)
+- [x] Screenshot audit with `npm run visual`; list the weak sections and layouts for each kind of user (in `docs/04-SECTIONS-AND-DESIGNS.md`, "Design audit"; `/dev/render/frame?sections=...&family=...` shows chosen sections)
+- [x] New layouts for the sections with the fewest or weakest ones (contact big, services numbered, questions cards, how it works cards)
+- [x] New section style choices: columns, image proportions, shadow strength, text effects, a font for one section
+- [x] Pages carry only the CSS for the sections and layouts they use (`pageCss`: about 55 KB instead of 107 KB for a typical page)
 
 ### 8D - Pro showcase sections (about 1.5 weeks, needs 8A)
 Finished, animated sections (device mockups, bento grid, animated hero, marquee, scroll story). Their movement is CSS and `page-script.ts` only, and each works with no script.

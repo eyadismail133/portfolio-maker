@@ -103,3 +103,35 @@
 .pk-root[data-pk-static] form[data-pk-mailto] button[type="submit"] {
   display: none;
 }
+
+/* Big email: the address as large type that wraps on small screens. */
+.pk-contact__big {
+  display: grid;
+  gap: 22px;
+  justify-items: start;
+}
+.pk-contact__email {
+  font-family: var(--pk-font-heading);
+  font-weight: var(--pk-heading-weight);
+  font-size: clamp(1.9rem, 1rem + 4.2vw, 4.6rem);
+  line-height: 1.05;
+  letter-spacing: var(--pk-h-tracking);
+  color: var(--pk-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  border-block-end: 3px solid var(--pk-primary);
+  padding-block-end: 6px;
+}
+.pk-contact__email:hover {
+  color: var(--pk-primary);
+}
+.pk-contact__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 48px;
+  margin-block-start: 8px;
+}
+.pk-contact__row dd {
+  margin: 4px 0 0;
+}

@@ -48,3 +48,15 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Cards: each question in its own card, the answer always shown. */
+.pk-faq__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--pk-gap);
+}
+.pk-faq__cards li {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}

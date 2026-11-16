@@ -9,7 +9,7 @@ import "./sections";
 import { themeToCssVars } from "./themes/css-vars";
 import { getFamily } from "./themes/families";
 import { sectionLook } from "./themes/section-style";
-import { googleFontsUrl } from "./themes/fonts";
+import { googleFontsUrl, sectionFontIds } from "./themes/fonts";
 
 type Props = {
   /** A document that went through `normalizeDoc`. */
@@ -97,13 +97,18 @@ export function Renderer({
       style={themeToCssVars(doc.theme, language) as CSSProperties}
     >
       {/* A plain link: the page must still show when the font service is slow or blocked. */}
-      {fontLink && <link rel="stylesheet" href={googleFontsUrl(doc.theme, doc.meta.languages)} />}
+      {fontLink && (
+        <link
+          rel="stylesheet"
+          href={googleFontsUrl(doc.theme, doc.meta.languages, sectionFontIds(doc.sections))}
+        />
+      )}
       {sorted.map(({ section, def }) => {
         const variant = def.variants[section.variant] ?? def.variants[def.defaultVariant];
         const Component = variant.component;
         const Tag =
           def.pinned === "top" ? "header" : def.pinned === "bottom" ? "footer" : "section";
-        const look = sectionLook(section.style, doc.theme.palette);
+        const look = sectionLook(section.style, doc.theme.palette, language);
         const sectionCtx: SectionContext = {
           ...ctx,
           el: (key, className) => elementProps(section.elements, editing, key, className),

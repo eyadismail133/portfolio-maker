@@ -38,3 +38,14 @@
   grid-template-columns: 40px minmax(0, 1fr);
   gap: 20px;
 }
+
+/* Step cards: each step in a card, its number filled in the main color. */
+.pk-steps--cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.pk-steps--cards .pk-steps__num {
+  background: var(--pk-primary);
+  color: var(--pk-on-primary);
+  border-color: var(--pk-primary);
+  border-radius: var(--pk-radius, 10px);
+}

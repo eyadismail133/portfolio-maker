@@ -10,13 +10,13 @@ const schema = z.object({
 });
 type Content = z.output<typeof schema>;
 
-const make = (layout: "horizontal" | "vertical"): VariantComponent<Content> =>
+const make = (layout: "horizontal" | "vertical" | "cards"): VariantComponent<Content> =>
   function HowItWorks({ content, ctx }) {
     return (
       <Stack heading={content.heading} subheading={content.subheading} ctx={ctx}>
         <ol className={`pk-steps pk-steps--${layout}`}>
           {content.steps.map((step, i) => (
-            <li key={i} {...ctx.el(step.id)}>
+            <li key={i} {...ctx.el(step.id, layout === "cards" ? "pk-card" : undefined)}>
               <span className="pk-steps__num" aria-hidden="true">
                 {i + 1}
               </span>
@@ -73,6 +73,7 @@ export const howItWorks = defineSection({
   variants: {
     horizontal: { name: "Side by side", component: make("horizontal") },
     vertical: { name: "Top to bottom", component: make("vertical") },
+    cards: { name: "Step cards", component: make("cards") },
   },
   defaultVariant: "horizontal",
   fields: [

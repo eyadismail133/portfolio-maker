@@ -1,6 +1,8 @@
 import { safeImageUrl } from "../i18n";
 import type { Palette, SectionStyle } from "../schema/document";
 import { contrastRatio, hexToRgb, readableOn, rgbToHex } from "./color";
+import { fontStacks } from "./fonts";
+import type { Lang } from "../schema/primitives";
 
 /** What the Renderer puts on a section wrapper for its style. */
 export type SectionLook = {
@@ -55,7 +57,11 @@ function ownColors(bg: string, text: string, palette: Palette): Record<string, s
  * Turns a section's style into data attributes (read by styles/section-style.css) and the few
  * CSS variables that depend on chosen colors. Pure, so the page, the preview and the export agree.
  */
-export function sectionLook(style: SectionStyle | undefined, palette: Palette): SectionLook {
+export function sectionLook(
+  style: SectionStyle | undefined,
+  palette: Palette,
+  lang: Lang = "en",
+): SectionLook {
   const attrs: Record<string, string> = {
     "data-pk-bg": style?.background ?? "default",
     "data-pk-pad": style?.padding ?? "normal",
@@ -96,5 +102,14 @@ export function sectionLook(style: SectionStyle | undefined, palette: Palette): 
     if (bottom !== "none") attrs["data-pk-edge-bottom"] = bottom;
   }
   if (style.entrance) attrs["data-pk-entrance"] = style.entrance;
+  if (style.columns) attrs["data-pk-columns"] = style.columns;
+  if (style.ratio) attrs["data-pk-ratio"] = style.ratio;
+  if (style.shadow) attrs["data-pk-shadow"] = style.shadow;
+  if (style.headingEffect) attrs["data-pk-heffect"] = style.headingEffect;
+  if (style.font) {
+    const fonts = fontStacks(style.font, lang);
+    vars["--pk-font-heading"] = fonts.heading;
+    vars["--pk-font-body"] = fonts.body;
+  }
   return { attrs, vars };
 }

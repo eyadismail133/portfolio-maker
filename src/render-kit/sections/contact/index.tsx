@@ -146,6 +146,38 @@ const Cards: VariantComponent<Content> = (props) => {
   );
 };
 
+/** The email as one large link, with the other details and social links in a row below it. */
+const Big: VariantComponent<Content> = (props) => {
+  const { content, ctx } = props;
+  const rest = details(props).filter((d) => d.key !== "email");
+  return (
+    <div className="pk-contact__big">
+      {ctx.t(content.heading) && (
+        <h2 {...ctx.el("heading", "pk-h3 pk-muted")}>{ctx.t(content.heading)}</h2>
+      )}
+      {content.email && (
+        <a {...ctx.el("email", "pk-contact__email")} href={`mailto:${content.email}`}>
+          <bdi dir="ltr">{content.email}</bdi>
+        </a>
+      )}
+      {ctx.t(content.body) && <p {...ctx.el("body", "pk-sub")}>{ctx.rich(content.body)}</p>}
+      {rest.length > 0 && (
+        <dl className="pk-contact__row">
+          {rest.map((d, i) => (
+            <div key={i} {...ctx.el(d.key)}>
+              <dt className="pk-contact__label">{d.label}</dt>
+              <dd>
+                <Value d={d} />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <Socials {...props} />
+    </div>
+  );
+};
+
 export const contact = defineSection({
   type: "contact",
   name: "Contact",
@@ -170,6 +202,7 @@ export const contact = defineSection({
   variants: {
     form: { name: "Form with details", component: WithForm },
     cards: { name: "Detail cards", component: Cards },
+    big: { name: "Big email", component: Big },
   },
   defaultVariant: "form",
   fields: [

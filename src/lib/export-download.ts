@@ -6,13 +6,13 @@ export async function downloadHtml(
   doc: PortfolioDoc,
   fileName: string,
 ): Promise<{ missingImages: number }> {
-  const [{ buildExportZip }, { PAGE_CSS }, { PAGE_SCRIPT }] = await Promise.all([
+  const [{ buildExportZip }, { pageCss }, { PAGE_SCRIPT }] = await Promise.all([
     import("@/render-kit/export"),
-    import("@/render-kit/generated/page-css"),
+    import("@/render-kit/page-css"),
     import("@/render-kit/page-script"),
   ]);
   const result = await buildExportZip(doc, {
-    css: PAGE_CSS,
+    css: pageCss(doc),
     script: PAGE_SCRIPT,
     fetchImage: async (url) => {
       const response = await fetch(url, { mode: "cors" });
@@ -39,12 +39,12 @@ export async function downloadHtml(
  * editing outlines. `target` is a tab opened right on the click, so pop-up blockers allow it.
  */
 export async function openPreviewTab(doc: PortfolioDoc, lang: Lang, target: Window | null) {
-  const [{ renderToHtml }, { PAGE_CSS }, { PAGE_SCRIPT }] = await Promise.all([
+  const [{ renderToHtml }, { pageCss }, { PAGE_SCRIPT }] = await Promise.all([
     import("@/render-kit/export"),
-    import("@/render-kit/generated/page-css"),
+    import("@/render-kit/page-css"),
     import("@/render-kit/page-script"),
   ]);
-  const html = renderToHtml(doc, { lang, css: PAGE_CSS, script: PAGE_SCRIPT });
+  const html = renderToHtml(doc, { lang, css: pageCss(doc), script: PAGE_SCRIPT });
   const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
   if (target) {
     target.opener = null;

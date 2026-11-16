@@ -92,6 +92,18 @@ Total: 43 types, 39 in version 1. Build order is in the roadmap; the first 12 ar
 
 Side-scrolling rows use the shared `.pk-slider` class: CSS scroll snapping, no script, so they work in exported HTML. It is positioned and has `min-width: 0`; without that it widens the page on phones.
 
+### Design audit and layouts added in Phase 8C (112 in all)
+The audit (16 November 2026) counted layouts per section against the starting pages each kind of user gets (`src/recommend/recipes.ts`). 28 sections had two layouts. The most used of those, and what they got:
+
+| Section | Used by | New layout |
+|---|---|---|
+| Contact | every starting page | `big`: the email as one large link, details and social links below |
+| Services | freelancers, companies, agencies, sign-ups | `numbered`: big numbers over a thin line, three across |
+| Questions and answers | clients, sign-ups, companies | `cards`: each question in a card, answers open |
+| How it works | clients, companies, sign-ups | `cards`: steps in cards with filled numbers |
+
+Still at two layouts and next in line: pricing, case study, timeline, mission and values, problem and solution, press, partners, awards, languages, interests. The new Style tab choices (columns, photo shape, card shadow, heading look, section font) give every section more range without new layouts. The visual check (`npm run visual`, 96 pages) passes with all of it.
+
 ## Content fields example
 
 Every section doc entry follows this pattern. Example for `work-experience`:
