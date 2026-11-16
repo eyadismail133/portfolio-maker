@@ -22,15 +22,15 @@ function Copy({ content, ctx }: Parameters<VariantComponent<Content>>[0]) {
   const intro = ctx.t(content.intro);
   return (
     <div className="pk-hero__copy">
-      {title && <p className="pk-hero__title">{title}</p>}
-      <h1 className="pk-hero__name">{ctx.t(content.name)}</h1>
-      {intro && <p className="pk-hero__intro">{ctx.rich(content.intro)}</p>}
+      {title && <p {...ctx.el("title", "pk-hero__title")}>{title}</p>}
+      <h1 {...ctx.el("name", "pk-hero__name")}>{ctx.t(content.name)}</h1>
+      {intro && <p {...ctx.el("intro", "pk-hero__intro")}>{ctx.rich(content.intro)}</p>}
       <div className="pk-hero__actions">
-        <ButtonLink link={content.primaryCta} ctx={ctx} />
-        <ButtonLink link={content.secondaryCta} ctx={ctx} kind="ghost" />
+        <ButtonLink link={content.primaryCta} ctx={ctx} elKey="primaryCta" />
+        <ButtonLink link={content.secondaryCta} ctx={ctx} elKey="secondaryCta" kind="ghost" />
       </div>
       {status && (
-        <p className="pk-hero__status">
+        <p {...ctx.el("status", "pk-hero__status")}>
           <span className="pk-hero__dot" aria-hidden="true" />
           {status}
         </p>
@@ -46,6 +46,8 @@ const Split: VariantComponent<Content> = (props) => (
       asset={props.content.image}
       label={props.ctx.t(props.content.name)}
       className="pk-hero__image"
+      ctx={props.ctx}
+      elKey="image"
     />
   </div>
 );
@@ -56,6 +58,8 @@ const Centered: VariantComponent<Content> = (props) => (
       asset={props.content.image}
       label={props.ctx.t(props.content.name)}
       className="pk-hero__avatar"
+      ctx={props.ctx}
+      elKey="image"
     />
     <Copy {...props} />
   </div>
@@ -69,6 +73,7 @@ const Cover: VariantComponent<Content> = (props) => {
       <div className="pk-hero__backdrop" aria-hidden="true">
         {url && (
           <img
+            {...props.ctx.el("image")}
             src={url}
             alt=""
             width={props.content.image?.width}
@@ -89,17 +94,19 @@ const Statement: VariantComponent<Content> = ({ content, ctx }) => {
   const status = ctx.t(content.status);
   return (
     <div className="pk-hero__statement">
-      {title && <p className="pk-hero__title">{title}</p>}
-      <h1 className="pk-hero__name">{ctx.t(content.name)}</h1>
+      {title && <p {...ctx.el("title", "pk-hero__title")}>{title}</p>}
+      <h1 {...ctx.el("name", "pk-hero__name")}>{ctx.t(content.name)}</h1>
       <div className="pk-hero__below">
-        {ctx.t(content.intro) && <p className="pk-hero__intro">{ctx.rich(content.intro)}</p>}
+        {ctx.t(content.intro) && (
+          <p {...ctx.el("intro", "pk-hero__intro")}>{ctx.rich(content.intro)}</p>
+        )}
         <div>
           <div className="pk-hero__actions">
-            <ButtonLink link={content.primaryCta} ctx={ctx} />
-            <ButtonLink link={content.secondaryCta} ctx={ctx} kind="ghost" />
+            <ButtonLink link={content.primaryCta} ctx={ctx} elKey="primaryCta" />
+            <ButtonLink link={content.secondaryCta} ctx={ctx} elKey="secondaryCta" kind="ghost" />
           </div>
           {status && (
-            <p className="pk-hero__status">
+            <p {...ctx.el("status", "pk-hero__status")}>
               <span className="pk-hero__dot" aria-hidden="true" />
               {status}
             </p>
@@ -107,7 +114,13 @@ const Statement: VariantComponent<Content> = ({ content, ctx }) => {
         </div>
       </div>
       {content.image && (
-        <Media asset={content.image} label={ctx.t(content.name)} className="pk-hero__banner" />
+        <Media
+          asset={content.image}
+          label={ctx.t(content.name)}
+          className="pk-hero__banner"
+          ctx={ctx}
+          elKey="image"
+        />
       )}
     </div>
   );

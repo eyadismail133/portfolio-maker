@@ -126,6 +126,11 @@ export const elementStyleSchema = z.object({
   weight: z.enum(ELEMENT_WEIGHTS).optional(),
   align: z.enum(ELEMENT_ALIGNS).optional(),
   hidden: z.boolean().optional(),
+  /**
+   * Mirrors the element's place beside its neighbor (photo on the other side of the text).
+   * Added to version 2 without a bump: missing means "as the design places it".
+   */
+  flip: z.boolean().optional(),
 });
 export type ElementStyle = z.infer<typeof elementStyleSchema>;
 

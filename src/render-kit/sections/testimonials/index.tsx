@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
-import { L, Media, Stack } from "../shared";
+import { L, Media, Stack, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -27,7 +27,13 @@ function Quote({ item, ctx, className }: { item: Item; ctx: Ctx; className: stri
         <p>{ctx.rich(item.quote)}</p>
       </blockquote>
       <figcaption>
-        <Media asset={item.photo} label={ctx.t(item.name)} className="pk-testi__photo" />
+        <Media
+          ctx={ctx}
+          elKey={sub(item.id, "photo")}
+          asset={item.photo}
+          label={ctx.t(item.name)}
+          className="pk-testi__photo"
+        />
         <span>
           <strong>{ctx.t(item.name)}</strong>
           {ctx.t(item.role) && <span className="pk-testi__role">{ctx.t(item.role)}</span>}
@@ -65,7 +71,9 @@ const Single: VariantComponent<Content> = ({ content, ctx }) => {
   if (!first) return null;
   return (
     <>
-      {ctx.t(content.heading) && <h2 className="pk-visually-hidden">{ctx.t(content.heading)}</h2>}
+      {ctx.t(content.heading) && (
+        <h2 {...ctx.el("heading", "pk-visually-hidden")}>{ctx.t(content.heading)}</h2>
+      )}
       <Quote item={first} ctx={ctx} className="pk-testi pk-testi--large" />
     </>
   );

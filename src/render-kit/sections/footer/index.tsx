@@ -22,16 +22,16 @@ const make = (layout: "simple" | "columns" | "big"): VariantComponent<Content> =
         <div>
           {logo && (
             <img
-              className="pk-footer__logo"
+              {...ctx.el("logo", "pk-footer__logo")}
               src={logo}
               alt={ctx.t(content.name) ? "" : content.logo?.alt || ctx.ui("logo")}
               width={content.logo?.width}
               height={content.logo?.height}
             />
           )}
-          <p className="pk-footer__name">{ctx.t(content.name)}</p>
+          <p {...ctx.el("name", "pk-footer__name")}>{ctx.t(content.name)}</p>
           {layout !== "simple" && ctx.t(content.tagline) && (
-            <p className="pk-footer__tagline">{ctx.t(content.tagline)}</p>
+            <p {...ctx.el("tagline", "pk-footer__tagline")}>{ctx.t(content.tagline)}</p>
           )}
         </div>
         {links.length > 0 && (
@@ -43,7 +43,9 @@ const make = (layout: "simple" | "columns" | "big"): VariantComponent<Content> =
             ))}
           </ul>
         )}
-        {ctx.t(content.copyright) && <p className="pk-footer__copy">{ctx.t(content.copyright)}</p>}
+        {ctx.t(content.copyright) && (
+          <p {...ctx.el("copyright", "pk-footer__copy")}>{ctx.t(content.copyright)}</p>
+        )}
       </div>
     );
   };

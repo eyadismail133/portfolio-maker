@@ -17,7 +17,7 @@ function Frame({ content, ctx }: SectionProps<Content>) {
   if (!content.query.trim()) return null;
   return (
     <iframe
-      className="pk-embed pk-map__frame"
+      {...ctx.el("query", "pk-embed pk-map__frame")}
       src={mapEmbedUrl(content.query)}
       title={ctx.t(content.heading) || ctx.ui("location")}
       loading="lazy"
@@ -29,9 +29,14 @@ function Frame({ content, ctx }: SectionProps<Content>) {
 function Details({ content, ctx }: SectionProps<Content>) {
   return (
     <div className="pk-map__details">
-      {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
-      <Paragraphs text={ctx.t(content.address)} />
-      <Paragraphs text={ctx.t(content.hours)} className="pk-prose pk-muted" />
+      {ctx.t(content.heading) && <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>}
+      <Paragraphs ctx={ctx} elKey="address" text={ctx.t(content.address)} />
+      <Paragraphs
+        ctx={ctx}
+        elKey="hours"
+        text={ctx.t(content.hours)}
+        className="pk-prose pk-muted"
+      />
       {content.query.trim() && (
         <a
           className="pk-link"

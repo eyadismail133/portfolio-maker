@@ -20,7 +20,12 @@ const Embed: VariantComponent<Content> = ({ content, ctx }) => {
   return (
     <Stack heading={content.heading} ctx={ctx}>
       {ctx.t(content.body) && (
-        <Paragraphs text={ctx.t(content.body)} className="pk-prose pk-booking__body" />
+        <Paragraphs
+          ctx={ctx}
+          elKey="body"
+          text={ctx.t(content.body)}
+          className="pk-prose pk-booking__body"
+        />
       )}
       {embed ? (
         <iframe
@@ -51,9 +56,14 @@ function ButtonOnly({ content, ctx }: Parameters<VariantComponent<Content>>[0]) 
 const Button: VariantComponent<Content> = ({ content, ctx }) => (
   <div className="pk-booking__box pk-card">
     <div>
-      {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
+      {ctx.t(content.heading) && <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>}
       {ctx.t(content.body) && (
-        <Paragraphs text={ctx.t(content.body)} className="pk-prose pk-muted" />
+        <Paragraphs
+          ctx={ctx}
+          elKey="body"
+          text={ctx.t(content.body)}
+          className="pk-prose pk-muted"
+        />
       )}
     </div>
     {isWebLink(content.url) ? (

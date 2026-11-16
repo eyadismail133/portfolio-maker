@@ -9,6 +9,7 @@ export function elementClasses(style: ElementStyle | undefined): string[] {
   if (style.size) classes.push(`pk-e-s-${style.size}`);
   if (style.weight) classes.push(`pk-e-w-${style.weight}`);
   if (style.align) classes.push(`pk-e-a-${style.align}`);
+  if (style.flip) classes.push("pk-e-flip");
   return classes;
 }
 

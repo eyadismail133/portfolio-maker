@@ -11,10 +11,10 @@ const make = (layout: "banner" | "minimal" | "card" | "statement"): VariantCompo
     return (
       <div className={`pk-cta__box pk-cta__box--${layout}`}>
         <div>
-          <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
+          <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+          {ctx.t(content.body) && <p {...ctx.el("body", "pk-sub")}>{ctx.rich(content.body)}</p>}
         </div>
-        <ButtonLink link={content.button} ctx={ctx} />
+        <ButtonLink link={content.button} ctx={ctx} elKey="button" />
       </div>
     );
   };

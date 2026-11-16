@@ -17,7 +17,9 @@ const make = (layout: "row" | "cards"): VariantComponent<Content> =>
   function SocialLinks({ content, ctx }) {
     return (
       <div className="pk-social">
-        {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
+        {ctx.t(content.heading) && (
+          <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+        )}
         <ul
           className={`pk-social__list pk-social__list--${layout} ${layout === "cards" ? "pk-grid" : ""}`}
         >

@@ -19,18 +19,20 @@ type Content = z.output<typeof schema>;
 
 function Head({ content, ctx }: SectionProps<Content>) {
   const meta = [
-    [ctx.ui("client"), ctx.t(content.client)],
-    [ctx.ui("year"), content.year],
-    [ctx.ui("role"), ctx.t(content.role)],
+    [ctx.ui("client"), ctx.t(content.client), "client"],
+    [ctx.ui("year"), content.year, "year"],
+    [ctx.ui("role"), ctx.t(content.role), "role"],
   ].filter(([, value]) => value);
   return (
     <header className="pk-case__head">
-      <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-      {ctx.t(content.summary) && <p className="pk-case__summary">{ctx.rich(content.summary)}</p>}
+      <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+      {ctx.t(content.summary) && (
+        <p {...ctx.el("summary", "pk-case__summary")}>{ctx.rich(content.summary)}</p>
+      )}
       {meta.length > 0 && (
         <dl className="pk-facts">
-          {meta.map(([label, value]) => (
-            <div key={label}>
+          {meta.map(([label, value, key]) => (
+            <div key={label} {...ctx.el(key)}>
               <dt>{label}</dt>
               <dd>{value}</dd>
             </div>
@@ -43,14 +45,14 @@ function Head({ content, ctx }: SectionProps<Content>) {
 
 function Parts({ content, ctx }: SectionProps<Content>) {
   const parts = [
-    [ctx.ui("challenge"), ctx.t(content.challenge)],
-    [ctx.ui("solution"), ctx.t(content.solution)],
-    [ctx.ui("result"), ctx.t(content.result)],
+    [ctx.ui("challenge"), ctx.t(content.challenge), "challenge"],
+    [ctx.ui("solution"), ctx.t(content.solution), "solution"],
+    [ctx.ui("result"), ctx.t(content.result), "result"],
   ].filter(([, text]) => text);
   return (
     <div className="pk-case__parts">
-      {parts.map(([title, text]) => (
-        <div key={title}>
+      {parts.map(([title, text, key]) => (
+        <div key={title} {...ctx.el(key)}>
           <h3 className="pk-h3">{title}</h3>
           <Paragraphs text={text} />
         </div>
@@ -80,6 +82,8 @@ const Story: VariantComponent<Content> = (props) => (
       asset={props.content.image}
       label={props.ctx.t(props.content.heading)}
       className="pk-case__image"
+      ctx={props.ctx}
+      elKey="image"
     />
     <Stats {...props} />
     <Parts {...props} />
@@ -97,6 +101,8 @@ const Split: VariantComponent<Content> = (props) => (
         asset={props.content.image}
         label={props.ctx.t(props.content.heading)}
         className="pk-case__image"
+        ctx={props.ctx}
+        elKey="image"
       />
       <Stats {...props} />
     </div>

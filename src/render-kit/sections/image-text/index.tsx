@@ -15,11 +15,19 @@ const make = (side: "start" | "end"): VariantComponent<Content> =>
   function ImageText({ content, ctx }) {
     return (
       <div className={`pk-it pk-it--${side}`}>
-        <Media asset={content.image} label={ctx.t(content.heading)} className="pk-it__image" />
+        <Media
+          ctx={ctx}
+          elKey="image"
+          asset={content.image}
+          label={ctx.t(content.heading)}
+          className="pk-it__image"
+        />
         <div className="pk-it__copy">
-          {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
-          <Paragraphs text={ctx.t(content.body)} />
-          <ButtonLink link={content.button} ctx={ctx} kind="ghost" />
+          {ctx.t(content.heading) && (
+            <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+          )}
+          <Paragraphs ctx={ctx} elKey="body" text={ctx.t(content.body)} />
+          <ButtonLink link={content.button} ctx={ctx} elKey="button" kind="ghost" />
         </div>
       </div>
     );

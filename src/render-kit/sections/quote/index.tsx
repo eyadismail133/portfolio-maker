@@ -12,13 +12,15 @@ const make = (layout: "simple" | "boxed"): VariantComponent<Content> =>
       <figure
         className={`pk-bigquote pk-bigquote--${layout} ${layout === "boxed" ? "pk-card" : ""}`}
       >
-        <blockquote>
+        <blockquote {...ctx.el("quote")}>
           <p>{ctx.rich(content.quote)}</p>
         </blockquote>
         {ctx.t(content.author) && (
           <figcaption>
-            <strong>{ctx.t(content.author)}</strong>
-            {ctx.t(content.role) && <span className="pk-muted">{ctx.t(content.role)}</span>}
+            <strong {...ctx.el("author")}>{ctx.t(content.author)}</strong>
+            {ctx.t(content.role) && (
+              <span {...ctx.el("role", "pk-muted")}>{ctx.t(content.role)}</span>
+            )}
           </figcaption>
         )}
       </figure>

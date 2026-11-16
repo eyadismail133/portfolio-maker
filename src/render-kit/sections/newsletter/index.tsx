@@ -25,8 +25,8 @@ const make = (layout: "inline" | "card"): VariantComponent<Content> =>
     return (
       <div className={`pk-news pk-news--${layout} ${layout === "card" ? "pk-card" : ""}`}>
         <div>
-          <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
+          <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+          {ctx.t(content.body) && <p {...ctx.el("body", "pk-sub")}>{ctx.rich(content.body)}</p>}
         </div>
         <form
           className="pk-news__form"
@@ -50,10 +50,10 @@ const make = (layout: "inline" | "card"): VariantComponent<Content> =>
               required
             />
           </label>
-          <button type="submit" className="pk-btn pk-btn--primary">
+          <button type="submit" {...ctx.el("buttonLabel", "pk-btn pk-btn--primary")}>
             {ctx.t(content.buttonLabel) || ctx.ui("subscribe")}
           </button>
-          {ctx.t(content.note) && <p className="pk-news__note">{ctx.t(content.note)}</p>}
+          {ctx.t(content.note) && <p {...ctx.el("note", "pk-news__note")}>{ctx.t(content.note)}</p>}
           {inbox && (
             <p
               className="pk-form__status pk-news__status"

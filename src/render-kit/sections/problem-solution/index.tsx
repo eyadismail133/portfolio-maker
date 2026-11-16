@@ -27,8 +27,8 @@ function Side({
   const points = part.points.map((p) => ctx.t(p)).filter(Boolean);
   return (
     <div className={`pk-ps__side pk-ps__side--${kind} ${kind === "solution" ? "pk-card" : ""}`}>
-      <h3 className="pk-h3">{ctx.t(part.title)}</h3>
-      {ctx.t(part.body) && <p>{ctx.rich(part.body)}</p>}
+      <h3 {...ctx.el(`${kind}.title`, "pk-h3")}>{ctx.t(part.title)}</h3>
+      {ctx.t(part.body) && <p {...ctx.el(`${kind}.body`)}>{ctx.rich(part.body)}</p>}
       {points.length > 0 && (
         <ul className={kind === "solution" ? "pk-points" : "pk-ps__pains"}>
           {points.map((p, i) => (
@@ -46,7 +46,7 @@ const make = (layout: "columns" | "story"): VariantComponent<Content> =>
       <div className="pk-stack">
         {ctx.t(content.heading) && (
           <div className="pk-stack__head">
-            <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
+            <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
           </div>
         )}
         <div className={`pk-ps__grid pk-ps__grid--${layout}`}>

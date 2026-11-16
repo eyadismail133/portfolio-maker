@@ -2,7 +2,7 @@ import { z } from "zod";
 import { defineSection, type SectionProps, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { safeImageUrl } from "../../i18n";
-import { L } from "../shared";
+import { L, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -19,6 +19,7 @@ function Logos({ content, ctx, hidden }: SectionProps<Content> & { hidden?: bool
           <li key={i} {...ctx.el(item.id)}>
             {url && item.logo ? (
               <img
+                {...ctx.el(sub(item.id, "logo"))}
                 src={url}
                 alt={ctx.t(item.name)}
                 width={item.logo.width}
@@ -38,7 +39,9 @@ function Logos({ content, ctx, hidden }: SectionProps<Content> & { hidden?: bool
 const Row: VariantComponent<Content> = (props) => (
   <div className="pk-logo-strip__row">
     {props.ctx.t(props.content.heading) && (
-      <p className="pk-logo-strip__label">{props.ctx.t(props.content.heading)}</p>
+      <p {...props.ctx.el("heading", "pk-logo-strip__label")}>
+        {props.ctx.t(props.content.heading)}
+      </p>
     )}
     <Logos {...props} />
   </div>
@@ -47,7 +50,9 @@ const Row: VariantComponent<Content> = (props) => (
 const Scroll: VariantComponent<Content> = (props) => (
   <div className="pk-logo-strip__scroll">
     {props.ctx.t(props.content.heading) && (
-      <p className="pk-logo-strip__label">{props.ctx.t(props.content.heading)}</p>
+      <p {...props.ctx.el("heading", "pk-logo-strip__label")}>
+        {props.ctx.t(props.content.heading)}
+      </p>
     )}
     <div className="pk-logo-strip__track">
       <Logos {...props} />

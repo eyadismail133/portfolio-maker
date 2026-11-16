@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
-import { L, Media, Stack } from "../shared";
+import { L, Media, Stack, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -21,6 +21,8 @@ const make = (layout: "grid" | "masonry" | "slider"): VariantComponent<Content> 
             <li key={i} {...ctx.el(item.id)}>
               <figure>
                 <Media
+                  ctx={ctx}
+                  elKey={sub(item.id, "image")}
                   asset={item.image}
                   label={ctx.t(item.caption) || String(i + 1)}
                   className="pk-gallery__image"

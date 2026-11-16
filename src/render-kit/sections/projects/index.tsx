@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
-import { L, linkProps, Media, Stack } from "../shared";
+import { L, linkProps, Media, Stack, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -32,7 +32,13 @@ function Project({
   const tags = item.tags.map((tag) => ctx.t(tag)).filter(Boolean);
   return (
     <li {...ctx.el(item.id, "pk-project")}>
-      <Media asset={item.image} label={title} className="pk-project__image" />
+      <Media
+        ctx={ctx}
+        elKey={sub(item.id, "image")}
+        asset={item.image}
+        label={title}
+        className="pk-project__image"
+      />
       <div className="pk-project__body">
         <div className="pk-project__top">
           <h3 className="pk-h3">{title}</h3>

@@ -14,12 +14,14 @@ const make = (layout: "banner" | "inline"): VariantComponent<Content> =>
     return (
       <div className={`pk-cv pk-cv--${layout} ${layout === "banner" ? "pk-card" : ""}`}>
         <div>
-          <h2 className={layout === "banner" ? "pk-h2" : "pk-h3"}>{ctx.t(content.heading)}</h2>
-          {ctx.t(content.body) && <p className="pk-sub">{ctx.rich(content.body)}</p>}
+          <h2 {...ctx.el("heading", layout === "banner" ? "pk-h2" : "pk-h3")}>
+            {ctx.t(content.heading)}
+          </h2>
+          {ctx.t(content.body) && <p {...ctx.el("body", "pk-sub")}>{ctx.rich(content.body)}</p>}
         </div>
         {label && content.file && (
           <a
-            className="pk-btn pk-btn--primary pk-cv__btn"
+            {...ctx.el("file", "pk-btn pk-btn--primary pk-cv__btn")}
             href={safeHref(content.file.href)}
             download
           >

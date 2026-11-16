@@ -49,7 +49,7 @@ function Job({ job, ctx }: { job: Content["jobs"][number]; ctx: Ctx }) {
 }
 
 function Empty({ content, ctx }: { content: Content; ctx: Ctx }) {
-  return <p className="pk-careers__empty">{ctx.t(content.note) || ctx.ui("noJobs")}</p>;
+  return <p {...ctx.el("note", "pk-careers__empty")}>{ctx.t(content.note) || ctx.ui("noJobs")}</p>;
 }
 
 const List: VariantComponent<Content> = ({ content, ctx }) => (
@@ -66,7 +66,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
       </ul>
     )}
     {content.jobs.length > 0 && ctx.t(content.note) && (
-      <p className="pk-careers__note pk-muted">{ctx.t(content.note)}</p>
+      <p {...ctx.el("note", "pk-careers__note pk-muted")}>{ctx.t(content.note)}</p>
     )}
   </Rail>
 );
@@ -85,7 +85,7 @@ const Cards: VariantComponent<Content> = ({ content, ctx }) => (
       </ul>
     )}
     {content.jobs.length > 0 && ctx.t(content.note) && (
-      <p className="pk-careers__note pk-muted">{ctx.t(content.note)}</p>
+      <p {...ctx.el("note", "pk-careers__note pk-muted")}>{ctx.t(content.note)}</p>
     )}
   </Stack>
 );

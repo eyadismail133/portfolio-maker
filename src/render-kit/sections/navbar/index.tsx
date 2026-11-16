@@ -42,20 +42,20 @@ const Nav: VariantComponent<Content> = ({ content, ctx }) => {
       <a className="pk-nav__brand" href="#" data-pk-logo-size={content.logoSize}>
         {logo && (
           <img
-            className="pk-nav__logo"
+            {...ctx.el("logo", "pk-nav__logo")}
             src={logo}
             alt={brand ? "" : content.logo?.alt || ctx.ui("logo")}
             width={content.logo?.width}
             height={content.logo?.height}
           />
         )}
-        {brand && <span>{brand}</span>}
+        {brand && <span {...ctx.el("brand")}>{brand}</span>}
       </a>
       {links.length > 0 && <ul className="pk-nav__links">{items}</ul>}
       {switches}
       {cta && content.cta && (
         <a
-          className="pk-btn pk-btn--primary pk-btn--small pk-nav__cta"
+          {...ctx.el("cta", "pk-btn pk-btn--primary pk-btn--small pk-nav__cta")}
           {...linkProps(content.cta.href)}
         >
           {cta}

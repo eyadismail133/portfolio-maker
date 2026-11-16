@@ -37,18 +37,18 @@ const Cards: VariantComponent<Content> = (props) => {
     <div className="pk-stack">
       {ctx.t(content.heading) && (
         <div className="pk-stack__head">
-          <h2 className="pk-h2">{ctx.t(content.heading)}</h2>
+          <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
         </div>
       )}
       <div className="pk-mv__pair">
         {ctx.t(content.mission) && (
-          <div>
+          <div {...ctx.el("mission")}>
             <h3 className="pk-h3">{ctx.ui("mission")}</h3>
             <p>{ctx.rich(content.mission)}</p>
           </div>
         )}
         {ctx.t(content.vision) && (
-          <div>
+          <div {...ctx.el("vision")}>
             <h3 className="pk-h3">{ctx.ui("vision")}</h3>
             <p>{ctx.rich(content.vision)}</p>
           </div>
@@ -63,9 +63,11 @@ const Statement: VariantComponent<Content> = (props) => {
   const { content, ctx } = props;
   return (
     <div className="pk-mv__statement">
-      {ctx.t(content.heading) && <h2 className="pk-h3 pk-muted">{ctx.t(content.heading)}</h2>}
-      <p className="pk-mv__big">{ctx.rich(content.mission)}</p>
-      {ctx.t(content.vision) && <p className="pk-sub">{ctx.rich(content.vision)}</p>}
+      {ctx.t(content.heading) && (
+        <h2 {...ctx.el("heading", "pk-h3 pk-muted")}>{ctx.t(content.heading)}</h2>
+      )}
+      <p {...ctx.el("mission", "pk-mv__big")}>{ctx.rich(content.mission)}</p>
+      {ctx.t(content.vision) && <p {...ctx.el("vision", "pk-sub")}>{ctx.rich(content.vision)}</p>}
       <Values {...props} />
     </div>
   );

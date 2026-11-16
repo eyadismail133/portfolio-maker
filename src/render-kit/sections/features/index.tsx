@@ -2,7 +2,7 @@ import { z } from "zod";
 import { defineSection, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
 import { Icon } from "../icons";
-import { L, Media, Stack } from "../shared";
+import { L, Media, Stack, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -55,7 +55,13 @@ const Rows: VariantComponent<Content> = ({ content, ctx }) => (
     <ul className="pk-features__rows">
       {content.items.map((item, i) => (
         <li key={i} {...ctx.el(item.id)}>
-          <Media asset={item.image} label={ctx.t(item.title)} className="pk-features__image" />
+          <Media
+            ctx={ctx}
+            elKey={sub(item.id, "image")}
+            asset={item.image}
+            label={ctx.t(item.title)}
+            className="pk-features__image"
+          />
           <div>
             <h3 className="pk-h3">{ctx.t(item.title)}</h3>
             <p className="pk-muted">{ctx.rich(item.description)}</p>

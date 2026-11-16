@@ -18,20 +18,23 @@ function details({ content, ctx }: Props) {
   return [
     content.email && {
       label: ctx.ui("email"),
+      key: "email",
       value: content.email,
       href: `mailto:${content.email}`,
     },
     content.phone && {
       label: ctx.ui("phone"),
+      key: "phone",
       value: content.phone,
       href: `tel:${content.phone.replace(/[^\d+]/g, "")}`,
     },
     ctx.t(content.location) && {
       label: ctx.ui("location"),
+      key: "location",
       value: ctx.t(content.location),
       href: "",
     },
-  ].filter((d): d is { label: string; value: string; href: string } => Boolean(d));
+  ].filter((d): d is { label: string; key: string; value: string; href: string } => Boolean(d));
 }
 
 /** Emails and phone numbers always read left to right, also on Arabic pages. */
@@ -111,7 +114,7 @@ const WithForm: VariantComponent<Content> = (props) => {
         <div className="pk-contact__info">
           <dl className="pk-facts pk-facts--stacked">
             {details(props).map((d, i) => (
-              <div key={i}>
+              <div key={i} {...ctx.el(d.key)}>
                 <dt>{d.label}</dt>
                 <dd>
                   <Value d={d} />
@@ -132,7 +135,7 @@ const Cards: VariantComponent<Content> = (props) => {
     <Stack heading={content.heading} subheading={content.body} subheadingKey="body" ctx={ctx}>
       <ul className="pk-contact__cards">
         {details(props).map((d, i) => (
-          <li key={i} className="pk-card">
+          <li key={i} {...ctx.el(d.key, "pk-card")}>
             <span className="pk-contact__label">{d.label}</span>
             <Value d={d} />
           </li>

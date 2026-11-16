@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { renderToHtml } from "../export";
+import { PAGE_CSS } from "../generated/page-css";
 import { allSections, normalizeDoc } from "../registry";
 import { Renderer } from "../Renderer";
 import { createSampleDoc } from "../samples";
@@ -146,5 +147,87 @@ describe("element styles", () => {
       "data-pk-el",
     );
     expect(renderToHtml(doc)).not.toContain("data-pk-el");
+  });
+});
+
+describe("every shown field can be picked in the editor", () => {
+  type Field = { key: string; type: string; fields?: Field[] };
+  const photo = (url: string) => ({ assetId: url, url, alt: "", width: 800, height: 600 });
+  const setPath = (target: Record<string, unknown>, key: string, value: unknown) => {
+    const parts = key.split(".");
+    let node = target;
+    for (const part of parts.slice(0, -1)) {
+      node[part] = { ...((node[part] as Record<string, unknown>) ?? {}) };
+      node = node[part] as Record<string, unknown>;
+    }
+    node[parts[parts.length - 1]] = value;
+  };
+  /** A unique value per field, so where it shows in the page tells which field it came from. */
+  const marker = (field: Field, tag: string) => {
+    if (field.type === "image") return photo(`https://cdn.example/${tag}.webp`);
+    if (field.type === "link") return { label: `MK${tag}MK`, href: "https://x.example" };
+    return `MK${tag}MK`;
+  };
+  const shown = (field: Field, tag: string, html: string) =>
+    html.includes(field.type === "image" ? `cdn.example/${tag}.webp` : `MK${tag}MK`);
+  const checked = ["text", "longtext", "image", "link"];
+
+  const cases = allSections().flatMap((def) =>
+    Object.keys(def.variants).map((variant) => [def.type, variant] as const),
+  );
+
+  test.each(cases)("%s / %s", (type, variant) => {
+    const def = allSections().find((d) => d.type === type)!;
+    const content = structuredClone(fillItemIds(def.defaults())) as Record<string, unknown>;
+    const fields = def.fields as Field[];
+    const expected: string[] = [];
+    fields.forEach((field, f) => {
+      if (checked.includes(field.type)) {
+        setPath(content, field.key, marker(field, `f${f}`));
+        expected.push(field.key);
+      }
+      // Photos inside list items: the first item's photo.
+      if (field.type === "list" && Array.isArray(content[field.key])) {
+        const first = (content[field.key] as Record<string, unknown>[])[0];
+        for (const sub of field.fields ?? []) {
+          if (first && sub.type === "image") first[sub.key] = marker(sub, `f${f}${sub.key}`);
+        }
+      }
+    });
+    const doc = normalizeDoc({
+      ...createSampleDoc({ sections: [] }),
+      sections: [{ id: "s", type, variant, content }],
+    });
+    const html = renderToStaticMarkup(<Renderer doc={doc} fontLink={false} editing />);
+    const missing: string[] = [];
+    fields.forEach((field, f) => {
+      if (checked.includes(field.type) && shown(field, `f${f}`, html)) {
+        if (!html.includes(`data-pk-el="${field.key}"`)) missing.push(field.key);
+      }
+      if (field.type === "list") {
+        const first = (doc.sections[0].content as Record<string, { id: string }[]>)[field.key]?.[0];
+        for (const sub of field.fields ?? []) {
+          if (first && sub.type === "image" && shown(sub, `f${f}${sub.key}`, html)) {
+            if (!html.includes(`data-pk-el="${first.id}.${sub.key}"`)) {
+              missing.push(`${field.key}[].${sub.key}`);
+            }
+          }
+        }
+      }
+    });
+    expect(missing).toEqual([]);
+  });
+});
+
+describe("swap sides", () => {
+  test("a flipped photo carries pk-e-flip and the page stylesheet mirrors its container", () => {
+    const base = createSampleDoc({ sections: ["hero:split"] });
+    const doc = normalizeDoc({
+      ...base,
+      sections: [{ ...base.sections[0], elements: { image: { flip: true } } }],
+    });
+    const page = renderToStaticMarkup(<Renderer doc={doc} fontLink={false} />);
+    expect(page).toMatch(/class="[^"]*pk-hero__image[^"]*pk-e-flip/);
+    expect(PAGE_CSS).toContain(":has(> .pk-e-flip)");
   });
 });

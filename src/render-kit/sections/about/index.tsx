@@ -28,9 +28,15 @@ function Facts({ content, ctx }: Parameters<VariantComponent<Content>>[0]) {
 const WithPhoto: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
     <div className="pk-about__grid">
-      <Media asset={content.image} label={ctx.t(content.heading)} className="pk-about__image" />
+      <Media
+        ctx={ctx}
+        elKey="image"
+        asset={content.image}
+        label={ctx.t(content.heading)}
+        className="pk-about__image"
+      />
       <div>
-        <Paragraphs text={ctx.t(content.body)} />
+        <Paragraphs ctx={ctx} elKey="body" text={ctx.t(content.body)} />
         <Facts content={content} ctx={ctx} />
       </div>
     </div>
@@ -39,7 +45,12 @@ const WithPhoto: VariantComponent<Content> = ({ content, ctx }) => (
 
 const TextOnly: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
-    <Paragraphs text={ctx.t(content.body)} className="pk-prose pk-prose--large" />
+    <Paragraphs
+      ctx={ctx}
+      elKey="body"
+      text={ctx.t(content.body)}
+      className="pk-prose pk-prose--large"
+    />
     <Facts content={content} ctx={ctx} />
   </Rail>
 );
@@ -47,12 +58,25 @@ const TextOnly: VariantComponent<Content> = ({ content, ctx }) => (
 const Banner: VariantComponent<Content> = ({ content, ctx }) => (
   <div className="pk-about__banner">
     {content.image && (
-      <Media asset={content.image} label={ctx.t(content.heading)} className="pk-about__wide" />
+      <Media
+        ctx={ctx}
+        elKey="image"
+        asset={content.image}
+        label={ctx.t(content.heading)}
+        className="pk-about__wide"
+      />
     )}
     <div className="pk-about__split">
       <div>
-        {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
-        <Paragraphs text={ctx.t(content.body)} className="pk-prose pk-prose--large" />
+        {ctx.t(content.heading) && (
+          <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>
+        )}
+        <Paragraphs
+          ctx={ctx}
+          elKey="body"
+          text={ctx.t(content.body)}
+          className="pk-prose pk-prose--large"
+        />
       </div>
       {content.facts.length > 0 && (
         <div className="pk-card pk-about__card">

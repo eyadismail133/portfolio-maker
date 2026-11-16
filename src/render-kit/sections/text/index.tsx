@@ -8,14 +8,14 @@ type Content = z.output<typeof schema>;
 
 const Left: VariantComponent<Content> = ({ content, ctx }) => (
   <Rail heading={content.heading} ctx={ctx}>
-    <Paragraphs text={ctx.t(content.body)} />
+    <Paragraphs ctx={ctx} elKey="body" text={ctx.t(content.body)} />
   </Rail>
 );
 
 const Centered: VariantComponent<Content> = ({ content, ctx }) => (
   <div className="pk-text__center">
-    {ctx.t(content.heading) && <h2 className="pk-h2">{ctx.t(content.heading)}</h2>}
-    <Paragraphs text={ctx.t(content.body)} />
+    {ctx.t(content.heading) && <h2 {...ctx.el("heading", "pk-h2")}>{ctx.t(content.heading)}</h2>}
+    <Paragraphs ctx={ctx} elKey="body" text={ctx.t(content.body)} />
   </div>
 );
 

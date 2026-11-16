@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { safeImageUrl } from "../../i18n";
-import { defineSection, type VariantComponent } from "../../registry";
+import { defineSection, type SectionContext, type VariantComponent } from "../../registry";
 import { assetRefSchema, textSchema, listItem } from "../../schema/primitives";
-import { L, Rail, Stack } from "../shared";
+import { L, Rail, Stack, sub } from "../shared";
 
 const schema = z.object({
   heading: textSchema,
@@ -14,11 +14,11 @@ const schema = z.object({
 type Content = z.output<typeof schema>;
 type Item = Content["items"][number];
 
-function Mark({ item, name }: { item: Item; name: string }) {
+function Mark({ item, name, ctx }: { item: Item; name: string; ctx: SectionContext }) {
   const url = safeImageUrl(item.logo?.url);
   return url && item.logo ? (
     <img
-      className="pk-partners__logo"
+      {...ctx.el(sub(item.id, "logo"), "pk-partners__logo")}
       src={url}
       alt={name}
       width={item.logo.width}
@@ -35,7 +35,7 @@ const Grid: VariantComponent<Content> = ({ content, ctx }) => (
     <ul className="pk-grid pk-partners__grid">
       {content.items.map((item, i) => (
         <li key={i} {...ctx.el(item.id, "pk-card")}>
-          <Mark item={item} name={ctx.t(item.name)} />
+          <Mark item={item} name={ctx.t(item.name)} ctx={ctx} />
           {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>
       ))}
@@ -48,7 +48,7 @@ const List: VariantComponent<Content> = ({ content, ctx }) => (
     <ul className="pk-partners__list">
       {content.items.map((item, i) => (
         <li key={i} {...ctx.el(item.id)}>
-          <Mark item={item} name={ctx.t(item.name)} />
+          <Mark item={item} name={ctx.t(item.name)} ctx={ctx} />
           {ctx.t(item.description) && <p className="pk-muted">{ctx.rich(item.description)}</p>}
         </li>
       ))}

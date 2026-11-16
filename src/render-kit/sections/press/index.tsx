@@ -13,7 +13,7 @@ type Content = z.output<typeof schema>;
 
 const Logos: VariantComponent<Content> = ({ content, ctx }) => (
   <div className="pk-press__row">
-    {ctx.t(content.heading) && <p className="pk-muted">{ctx.t(content.heading)}</p>}
+    {ctx.t(content.heading) && <p {...ctx.el("heading", "pk-muted")}>{ctx.t(content.heading)}</p>}
     <ul className="pk-logos">
       {content.items.map((item, i) => (
         <li key={i} {...ctx.el(item.id)}>

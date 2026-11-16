@@ -122,6 +122,7 @@ type ElementStyle = {
   weight?: "normal" | "bold";
   align?: "start" | "center" | "end";
   hidden?: boolean;
+  flip?: boolean;            // swap sides with the one element beside it (added to version 2 without a bump)
 };
 
 type LocalizedText = string | { en?: string; ar?: string };

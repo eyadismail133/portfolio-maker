@@ -32,15 +32,27 @@ const make = (layout: "slider" | "side"): VariantComponent<Content> =>
             data-pk-compare-label={ctx.ui("compare")}
           >
             <div className="pk-before-after__pane">
-              <Media asset={content.before} label={before} className="pk-before-after__image" />
-              <span className="pk-before-after__label">{before}</span>
+              <Media
+                ctx={ctx}
+                elKey="before"
+                asset={content.before}
+                label={before}
+                className="pk-before-after__image"
+              />
+              <span {...ctx.el("beforeLabel", "pk-before-after__label")}>{before}</span>
             </div>
             <div className="pk-before-after__pane">
-              <Media asset={content.after} label={after} className="pk-before-after__image" />
-              <span className="pk-before-after__label">{after}</span>
+              <Media
+                ctx={ctx}
+                elKey="after"
+                asset={content.after}
+                label={after}
+                className="pk-before-after__image"
+              />
+              <span {...ctx.el("afterLabel", "pk-before-after__label")}>{after}</span>
             </div>
           </div>
-          {caption && <figcaption className="pk-muted">{caption}</figcaption>}
+          {caption && <figcaption {...ctx.el("caption", "pk-muted")}>{caption}</figcaption>}
         </figure>
       </Stack>
     );

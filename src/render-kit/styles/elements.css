@@ -49,3 +49,21 @@
 .pk-e-a-end {
   text-align: end !important;
 }
+
+/*
+ * Swap sides: the container of a flipped element lays its columns out in the other direction,
+ * so a photo moves to the other side of its text and every column keeps its width. Its children
+ * read in the page's own direction again. On one column (phones) nothing changes.
+ */
+.pk-root[dir="ltr"] :has(> .pk-e-flip) {
+  direction: rtl;
+}
+.pk-root[dir="rtl"] :has(> .pk-e-flip) {
+  direction: ltr;
+}
+.pk-root[dir="ltr"] :has(> .pk-e-flip) > * {
+  direction: ltr;
+}
+.pk-root[dir="rtl"] :has(> .pk-e-flip) > * {
+  direction: rtl;
+}

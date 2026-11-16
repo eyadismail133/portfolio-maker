@@ -14,7 +14,7 @@ const make = (layout: "row" | "cards" | "big"): VariantComponent<Content> =>
     return (
       <>
         {ctx.t(content.heading) && (
-          <h2 className="pk-h2 pk-stats__heading">{ctx.t(content.heading)}</h2>
+          <h2 {...ctx.el("heading", "pk-h2 pk-stats__heading")}>{ctx.t(content.heading)}</h2>
         )}
         <dl className={`pk-stats__list pk-stats__list--${layout}`}>
           {content.items.map((item, i) => (
