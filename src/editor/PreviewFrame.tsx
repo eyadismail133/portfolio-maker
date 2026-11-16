@@ -1,12 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Renderer } from "@/render-kit/Renderer";
-import type { PortfolioDoc } from "@/render-kit/schema/document";
+import { ELEMENT_KEY, type ElementStyle, type PortfolioDoc } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
 import "@/render-kit/styles/index.css";
 import { rootFontSize } from "@/render-kit/themes/css-vars";
-import { findTextPath } from "./doc-ops";
+import {
+  assetPath,
+  elementKeyFor,
+  elementPath,
+  findTextPath,
+  getAt,
+  isItemKey,
+  itemPath,
+} from "./doc-ops";
+import { startDrag, type DragSource } from "./preview-drag";
+import { tl } from "./preview-text";
+import { ElementTools, GripIcon } from "./ElementTools";
 import "./preview.css";
 
 export type SectionAction = "up" | "down" | "duplicate" | "delete";
@@ -18,15 +35,24 @@ export type ToPreview =
       doc: PortfolioDoc;
       lang: Lang;
       selectedId: string | null;
+      /** Element picked inside the selected section. */
+      selectedEl: string | null;
       /** Which toolbar buttons work for the selected section. */
       tools: { up: boolean; down: boolean; duplicate: boolean };
     }
   | { type: "pk:scroll"; id: string; block?: "start" | "nearest" };
 export type FromPreview =
   | { type: "pk:ready" }
-  | { type: "pk:select"; id: string }
+  | { type: "pk:select"; id: string; el?: string | null }
+  | { type: "pk:style"; id: string; key: string; style: Partial<ElementStyle> | null }
+  /** Asks the editor to replace the photo at this element key. */
+  | { type: "pk:photo"; id: string; key: string }
   | { type: "pk:action"; id: string; action: SectionAction }
-  | { type: "pk:key"; key: string; ctrl: boolean; shift: boolean }
+  /** A section dragged onto another section. */
+  | { type: "pk:move"; id: string; target: string }
+  /** A list item dragged onto another item of its list, or moved one place. */
+  | { type: "pk:move-item"; id: string; key: string; target?: string; delta?: -1 | 1 }
+  | { type: "pk:key"; key: string; ctrl: boolean; shift: boolean; alt?: boolean }
   | { type: "pk:edit"; id: string; path: (string | number)[]; text: string }
   | { type: "pk:note"; text: string };
 
@@ -48,6 +74,74 @@ function send(message: FromPreview) {
   window.parent.postMessage(message, window.location.origin);
 }
 
+/**
+ * The element key for a click inside a section: a photo is found by its address in the content,
+ * anything else by the nearest element the Renderer marked. Null picks the whole section.
+ */
+function pickedElement(
+  target: HTMLElement,
+  section: HTMLElement,
+  content: unknown,
+  point: { x: number; y: number },
+): string | null {
+  // Embedded frames (a map, a video) take no clicks in the editor, so they are found by place.
+  for (const frame of section.querySelectorAll<HTMLElement>("iframe[data-pk-el]")) {
+    const box = frame.getBoundingClientRect();
+    if (
+      point.x >= box.left &&
+      point.x <= box.right &&
+      point.y >= box.top &&
+      point.y <= box.bottom
+    ) {
+      return frame.getAttribute("data-pk-el");
+    }
+  }
+  if (target instanceof HTMLImageElement) {
+    const path = assetPath(content, target.getAttribute("src") ?? "");
+    const key = path && path.length > 0 ? elementKeyFor(content, path) : null;
+    if (key && ELEMENT_KEY.test(key)) return key;
+  }
+  const marked = target.closest<HTMLElement>("[data-pk-el]");
+  return marked && section.contains(marked) ? marked.getAttribute("data-pk-el") : null;
+}
+
+/** The element on the page for a key. Photos carry no mark, so they are found by address. */
+function findElement(section: HTMLElement, key: string, content: unknown): HTMLElement | null {
+  const marked = section.querySelector<HTMLElement>(`[data-pk-el="${CSS.escape(key)}"]`);
+  if (marked) return marked;
+  const asset = getAt(content, elementPath(content, key)) as { url?: unknown } | undefined;
+  if (!asset || typeof asset.url !== "string") return null;
+  for (const img of section.querySelectorAll("img")) {
+    if (img.getAttribute("src") === asset.url) return img;
+  }
+  return null;
+}
+
+/**
+ * True when the element sits beside exactly one other element (a photo next to its text), so
+ * "Swap sides" can mirror the two. Checked at the width the preview has now.
+ */
+function besideNeighbor(el: HTMLElement | null): boolean {
+  const parent = el?.parentElement;
+  if (!parent || parent.children.length !== 2) return false;
+  const css = getComputedStyle(parent);
+  if (css.display.includes("grid")) {
+    return css.gridTemplateColumns.trim().split(/\s+/).length >= 2;
+  }
+  return css.display.includes("flex") && css.flexDirection.startsWith("row");
+}
+
+function sameRect(a: DOMRect | null, b: DOMRect | null) {
+  return (
+    !!a &&
+    !!b &&
+    a.top === b.top &&
+    a.left === b.left &&
+    a.width === b.width &&
+    a.height === b.height
+  );
+}
+
 /** The portfolio as shown inside the editor. It renders whatever document the editor sends. */
 export function PreviewFrame() {
   const [state, setState] = useState<Extract<ToPreview, { type: "pk:state" }> | null>(null);
@@ -55,6 +149,9 @@ export function PreviewFrame() {
   // Drawn over the page instead of on the section: a shaped section is cut by a mask, which
   // would cut its own outline too.
   const [outline, setOutline] = useState<DOMRect | null>(null);
+  const [elOutline, setElOutline] = useState<DOMRect | null>(null);
+  const [drop, setDrop] = useState<DOMRect | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<ToPreview>) => {
@@ -74,6 +171,12 @@ export function PreviewFrame() {
       );
       if (editing) return;
       const ctrl = event.ctrlKey || event.metaKey;
+      // Alt with an arrow moves the picked item or section.
+      if (event.altKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+        event.preventDefault();
+        send({ type: "pk:key", key: event.key, ctrl, shift: event.shiftKey, alt: true });
+        return;
+      }
       if (ctrl || event.key === "Delete" || event.key === "Backspace" || event.key === "Escape") {
         if (ctrl && ["z", "y", "s", "d"].includes(event.key.toLowerCase())) event.preventDefault();
         send({ type: "pk:key", key: event.key, ctrl, shift: event.shiftKey });
@@ -89,6 +192,9 @@ export function PreviewFrame() {
   }, []);
 
   const selectedId = state?.selectedId ?? null;
+  const selectedEl = state?.selectedEl ?? null;
+  const selectedSection = state?.doc.sections.find((s) => s.id === selectedId);
+  const content = selectedSection?.content;
   const fontSize = state ? rootFontSize(state.doc.theme) : null;
 
   // The page text size lives on <html>, as on the published page.
@@ -101,18 +207,15 @@ export function PreviewFrame() {
     const el = selectedId ? document.getElementById(selectedId) : null;
     const next = el ? el.getBoundingClientRect() : null;
     // Only a real change re-renders: this runs after every render.
-    setOutline((old) =>
-      old &&
-      next &&
-      ["top", "left", "width", "height"].every((k) => old[k as "top"] === next[k as "top"])
-        ? old
-        : next,
-    );
+    setOutline((old) => (sameRect(old, next) ? old : next));
+    const picked = el && selectedEl ? findElement(el, selectedEl, content) : null;
+    const pickedRect = picked ? picked.getBoundingClientRect() : null;
+    setElOutline((old) => (sameRect(old, pickedRect) ? old : pickedRect));
     if (!el) return setToolbarTop(null);
     const box = el.getBoundingClientRect();
     if (box.bottom < 48 || box.top > window.innerHeight) return setToolbarTop(null);
     setToolbarTop(Math.max(8, box.top + 8));
-  }, [selectedId]);
+  }, [selectedId, selectedEl, content]);
 
   useEffect(() => {
     for (const el of document.querySelectorAll("[data-pk-selected]"))
@@ -143,11 +246,46 @@ export function PreviewFrame() {
     if (target.closest(".pk-editor-toolbar")) return;
     // Links and buttons do not leave the page while editing.
     if (target.closest("a, button")) event.preventDefault();
-    const section = target.closest(".pk-section");
-    if (section?.id) send({ type: "pk:select", id: section.id });
+    const section = target.closest<HTMLElement>(".pk-section");
+    if (!section?.id) return;
+    const sectionContent = state.doc.sections.find((s) => s.id === section.id)?.content;
+    send({
+      type: "pk:select",
+      id: section.id,
+      el: pickedElement(target, section, sectionContent, { x: event.clientX, y: event.clientY }),
+    });
   };
 
   const tools: SectionAction[] = ["up", "down", "duplicate", "delete"];
+  // Read while drawing so the element toolbar knows the section colors and whether it is a photo.
+  const sectionEl = selectedId ? document.getElementById(selectedId) : null;
+  const pickedEl = sectionEl && selectedEl ? findElement(sectionEl, selectedEl, content) : null;
+
+  // A picked list item can move within its list.
+  const itemPlace = isItemKey(selectedEl) ? itemPath(content, selectedEl) : null;
+  const listLength = itemPlace
+    ? ((getAt(content, itemPlace.slice(0, -1)) as unknown[] | undefined)?.length ?? 0)
+    : 0;
+  const itemIndex = itemPlace ? (itemPlace[itemPlace.length - 1] as number) : -1;
+
+  const beginDrag = (event: ReactPointerEvent, source: DragSource) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    setDragging(true);
+    startDrag(event, source, content, {
+      over: (found) =>
+        setDrop(
+          found && found.target !== (source.kind === "item" ? source.key : source.id)
+            ? found.rect
+            : null,
+        ),
+      end: () => setDragging(false),
+      drop: (target) => {
+        if (source.kind === "section") send({ type: "pk:move", id: source.id, target });
+        else send({ type: "pk:move-item", id: source.id, key: source.key, target });
+      },
+    });
+  };
   const enabled = (action: SectionAction) => action === "delete" || state.tools[action];
 
   /** Double-click a text to type over it. Enter or clicking away keeps it; Escape cancels. */
@@ -202,6 +340,7 @@ export function PreviewFrame() {
 
   return (
     <div
+      data-pk-dragging={dragging ? "" : undefined}
       onClickCapture={onClick}
       onDoubleClick={onDoubleClick}
       onSubmitCapture={(event) => event.preventDefault()}
@@ -219,19 +358,77 @@ export function PreviewFrame() {
           }}
         />
       )}
+      {selectedId && selectedEl && elOutline && (
+        <div
+          className="pk-editor-eloutline"
+          aria-hidden="true"
+          style={{
+            top: elOutline.top - 3,
+            left: elOutline.left - 3,
+            width: elOutline.width + 6,
+            height: elOutline.height + 6,
+          }}
+        />
+      )}
+      {selectedId && selectedEl && elOutline && sectionEl && (
+        <ElementTools
+          rect={elOutline}
+          section={sectionEl}
+          style={selectedSection?.elements?.[selectedEl]}
+          photo={
+            pickedEl?.tagName === "IMG"
+              ? "photo"
+              : pickedEl?.classList.contains("pk-media--empty")
+                ? "empty"
+                : false
+          }
+          onStyle={(style) => send({ type: "pk:style", id: selectedId, key: selectedEl, style })}
+          onPhoto={() => send({ type: "pk:photo", id: selectedId, key: selectedEl })}
+          canFlip={besideNeighbor(pickedEl) || !!selectedSection?.elements?.[selectedEl]?.flip}
+          move={
+            itemPlace
+              ? {
+                  earlier: itemIndex > 0,
+                  later: itemIndex < listLength - 1,
+                  onMove: (delta) =>
+                    send({ type: "pk:move-item", id: selectedId, key: selectedEl, delta }),
+                  onGrip: (event) =>
+                    beginDrag(event, { kind: "item", id: selectedId, key: selectedEl }),
+                }
+              : undefined
+          }
+        />
+      )}
+      {drop && (
+        <div
+          className="pk-editor-drop"
+          aria-hidden="true"
+          style={{ top: drop.top, left: drop.left, width: drop.width, height: drop.height }}
+        />
+      )}
       {selectedId && toolbarTop !== null && (
         <div
           className="pk-editor-toolbar"
           role="toolbar"
-          aria-label="Section"
+          aria-label={tl("Section")}
           style={{ top: toolbarTop }}
         >
+          <button
+            type="button"
+            className="pk-editor-grip"
+            title={tl("Drag to move")}
+            aria-label={tl("Drag to move")}
+            disabled={!state.tools.up && !state.tools.down}
+            onPointerDown={(event) => beginDrag(event, { kind: "section", id: selectedId })}
+          >
+            <GripIcon />
+          </button>
           {tools.map((action) => (
             <button
               key={action}
               type="button"
-              title={TOOL_LABELS[action]}
-              aria-label={TOOL_LABELS[action]}
+              title={tl(TOOL_LABELS[action])}
+              aria-label={tl(TOOL_LABELS[action])}
               disabled={!enabled(action)}
               onClick={() => send({ type: "pk:action", id: selectedId, action })}
             >

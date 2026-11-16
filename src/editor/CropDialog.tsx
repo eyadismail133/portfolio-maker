@@ -61,20 +61,29 @@ export function CropDialog({
   onCancel: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [url] = useState(() => URL.createObjectURL(file));
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [ratio, setRatio] = useState<number | null>(null);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; start: { x: number; y: number } } | null>(null);
 
+  // The address of the picture is made and freed inside the effect, so each run has its own:
+  // React runs effects twice while developing, and a shared address would be freed before the
+  // second run loads it (the picture never appeared and "Use this picture" stayed off).
   useEffect(() => {
-    dialog.current?.showModal();
+    if (!dialog.current?.open) dialog.current?.showModal();
+    const url = URL.createObjectURL(file);
     const img = new Image();
-    img.onload = () => setImage(img);
+    let current = true;
+    img.onload = () => {
+      if (current) setImage(img);
+    };
     img.src = url;
-    return () => URL.revokeObjectURL(url);
-  }, [url]);
+    return () => {
+      current = false;
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
 
   const natural = image
     ? { width: image.naturalWidth, height: image.naturalHeight }
@@ -176,7 +185,7 @@ export function CropDialog({
           {image && (
             // eslint-disable-next-line @next/next/no-img-element -- local preview of the chosen file
             <img
-              src={url}
+              src={image.src}
               alt=""
               draggable={false}
               className="pointer-events-none absolute left-1/2 top-1/2 max-w-none select-none"

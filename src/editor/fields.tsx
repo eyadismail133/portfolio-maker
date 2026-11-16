@@ -28,6 +28,9 @@ export type FormContext = {
   isLocalized: (path: Path) => boolean;
   /** What the form is about, for AI writing: section name and portfolio title. */
   about: string;
+  /** Content path of the element picked in the preview: its list item opens and its photo field
+   * answers "Replace photo". */
+  focusPath?: Path;
 };
 
 type FieldProps = {
@@ -316,10 +319,27 @@ function ImageLibrary({ onPick }: { onPick: (asset: AssetRef) => void }) {
   );
 }
 
-function ImageField({ field, value, path, onChange }: FieldProps) {
+function ImageField({ field, value, path, ctx, onChange }: FieldProps) {
   const id = useId();
   const asset = value as AssetRef | undefined;
   const uploader = useEditor((s) => s.uploader);
+  const photoRequest = useEditor((s) => s.photoRequest);
+  const picker = useRef<HTMLInputElement>(null);
+  const address = useRef<HTMLInputElement>(null);
+  const handledRequest = useRef(photoRequest);
+  const picked = ctx.focusPath?.join(".") === path.join(".");
+  // "Replace photo" in the preview: open the file picker of the photo that was picked there.
+  // Without an account there are no uploads, so the image address box is ready to type in.
+  useEffect(() => {
+    if (photoRequest === handledRequest.current) return;
+    handledRequest.current = photoRequest;
+    if (!picked) return;
+    if (picker.current) picker.current.click();
+    else {
+      address.current?.focus();
+      address.current?.select();
+    }
+  }, [photoRequest, picked]);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -369,6 +389,7 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
           >
             {busy ? "Uploading…" : asset ? "Replace image" : "Upload image"}
             <input
+              ref={picker}
               type="file"
               accept="image/*"
               className="sr-only"
@@ -391,6 +412,27 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
           >
             My images
           </button>
+          {asset && (
+            <button
+              type="button"
+              className={buttonClass}
+              disabled={busy}
+              onClick={async () => {
+                // Crops the current photo: the cut is saved as a new image, the old one stays.
+                setProblem("");
+                try {
+                  const response = await fetch(asset.url);
+                  if (!response.ok) throw new Error();
+                  const blob = await response.blob();
+                  setCropping(new File([blob], "photo", { type: blob.type || "image/jpeg" }));
+                } catch {
+                  setProblem("This image cannot be cropped here. Upload it again to crop it.");
+                }
+              }}
+            >
+              Crop
+            </button>
+          )}
           {asset && (
             <button type="button" className={buttonClass} onClick={() => onChange(undefined)}>
               Remove
@@ -424,6 +466,7 @@ function ImageField({ field, value, path, onChange }: FieldProps) {
       <div className="grid gap-1">
         <Label htmlFor={id}>{uploader ? "Or paste an image address" : "Image address"}</Label>
         <input
+          ref={address}
           id={id}
           type="url"
           dir="ltr"
@@ -669,8 +712,24 @@ function TextListField(props: FieldProps) {
 function ListField(props: FieldProps) {
   const { field, ctx } = props;
   const items = Array.isArray(props.value) ? (props.value as Record<string, unknown>[]) : [];
-  const [open, setOpen] = useState<number | null>(null);
   const titleKey = field.fields?.find((f) => f.type === "text")?.key;
+  // The item picked in the preview opens.
+  const here = props.path.join(".");
+  const focus = ctx.focusPath;
+  const focusIndex =
+    focus &&
+    focus.length > props.path.length &&
+    focus.slice(0, props.path.length).join(".") === here
+      ? focus[props.path.length]
+      : null;
+  const [open, setOpen] = useState<number | null>(
+    typeof focusIndex === "number" ? focusIndex : null,
+  );
+  const [seenFocus, setSeenFocus] = useState(focusIndex);
+  if (focusIndex !== seenFocus) {
+    setSeenFocus(focusIndex);
+    if (typeof focusIndex === "number") setOpen(focusIndex);
+  }
   return (
     <fieldset className="grid gap-1.5">
       <legend className="mb-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
@@ -685,7 +744,8 @@ function ListField(props: FieldProps) {
         const isOpen = open === i;
         return (
           <div
-            key={i}
+            key={typeof item.id === "string" ? item.id : i}
+            data-field-path={[...props.path, i].join(".")}
             className="overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-2xs transition-colors dark:border-zinc-800 dark:bg-zinc-900/50"
           >
             <div className="flex items-center gap-1 py-0.5 pe-0.5 ps-1">
@@ -773,15 +833,17 @@ export function FormFields(props: {
         const Component = COMPONENTS[field.type];
         // A key such as "problem.title" points into a nested object.
         const keys = field.key.split(".");
+        const path = [...props.path, ...keys];
         return (
-          <Component
-            key={field.key}
-            field={field}
-            value={getAt(props.value, keys)}
-            path={[...props.path, ...keys]}
-            ctx={props.ctx}
-            onChange={(next, group) => props.onChange(setAt(props.value, keys, next), group)}
-          />
+          <div key={field.key} className="contents" data-field-path={path.join(".")}>
+            <Component
+              field={field}
+              value={getAt(props.value, keys)}
+              path={path}
+              ctx={props.ctx}
+              onChange={(next, group) => props.onChange(setAt(props.value, keys, next), group)}
+            />
+          </div>
         );
       })}
     </div>

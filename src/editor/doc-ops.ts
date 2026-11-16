@@ -1,6 +1,13 @@
 import { getSection, parseContent, type AnySectionDefinition } from "@/render-kit/registry";
 import { plainText } from "@/render-kit/rich-text";
-import type { PortfolioDoc, Section, SectionStyle } from "@/render-kit/schema/document";
+import {
+  ELEMENT_KEY,
+  elementStyleSchema,
+  type ElementStyle,
+  type PortfolioDoc,
+  type Section,
+  type SectionStyle,
+} from "@/render-kit/schema/document";
 import type { Lang, LocalizedText } from "@/render-kit/schema/primitives";
 
 /** Pure functions that change a portfolio document. Each returns a new document. */
@@ -309,4 +316,152 @@ export function setTextAt(
     ? writeLocalized(current as LocalizedText, lang, text, doc.meta.languages)
     : text;
   return setContent(doc, id, setAt(section.content, path, next));
+}
+
+/**
+ * Changes the style of one element of a section. Values set to undefined go back to the design's
+ * own look; `null` resets the element completely. An element left with no choices is removed.
+ */
+export function setElementStyle(
+  doc: PortfolioDoc,
+  id: string,
+  key: string,
+  style: Partial<ElementStyle> | null,
+): PortfolioDoc | null {
+  if (!ELEMENT_KEY.test(key)) return null;
+  const section = doc.sections.find((s) => s.id === id);
+  if (!section) return null;
+  const merged: Record<string, unknown> = style ? { ...section.elements?.[key], ...style } : {};
+  for (const name of Object.keys(merged)) if (merged[name] === undefined) delete merged[name];
+  const parsed = elementStyleSchema.safeParse(merged);
+  if (!parsed.success) return null;
+  const elements = { ...section.elements };
+  if (Object.keys(parsed.data).length > 0) elements[key] = parsed.data;
+  else delete elements[key];
+  return replaceSection(doc, id, (s) => {
+    const next: Section = { ...s, elements };
+    if (Object.keys(elements).length === 0) delete next.elements;
+    return next;
+  });
+}
+
+/** Path to the list item with this id inside section content, or null. */
+export function itemPath(content: unknown, itemId: string): Path | null {
+  const walk = (value: unknown, path: Path): Path | null => {
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i += 1) {
+        const item = value[i];
+        if (item && typeof item === "object" && (item as { id?: unknown }).id === itemId) {
+          return [...path, i];
+        }
+        const found = walk(item, [...path, i]);
+        if (found) return found;
+      }
+    } else if (value && typeof value === "object") {
+      for (const [key, child] of Object.entries(value)) {
+        const found = walk(child, [...path, key]);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return walk(content, []);
+}
+
+/**
+ * Content path of an element key: "heading" is ["heading"], "i3" is the path of item i3 (for
+ * example ["items", 2]) and "i3.image" goes on inside that item.
+ */
+export function elementPath(content: unknown, key: string): Path {
+  const [first, ...rest] = key.split(".");
+  const item = /^i\d+$/.test(first) ? itemPath(content, first) : null;
+  const tail = rest.map((part) => (/^\d+$/.test(part) ? Number(part) : part));
+  return item ? [...item, ...tail] : [first, ...tail];
+}
+
+/** The element key for a content path: the reverse of `elementPath`. */
+export function elementKeyFor(content: unknown, path: Path): string {
+  // The deepest list item on the path gives the start of the key.
+  for (let end = path.length; end > 0; end -= 1) {
+    const value = getAt(content, path.slice(0, end));
+    const id = value && typeof value === "object" ? (value as { id?: unknown }).id : undefined;
+    if (typeof id === "string" && typeof path[end - 1] === "number") {
+      return [id, ...path.slice(end)].join(".");
+    }
+  }
+  return path.join(".");
+}
+
+/** Path of the image with this address inside section content, or null. */
+export function assetPath(content: unknown, url: string): Path | null {
+  const walk = (value: unknown, path: Path): Path | null => {
+    if (!value || typeof value !== "object") return null;
+    const record = value as Record<string, unknown>;
+    if (typeof record.assetId === "string" && record.url === url) return path;
+    for (const [key, child] of Object.entries(record)) {
+      const found = walk(child, [...path, Array.isArray(value) ? Number(key) : key]);
+      if (found) return found;
+    }
+    return null;
+  };
+  return walk(content, []);
+}
+
+/** The list holding an item and the item's place in it, or null. */
+function itemPlace(content: unknown, itemId: string): { list: Path; index: number } | null {
+  const path = itemPath(content, itemId);
+  if (!path) return null;
+  return { list: path.slice(0, -1), index: path[path.length - 1] as number };
+}
+
+function moveInList(
+  doc: PortfolioDoc,
+  id: string,
+  list: Path,
+  from: number,
+  to: number,
+): PortfolioDoc | null {
+  const section = doc.sections.find((s) => s.id === id);
+  if (!section || from === to) return null;
+  const items = getAt(section.content, list);
+  if (!Array.isArray(items) || to < 0 || to >= items.length) return null;
+  const next = [...items];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return setContent(doc, id, setAt(section.content, list, next));
+}
+
+/**
+ * Moves a list item to the place of another item of the same list (dragging in the preview).
+ * Items of different lists never swap.
+ */
+export function moveItemTo(
+  doc: PortfolioDoc,
+  id: string,
+  itemId: string,
+  targetId: string,
+): PortfolioDoc | null {
+  const content = doc.sections.find((s) => s.id === id)?.content;
+  const from = itemPlace(content, itemId);
+  const to = itemPlace(content, targetId);
+  if (!from || !to || from.list.join(".") !== to.list.join(".")) return null;
+  return moveInList(doc, id, from.list, from.index, to.index);
+}
+
+/** Moves a list item one place earlier (-1) or later (1). */
+export function moveItemBy(
+  doc: PortfolioDoc,
+  id: string,
+  itemId: string,
+  delta: -1 | 1,
+): PortfolioDoc | null {
+  const content = doc.sections.find((s) => s.id === id)?.content;
+  const place = itemPlace(content, itemId);
+  if (!place) return null;
+  return moveInList(doc, id, place.list, place.index, place.index + delta);
+}
+
+/** True when the element key is a whole list item, so it can be moved. */
+export function isItemKey(key: string | null | undefined): key is string {
+  return !!key && /^i\d+$/.test(key);
 }

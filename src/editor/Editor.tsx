@@ -16,7 +16,7 @@ import { uploadImage } from "@/lib/upload";
 import { getSection } from "@/render-kit/registry";
 import { createSampleDoc, type SampleKind } from "@/render-kit/samples";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
-import { canMove } from "./doc-ops";
+import { canMove, isItemKey } from "./doc-ops";
 import { ImportCvDialog } from "./ImportCvDialog";
 import { motion } from "motion/react";
 import { ease } from "@/lib/motion";
@@ -74,6 +74,7 @@ const STATUS_TEXT: Record<SaveStatus, string> = {
 export function Editor({ portfolioId }: { portfolioId?: string }) {
   const doc = useEditor((s) => s.doc);
   const selectedId = useEditor((s) => s.selectedId);
+  const selectedEl = useEditor((s) => s.selectedEl);
   const lang = useEditor((s) => s.lang);
   const device = useEditor((s) => s.device);
   const revision = useEditor((s) => s.revision);
@@ -196,8 +197,17 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
 
   // Keep the preview showing the current document.
   useEffect(() => {
-    if (doc) send({ type: "pk:state", doc, lang, selectedId, tools: toolsFor(doc, selectedId) });
-  }, [doc, lang, selectedId, send]);
+    if (doc) {
+      send({
+        type: "pk:state",
+        doc,
+        lang,
+        selectedId,
+        selectedEl,
+        tools: toolsFor(doc, selectedId),
+      });
+    }
+  }, [doc, lang, selectedId, selectedEl, send]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<FromPreview>) => {
@@ -212,19 +222,38 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
             doc: state.doc,
             lang: state.lang,
             selectedId: state.selectedId,
+            selectedEl: state.selectedEl,
             tools: toolsFor(state.doc, state.selectedId),
           });
         }
       }
-      if (event.data?.type === "pk:select") select(event.data.id);
+      if (event.data?.type === "pk:select") select(event.data.id, event.data.el ?? null);
+      if (event.data?.type === "pk:style") {
+        const { id, key, style } = event.data;
+        useEditor.getState().setElementStyle(id, key, style);
+      }
+      if (event.data?.type === "pk:move") {
+        useEditor.getState().moveSectionTo(event.data.id, event.data.target);
+      }
+      if (event.data?.type === "pk:move-item") {
+        const { id, key, target, delta } = event.data;
+        if (target) useEditor.getState().moveItemTo(id, key, target);
+        else if (delta) useEditor.getState().moveItemBy(id, key, delta);
+      }
+      if (event.data?.type === "pk:photo") {
+        useEditor.getState().select(event.data.id, event.data.key);
+        useEditor.getState().requestPhoto();
+      }
       if (event.data?.type === "pk:action") runAction(event.data.id, event.data.action);
       if (event.data?.type === "pk:edit") {
         useEditor.getState().setTextAt(event.data.id, event.data.path, event.data.text);
       }
       if (event.data?.type === "pk:note") setNotice(event.data.text);
       if (event.data?.type === "pk:key") {
-        const { key, ctrl, shift } = event.data;
-        window.dispatchEvent(new KeyboardEvent("keydown", { key, ctrlKey: ctrl, shiftKey: shift }));
+        const { key, ctrl, shift, alt } = event.data;
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key, ctrlKey: ctrl, shiftKey: shift, altKey: !!alt }),
+        );
       }
     };
     window.addEventListener("message", onMessage);
@@ -306,7 +335,37 @@ export function Editor({ portfolioId }: { portfolioId?: string }) {
         "input, textarea, select, [contenteditable]",
       );
       if (event.key === "Escape") setFocus(false);
-      const selected = useEditor.getState().selectedId;
+      const { selectedId: selected, selectedEl: element } = useEditor.getState();
+      // Alt with an arrow moves the picked list item, or else the selected section, one place.
+      if (
+        event.altKey &&
+        !typing &&
+        selected &&
+        (event.key === "ArrowUp" || event.key === "ArrowDown")
+      ) {
+        event.preventDefault();
+        const delta = event.key === "ArrowUp" ? -1 : 1;
+        if (isItemKey(element)) useEditor.getState().moveItemBy(selected, element, delta);
+        else useEditor.getState().moveSection(selected, delta);
+        return;
+      }
+      // With an element picked, Escape goes back to the whole section and Delete hides the element
+      // (one undo step, shown again from its toolbar) instead of deleting the section.
+      if (element && selected && !typing) {
+        if (event.key === "Escape") {
+          useEditor.getState().select(selected, null);
+          return;
+        }
+        if (
+          (event.key === "Delete" || event.key === "Backspace") &&
+          !event.ctrlKey &&
+          !event.metaKey
+        ) {
+          event.preventDefault();
+          useEditor.getState().setElementStyle(selected, element, { hidden: true });
+          return;
+        }
+      }
       if (
         (event.key === "Delete" || event.key === "Backspace") &&
         !typing &&

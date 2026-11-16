@@ -227,4 +227,28 @@ export const AR_3: Record<string, string> = {
     "معاينة كاملة. اضغط Esc أو إظهار اللوحات لتعود إلى التحرير.",
   "Drag a section to move it. The bin removes a section; Undo brings it back.":
     "اسحب القسم لتحريكه. سلة المهملات تحذف القسم، والتراجع يعيده.",
+  // Editor: the toolbars inside the preview (picking, styling and moving elements).
+  "Drag to move": "اسحب للتحريك",
+  Element: "عنصر",
+  "Replace photo": "استبدال الصورة",
+  "Add photo": "إضافة صورة",
+  "Text color": "لون النص",
+  "Soft text color": "لون النص الهادئ",
+  "Accent color": "لون التمييز",
+  Smaller: "أصغر",
+  Larger: "أكبر",
+  "Much larger": "أكبر بكثير",
+  "Bold text": "نص عريض",
+  "Regular weight": "سمك عادي",
+  "Swap sides": "تبديل الجانبين",
+  "Align to the start": "محاذاة إلى البداية",
+  Center: "توسيط",
+  "Align to the end": "محاذاة إلى النهاية",
+  "Hide on the page": "إخفاء من الصفحة",
+  "Back to the design's look": "العودة إلى شكل التصميم",
+  "Move earlier": "نقل إلى السابق",
+  "Move later": "نقل إلى التالي",
+  Crop: "قص",
+  "This image cannot be cropped here. Upload it again to crop it.":
+    "لا يمكن قص هذه الصورة هنا. ارفعها مرة أخرى لتقصها.",
 };

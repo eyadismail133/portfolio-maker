@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MiniPreview } from "@/components/MiniPreview";
 import { getSection } from "@/render-kit/registry";
 import type { Section } from "@/render-kit/schema/document";
 import type { Lang } from "@/render-kit/schema/primitives";
-import { isLocalizedIn } from "./doc-ops";
+import { elementPath, isLocalizedIn } from "./doc-ops";
 import { FormFields, type FormContext } from "./fields";
 import { SectionStylePanel } from "./SectionStylePanel";
 import { useEditor } from "./store";
@@ -23,6 +23,39 @@ export function SectionEditor({ section }: { section: Section }) {
   const languages = useEditor((s) => s.doc?.meta.languages ?? ONLY_ENGLISH);
   const { updateContent, setVariant, select, removeSection } = useEditor.getState();
   const def = getSection(section.type);
+  const selectedEl = useEditor((s) => s.selectedEl);
+  const focusPath = useMemo(
+    () => (selectedEl ? elementPath(section.content, selectedEl) : undefined),
+    [selectedEl, section.content],
+  );
+  const focusKey = focusPath?.join(".");
+
+  // An element picked in the preview: show the content form and bring its field into view.
+  const [seenFocus, setSeenFocus] = useState(focusKey);
+  if (focusKey !== seenFocus) {
+    setSeenFocus(focusKey);
+    if (focusKey) setTab("content");
+  }
+  useEffect(() => {
+    if (!focusKey) return;
+    // After the list item holding the field has opened.
+    const timer = window.setTimeout(() => {
+      const parts = focusKey.split(".");
+      for (let end = parts.length; end > 0; end -= 1) {
+        const field = document.querySelector<HTMLElement>(
+          `[data-field-path="${CSS.escape(parts.slice(0, end).join("."))}"]`,
+        );
+        const box = field?.firstElementChild ?? field;
+        if (box instanceof HTMLElement) {
+          box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          box.classList.add("ring-2", "ring-amber-400", "rounded-xl");
+          window.setTimeout(() => box.classList.remove("ring-2", "ring-amber-400"), 1400);
+          return;
+        }
+      }
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [focusKey]);
 
   const ctx = useMemo<FormContext | null>(
     () =>
@@ -32,9 +65,10 @@ export function SectionEditor({ section }: { section: Section }) {
             languages,
             isLocalized: (path) => isLocalizedIn(def, section.content, path),
             about: `the ${def.name} section of the portfolio "${title}"`,
+            focusPath,
           }
         : null,
-    [def, lang, languages, section.content, title],
+    [def, lang, languages, section.content, title, focusPath],
   );
   if (!def || !ctx) return null;
 

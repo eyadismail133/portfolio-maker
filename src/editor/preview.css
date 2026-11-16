@@ -76,3 +76,73 @@
   outline: 1px dashed currentColor;
   outline-offset: 2px;
 }
+/* The element picked inside the selected section, and its toolbar. */
+.pk-editor-eloutline {
+  position: fixed;
+  z-index: 41;
+  pointer-events: none;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 2px #f59e0b,
+    0 0 0 4px rgb(245 158 11 / 0.25);
+}
+.pk-section[data-pk-selected] [data-pk-el]:hover {
+  outline: 1px dashed rgb(245 158 11 / 0.8);
+  outline-offset: 2px;
+}
+.pk-editor-eltools {
+  align-items: center;
+  max-width: calc(100vw - 16px);
+  flex-wrap: wrap;
+}
+.pk-editor-eltools button {
+  font:
+    600 12px/1 system-ui,
+    sans-serif;
+}
+.pk-editor-eltools button[aria-pressed="true"] {
+  background: rgb(255 255 255 / 0.24);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5);
+}
+.pk-editor-eltools__wide {
+  width: auto !important;
+  padding-inline: 10px;
+}
+.pk-editor-eltools__gap {
+  width: 1px;
+  height: 18px;
+  margin-inline: 3px;
+  background: rgb(255 255 255 / 0.2);
+}
+.pk-editor-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.85);
+}
+/* Dragging a section or a list item. */
+.pk-editor-grip {
+  cursor: grab !important;
+  touch-action: none;
+}
+[data-pk-dragging],
+[data-pk-dragging] * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+.pk-editor-drop {
+  position: fixed;
+  z-index: 42;
+  pointer-events: none;
+  border-radius: 6px;
+  background: rgb(37 99 235 / 0.08);
+  box-shadow: inset 0 0 0 2px #2563eb;
+  outline: 2px dashed rgb(255 255 255 / 0.7);
+  outline-offset: -6px;
+}
+/* Embedded frames (maps, videos, booking) do not take clicks while editing, so a click picks
+   them, or the item they are in, instead of using the other site. */
+.pk-root iframe {
+  pointer-events: none;
+}

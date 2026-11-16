@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { getSection } from "@/render-kit/registry";
-import type { PortfolioDoc, Section, SectionStyle, Theme } from "@/render-kit/schema/document";
+import type {
+  ElementStyle,
+  PortfolioDoc,
+  Section,
+  SectionStyle,
+  Theme,
+} from "@/render-kit/schema/document";
 import type { AssetRef, Lang } from "@/render-kit/schema/primitives";
 import { applyFamily } from "@/render-kit/themes/apply";
 import * as ops from "./doc-ops";
@@ -18,6 +24,13 @@ type EditorState = {
   lastGroup: string | null;
   lastGroupAt: number;
   selectedId: string | null;
+  /**
+   * Element picked inside the selected section (an element key such as "heading" or "i3"), or
+   * null when the whole section is selected.
+   */
+  selectedEl: string | null;
+  /** Goes up when the preview asks to replace the picked photo; the photo field opens its picker. */
+  photoRequest: number;
   /** Language being edited and previewed. */
   lang: Lang;
   device: Device;
@@ -33,7 +46,9 @@ type EditorState = {
   commit: (next: PortfolioDoc | null, group?: string) => void;
   undo: () => void;
   redo: () => void;
-  select: (id: string | null) => void;
+  /** Selects a section, and optionally one element inside it. */
+  select: (id: string | null, el?: string | null) => void;
+  requestPhoto: () => void;
   setLang: (lang: Lang) => void;
   setDevice: (device: Device) => void;
 
@@ -45,10 +60,21 @@ type EditorState = {
   duplicateSection: (id: string) => void;
   moveSection: (id: string, delta: -1 | 1) => void;
   moveSectionTo: (id: string, targetId: string) => void;
+  /** Moves a list item to the place of another item of the same list. */
+  moveItemTo: (id: string, itemId: string, targetId: string) => void;
+  /** Moves a list item one place earlier (-1) or later (1). */
+  moveItemBy: (id: string, itemId: string, delta: -1 | 1) => void;
   toggleHidden: (id: string) => void;
   setVariant: (id: string, variant: string) => void;
   setSectionStyle: (id: string, style: Partial<SectionStyle>, group?: string) => void;
   resetSectionStyle: (id: string) => void;
+  /** Changes the look of one element; `null` puts it back as the design draws it. */
+  setElementStyle: (
+    id: string,
+    key: string,
+    style: Partial<ElementStyle> | null,
+    group?: string,
+  ) => void;
   applyStyleToAll: (id: string) => void;
   setTheme: (theme: Partial<Theme>, group?: string) => void;
   setFamily: (family: string, keepColors?: boolean) => void;
@@ -70,7 +96,9 @@ export const useEditor = create<EditorState>((set, get) => {
     lastGroup: null,
     lastGroupAt: 0,
     selectedId: null,
+    selectedEl: null,
     lang: "en",
+    photoRequest: 0,
     device: "desktop",
     revision: 0,
     uploader: null,
@@ -83,6 +111,7 @@ export const useEditor = create<EditorState>((set, get) => {
         future: [],
         lastGroup: null,
         selectedId: null,
+        selectedEl: null,
         lang: doc.meta.languages[0],
         revision: 0,
       }),
@@ -100,12 +129,12 @@ export const useEditor = create<EditorState>((set, get) => {
         lastGroupAt: now,
         revision: state.revision + 1,
         lang: next.meta.languages.includes(state.lang) ? state.lang : next.meta.languages[0],
-        selectedId: next.sections.some((s) => s.id === state.selectedId) ? state.selectedId : null,
+        ...keptSelection(next, state.selectedId, state.selectedEl),
       });
     },
 
     undo: () => {
-      const { doc, past, future, revision, selectedId } = get();
+      const { doc, past, future, revision, selectedId, selectedEl } = get();
       const previous = past[past.length - 1];
       if (!doc || !previous) return;
       set({
@@ -114,12 +143,12 @@ export const useEditor = create<EditorState>((set, get) => {
         future: [doc, ...future],
         lastGroup: null,
         revision: revision + 1,
-        selectedId: previous.sections.some((s) => s.id === selectedId) ? selectedId : null,
+        ...keptSelection(previous, selectedId, selectedEl),
       });
     },
 
     redo: () => {
-      const { doc, past, future, revision } = get();
+      const { doc, past, future, revision, selectedId, selectedEl } = get();
       const next = future[0];
       if (!doc || !next) return;
       set({
@@ -128,10 +157,12 @@ export const useEditor = create<EditorState>((set, get) => {
         future: future.slice(1),
         lastGroup: null,
         revision: revision + 1,
+        ...keptSelection(next, selectedId, selectedEl),
       });
     },
 
-    select: (id) => set({ selectedId: id }),
+    select: (id, el = null) => set({ selectedId: id, selectedEl: id ? el : null }),
+    requestPhoto: () => set((s) => ({ photoRequest: s.photoRequest + 1 })),
     setLang: (lang) => set({ lang }),
     setDevice: (device) => set({ device }),
 
@@ -143,7 +174,7 @@ export const useEditor = create<EditorState>((set, get) => {
       const result = doc && ops.addSection(doc, type, variant, selectedId);
       if (!result) return;
       commit(result.doc);
-      set({ selectedId: result.id });
+      set({ selectedId: result.id, selectedEl: null });
     },
 
     removeSection: (id) => change((doc) => ops.removeSection(doc, id)),
@@ -153,16 +184,21 @@ export const useEditor = create<EditorState>((set, get) => {
       const result = doc && ops.duplicateSection(doc, id);
       if (!result) return;
       commit(result.doc);
-      set({ selectedId: result.id });
+      set({ selectedId: result.id, selectedEl: null });
     },
 
     moveSection: (id, delta) => change((doc) => ops.moveSection(doc, id, delta)),
     moveSectionTo: (id, targetId) => change((doc) => ops.moveSectionTo(doc, id, targetId)),
+    moveItemTo: (id, itemId, targetId) =>
+      change((doc) => ops.moveItemTo(doc, id, itemId, targetId)),
+    moveItemBy: (id, itemId, delta) => change((doc) => ops.moveItemBy(doc, id, itemId, delta)),
     toggleHidden: (id) => change((doc) => ops.toggleHidden(doc, id)),
     setVariant: (id, variant) => change((doc) => ops.setVariant(doc, id, variant)),
     setSectionStyle: (id, style, group) =>
       change((doc) => ops.setSectionStyle(doc, id, style), group),
     resetSectionStyle: (id) => change((doc) => ops.resetSectionStyle(doc, id)),
+    setElementStyle: (id, key, style, group) =>
+      change((doc) => ops.setElementStyle(doc, id, key, style), group),
     applyStyleToAll: (id) => change((doc) => ops.applyStyleToAll(doc, id)),
     setTheme: (theme, group) =>
       change((doc) => ({ ...doc, theme: { ...doc.theme, ...theme } }), group),
@@ -171,6 +207,12 @@ export const useEditor = create<EditorState>((set, get) => {
     setLanguages: (languages) => change((doc) => ops.setLanguages(doc, languages)),
   };
 });
+
+/** The selection after the document changed: kept while its section is still there. */
+function keptSelection(doc: PortfolioDoc, selectedId: string | null, selectedEl: string | null) {
+  const kept = doc.sections.some((s) => s.id === selectedId);
+  return { selectedId: kept ? selectedId : null, selectedEl: kept ? selectedEl : null };
+}
 
 /** Name shown for a section in lists: its type name. */
 export function sectionName(section: Section): string {

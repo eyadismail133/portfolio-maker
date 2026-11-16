@@ -166,12 +166,13 @@ The riskiest step: it touches every section. Nothing visible changes for users.
 
 ### 8B - Direct editing in the preview (about 2 weeks, needs 8A)
 Click and drag inside the layout, like a document editor. Not a free canvas: things move between the places a layout offers, so pages keep working from 360px to desktop, right to left, and through a design switch.
-- [ ] Click any element (heading, text, card, photo, button) to select it; the side panel jumps to its fields
-- [ ] Floating element toolbar: edit text (the existing double-click), color, size, weight, alignment, hide, reset
-- [ ] Photos: click to replace or crop through the upload helper and `CropDialog`
-- [ ] Drag to reorder sections on the page and items inside a list; the same moves from the keyboard
-- [ ] Positions a layout offers: image side, button above or below text, columns; stored in `section.elements`
-- [ ] Every action is one Undo step; works in English and Arabic previews
+- [x] Click any element (heading, text, card, photo, button) to select it; the side panel jumps to its fields (every text, photo, logo, button and link field of every section, every list item and the photos in items; texts inside an item are edited through the item)
+- [x] Floating element toolbar: edit text (the existing double-click), color, size, weight, alignment, hide, reset
+- [x] Photos: click to replace or crop through the upload helper and `CropDialog`
+- [x] Drag to reorder sections on the page and items inside a list; the same moves from the keyboard (Alt+Up/Down, and "Move earlier/later" on the item toolbar)
+- [x] Positions a layout offers: "Swap sides" for any element that sits beside one other (a photo beside its text, one project row, a form beside its details), stored as `flip` in `section.elements`. Columns are a section style in 8C.
+- [ ] Button above or below the text (the text blocks of the hero and similar sections first need a flexible order)
+- [x] Every action is one Undo step; works in English and Arabic previews
 
 ### 8C - Better designs per kind of user (about 1.5 weeks, side by side with 8B)
 - [ ] Screenshot audit with `npm run visual`; list the weak sections and layouts for each kind of user (professional, student, freelancer, creative, company, agency, startup)
