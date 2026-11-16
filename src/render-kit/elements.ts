@@ -10,6 +10,7 @@ export function elementClasses(style: ElementStyle | undefined): string[] {
   if (style.weight) classes.push(`pk-e-w-${style.weight}`);
   if (style.align) classes.push(`pk-e-a-${style.align}`);
   if (style.flip) classes.push("pk-e-flip");
+  if (style.order) classes.push(`pk-e-o-${style.order}`);
   return classes;
 }
 

@@ -67,3 +67,16 @@
 .pk-root[dir="rtl"] :has(> .pk-e-flip) > * {
   direction: rtl;
 }
+
+/*
+ * Top or bottom of its block (buttons above the text). Works in blocks laid out as a grid or a
+ * column; the editor offers it only there. The element's own space moves to its other side.
+ */
+.pk-e-o-first {
+  order: -1;
+  margin-block: 0 var(--pk-e-o-space, 28px) !important;
+}
+.pk-e-o-last {
+  order: 99;
+  margin-block: var(--pk-e-o-space, 28px) 0 !important;
+}

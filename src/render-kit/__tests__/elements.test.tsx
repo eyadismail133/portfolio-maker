@@ -231,3 +231,17 @@ describe("swap sides", () => {
     expect(PAGE_CSS).toContain(":has(> .pk-e-flip)");
   });
 });
+
+describe("top or bottom of a block", () => {
+  test("the hero buttons can go above the text", () => {
+    const base = createSampleDoc({ sections: ["hero:split"] });
+    const doc = normalizeDoc({
+      ...base,
+      sections: [{ ...base.sections[0], elements: { actions: { order: "first" } } }],
+    });
+    const page = renderToStaticMarkup(<Renderer doc={doc} fontLink={false} />);
+    expect(page).toContain('class="pk-hero__actions pk-e-o-first"');
+    expect(PAGE_CSS).toMatch(/\.pk-e-o-first \{\n {2}order: -1;/);
+    expect(PAGE_CSS).toMatch(/\.pk-hero__copy \{\n {2}display: grid;/);
+  });
+});

@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
+  useEffectEvent,
   useState,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
@@ -131,6 +131,31 @@ function besideNeighbor(el: HTMLElement | null): boolean {
   return css.display.includes("flex") && css.flexDirection.startsWith("row");
 }
 
+/** True when the block lays its children out one under the other as a grid or a column. */
+function stacksVertically(block: HTMLElement): boolean {
+  const css = getComputedStyle(block);
+  if (css.display.includes("grid")) {
+    return css.gridTemplateColumns.trim().split(/\s+/).length === 1;
+  }
+  return css.display.includes("flex") && css.flexDirection.startsWith("column");
+}
+
+/**
+ * The element "Move to the top / bottom" acts on: the picked one, or the marked group it is in
+ * (a button moves with its group of buttons), when that sits in a block that can reorder.
+ * List items are left out: they move with the item tools.
+ */
+function orderTarget(el: HTMLElement | null): string | null {
+  const group = el?.parentElement?.closest<HTMLElement>("[data-pk-el]");
+  for (const candidate of [el, group]) {
+    const key = candidate?.getAttribute("data-pk-el");
+    const block = candidate?.parentElement;
+    if (!key || isItemKey(key) || !block || block.children.length < 2) continue;
+    if (stacksVertically(block)) return key;
+  }
+  return null;
+}
+
 function sameRect(a: DOMRect | null, b: DOMRect | null) {
   return (
     !!a &&
@@ -203,7 +228,8 @@ export function PreviewFrame() {
   }, [fontSize]);
 
   /** Keeps the toolbar at the top of the selected section, or at the top of the screen when it scrolls past. */
-  const place = useCallback(() => {
+  // An effect event: it always reads the current selection, and only effects call it.
+  const place = useEffectEvent(() => {
     const el = selectedId ? document.getElementById(selectedId) : null;
     const next = el ? el.getBoundingClientRect() : null;
     // Only a real change re-renders: this runs after every render.
@@ -215,29 +241,30 @@ export function PreviewFrame() {
     const box = el.getBoundingClientRect();
     if (box.bottom < 48 || box.top > window.innerHeight) return setToolbarTop(null);
     setToolbarTop(Math.max(8, box.top + 8));
-  }, [selectedId, selectedEl, content]);
+  });
 
   useEffect(() => {
     for (const el of document.querySelectorAll("[data-pk-selected]"))
       el.removeAttribute("data-pk-selected");
     if (selectedId) document.getElementById(selectedId)?.setAttribute("data-pk-selected", "");
     // After the page has laid out the new content.
-    const frame = requestAnimationFrame(place);
+    const frame = requestAnimationFrame(() => place());
     return () => cancelAnimationFrame(frame);
   });
 
   useEffect(() => {
-    window.addEventListener("scroll", place, { passive: true });
-    window.addEventListener("resize", place);
+    const onChange = () => place();
+    window.addEventListener("scroll", onChange, { passive: true });
+    window.addEventListener("resize", onChange);
     // Images that finish loading move the sections below them.
-    const observer = new ResizeObserver(() => place());
+    const observer = new ResizeObserver(onChange);
     observer.observe(document.body);
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", place);
-      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", onChange);
+      window.removeEventListener("resize", onChange);
     };
-  }, [place]);
+  }, []);
 
   if (!state) return null;
 
@@ -260,6 +287,7 @@ export function PreviewFrame() {
   // Read while drawing so the element toolbar knows the section colors and whether it is a photo.
   const sectionEl = selectedId ? document.getElementById(selectedId) : null;
   const pickedEl = sectionEl && selectedEl ? findElement(sectionEl, selectedEl, content) : null;
+  const orderKey = orderTarget(pickedEl);
 
   // A picked list item can move within its list.
   const itemPlace = isItemKey(selectedEl) ? itemPath(content, selectedEl) : null;
@@ -384,6 +412,15 @@ export function PreviewFrame() {
           }
           onStyle={(style) => send({ type: "pk:style", id: selectedId, key: selectedEl, style })}
           onPhoto={() => send({ type: "pk:photo", id: selectedId, key: selectedEl })}
+          order={
+            orderKey
+              ? {
+                  value: selectedSection?.elements?.[orderKey]?.order,
+                  onOrder: (order) =>
+                    send({ type: "pk:style", id: selectedId, key: orderKey, style: { order } }),
+                }
+              : undefined
+          }
           canFlip={besideNeighbor(pickedEl) || !!selectedSection?.elements?.[selectedEl]?.flip}
           move={
             itemPlace

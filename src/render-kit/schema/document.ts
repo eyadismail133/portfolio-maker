@@ -115,6 +115,7 @@ export const ELEMENT_COLORS = ["text", "muted", "primary", "accent"] as const;
 export const ELEMENT_SIZES = ["small", "large", "huge"] as const;
 export const ELEMENT_WEIGHTS = ["normal", "bold"] as const;
 export const ELEMENT_ALIGNS = ["start", "center", "end"] as const;
+export const ELEMENT_ORDERS = ["first", "last"] as const;
 
 /**
  * How one element inside a section looks (a heading, a card, a photo...). Only choices that work
@@ -131,6 +132,11 @@ export const elementStyleSchema = z.object({
    * Added to version 2 without a bump: missing means "as the design places it".
    */
   flip: z.boolean().optional(),
+  /**
+   * Moves the element to the top or the bottom of the block it is in (buttons above the text).
+   * Added to version 2 without a bump, like `flip`.
+   */
+  order: z.enum(ELEMENT_ORDERS).optional(),
 });
 export type ElementStyle = z.infer<typeof elementStyleSchema>;
 

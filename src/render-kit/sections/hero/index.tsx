@@ -25,7 +25,7 @@ function Copy({ content, ctx }: Parameters<VariantComponent<Content>>[0]) {
       {title && <p {...ctx.el("title", "pk-hero__title")}>{title}</p>}
       <h1 {...ctx.el("name", "pk-hero__name")}>{ctx.t(content.name)}</h1>
       {intro && <p {...ctx.el("intro", "pk-hero__intro")}>{ctx.rich(content.intro)}</p>}
-      <div className="pk-hero__actions">
+      <div {...ctx.el("actions", "pk-hero__actions")}>
         <ButtonLink link={content.primaryCta} ctx={ctx} elKey="primaryCta" />
         <ButtonLink link={content.secondaryCta} ctx={ctx} elKey="secondaryCta" kind="ghost" />
       </div>
@@ -101,7 +101,7 @@ const Statement: VariantComponent<Content> = ({ content, ctx }) => {
           <p {...ctx.el("intro", "pk-hero__intro")}>{ctx.rich(content.intro)}</p>
         )}
         <div>
-          <div className="pk-hero__actions">
+          <div {...ctx.el("actions", "pk-hero__actions")}>
             <ButtonLink link={content.primaryCta} ctx={ctx} elKey="primaryCta" />
             <ButtonLink link={content.secondaryCta} ctx={ctx} elKey="secondaryCta" kind="ghost" />
           </div>

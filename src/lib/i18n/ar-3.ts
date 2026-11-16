@@ -241,6 +241,8 @@ export const AR_3: Record<string, string> = {
   "Bold text": "نص عريض",
   "Regular weight": "سمك عادي",
   "Swap sides": "تبديل الجانبين",
+  "Move to the top": "نقل إلى الأعلى",
+  "Move to the bottom": "نقل إلى الأسفل",
   "Align to the start": "محاذاة إلى البداية",
   Center: "توسيط",
   "Align to the end": "محاذاة إلى النهاية",

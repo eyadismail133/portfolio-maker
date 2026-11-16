@@ -11,6 +11,11 @@
     grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
   }
 }
+/* A grid, so the editor can move a part to the top or the bottom (`order`). */
+.pk-hero__copy {
+  display: grid;
+  align-content: start;
+}
 .pk-hero__title {
   color: var(--pk-primary);
   font-weight: 600;

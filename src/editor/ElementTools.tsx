@@ -5,6 +5,7 @@ import { tl } from "./preview-text";
 import {
   ELEMENT_ALIGNS,
   ELEMENT_COLORS,
+  ELEMENT_ORDERS,
   ELEMENT_SIZES,
   type ElementStyle,
 } from "@/render-kit/schema/document";
@@ -37,6 +38,14 @@ const ALIGN_LABELS: Record<(typeof ELEMENT_ALIGNS)[number], string> = {
   start: "Align to the start",
   center: "Center",
   end: "Align to the end",
+};
+const ORDER_LABELS: Record<(typeof ELEMENT_ORDERS)[number], string> = {
+  first: "Move to the top",
+  last: "Move to the bottom",
+};
+const ORDER_PATHS: Record<(typeof ELEMENT_ORDERS)[number], string> = {
+  first: "M5 4h14M12 20V9M7 13l5-5 5 5",
+  last: "M5 20h14M12 4v11M7 11l5 5 5-5",
 };
 const ALIGN_PATHS: Record<(typeof ELEMENT_ALIGNS)[number], string> = {
   start: "M4 6h16M4 12h10M4 18h13",
@@ -71,6 +80,7 @@ export function ElementTools({
   onPhoto,
   move,
   canFlip = false,
+  order,
 }: {
   /** Where the element is on screen. */
   rect: DOMRect;
@@ -85,6 +95,11 @@ export function ElementTools({
   /** `null` resets the element. */
   onStyle: (style: Partial<ElementStyle> | null) => void;
   onPhoto: () => void;
+  /** The element (or its group) can move to the top or the bottom of its block. */
+  order?: {
+    value: (typeof ELEMENT_ORDERS)[number] | undefined;
+    onOrder: (order: (typeof ELEMENT_ORDERS)[number] | undefined) => void;
+  };
   /** The element sits beside one other element, so it can swap sides with it. */
   canFlip?: boolean;
   /** Set for a list item: it can be dragged or moved one place within its list. */
@@ -206,6 +221,23 @@ export function ElementTools({
               onClick={() => toggle("align", align)}
             >
               <Icon d={ALIGN_PATHS[align]} />
+            </button>
+          ))}
+        </>
+      )}
+      {order && (
+        <>
+          <span className="pk-editor-eltools__gap" aria-hidden="true" />
+          {ELEMENT_ORDERS.map((place) => (
+            <button
+              key={place}
+              type="button"
+              title={tl(ORDER_LABELS[place])}
+              aria-label={tl(ORDER_LABELS[place])}
+              aria-pressed={order.value === place}
+              onClick={() => order.onOrder(order.value === place ? undefined : place)}
+            >
+              <Icon d={ORDER_PATHS[place]} />
             </button>
           ))}
         </>

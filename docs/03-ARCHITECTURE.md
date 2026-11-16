@@ -123,6 +123,7 @@ type ElementStyle = {
   align?: "start" | "center" | "end";
   hidden?: boolean;
   flip?: boolean;            // swap sides with the one element beside it (added to version 2 without a bump)
+  order?: "first" | "last";  // top or bottom of its block, e.g. the hero buttons above the text (version 2, no bump)
 };
 
 type LocalizedText = string | { en?: string; ar?: string };

@@ -171,7 +171,7 @@ Click and drag inside the layout, like a document editor. Not a free canvas: thi
 - [x] Photos: click to replace or crop through the upload helper and `CropDialog`
 - [x] Drag to reorder sections on the page and items inside a list; the same moves from the keyboard (Alt+Up/Down, and "Move earlier/later" on the item toolbar)
 - [x] Positions a layout offers: "Swap sides" for any element that sits beside one other (a photo beside its text, one project row, a form beside its details), stored as `flip` in `section.elements`. Columns are a section style in 8C.
-- [ ] Button above or below the text (the text blocks of the hero and similar sections first need a flexible order)
+- [x] Button above or below the text: "Move to the top / bottom" (`order` in `section.elements`) for an element, or a button's group, in a block laid out as one column; the hero text block is now a grid so its parts can reorder
 - [x] Every action is one Undo step; works in English and Arabic previews
 
 ### 8C - Better designs per kind of user (about 1.5 weeks, side by side with 8B)
