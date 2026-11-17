@@ -26,7 +26,7 @@ function preset(
   };
 }
 
-/** The 24 ready palettes. Every one is checked for readable contrast by the tests. */
+/** The 25 ready palettes. Every one is checked for readable contrast by the tests. */
 export const palettes: PalettePreset[] = [
   preset("cobalt", "Cobalt", "serious", "#1f4fd8", { background: "#ffffff", surface: "#f3f5f9" }),
   preset("pine", "Pine", "calm", "#1d6b4f"),
@@ -55,6 +55,7 @@ export const palettes: PalettePreset[] = [
   preset("wine", "Wine", "luxury", "#7b1e3a"),
   preset("royal", "Royal green", "luxury", "#14532d", { accent: "#a16207" }),
   preset("onyx", "Onyx", "luxury", "#1c1917", { accent: "#a16207" }),
+  preset("signal", "Signal red", "vivid", "#c8102e", { background: "#ffffff", accent: "#111111" }),
 ];
 
 export function getPalette(id: string): PalettePreset {

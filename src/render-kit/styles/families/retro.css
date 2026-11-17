@@ -1,0 +1,54 @@
+/* Retro: warm and chunky. Thick outlines, offset shadows in the main color, buttons that press in. The shadows point the other way on right-to-left pages. */
+.pk-root[data-pk-family="retro"] {
+  --pk-heading-weight: 800;
+  --pk-heading-tracking: -0.01em;
+  --pk-heading-leading: 1.05;
+  --pk-display-scale: 1.08;
+  --pk-h2-scale: 1.15;
+  --pk-btn-weight: 800;
+}
+.pk-root[data-pk-family="retro"] .pk-section {
+  --pk-rule: 2px solid var(--pk-text);
+  --pk-card-bg: var(--pk-bg);
+  --pk-card-border: 2px solid var(--pk-text);
+  --pk-card-shadow: 6px 6px 0 var(--pk-primary);
+  --pk-tag-bg: var(--pk-surface);
+  --pk-tag-border: 2px solid var(--pk-text);
+  --pk-btn-shadow: 4px 4px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="retro"][dir="rtl"] .pk-section {
+  --pk-card-shadow: -6px 6px 0 var(--pk-primary);
+  --pk-btn-shadow: -4px 4px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="retro"] .pk-btn {
+  border: 2px solid var(--pk-text);
+  transition:
+    translate 0.12s,
+    box-shadow 0.12s;
+}
+.pk-root[data-pk-family="retro"] .pk-btn:hover {
+  transform: none;
+  translate: 2px 2px;
+  box-shadow: 1px 1px 0 var(--pk-text);
+}
+.pk-root[data-pk-family="retro"] :is(.pk-h2, .pk-hero__name) {
+  text-shadow: 0.05em 0.05em 0 color-mix(in srgb, var(--pk-primary) 45%, transparent);
+}
+.pk-root[data-pk-family="retro"][dir="rtl"] :is(.pk-h2, .pk-hero__name) {
+  text-shadow: -0.05em 0.05em 0 color-mix(in srgb, var(--pk-primary) 45%, transparent);
+}
+.pk-root[data-pk-family="retro"] .pk-media {
+  border: 2px solid var(--pk-text);
+}
+.pk-root[data-pk-family="retro"] .pk-media--empty {
+  background: var(--pk-accent);
+  color: var(--pk-bg);
+}
+.pk-root[data-pk-family="retro"] .pk-hero__title {
+  display: inline-block;
+  padding: 4px 14px;
+  border: 2px solid var(--pk-text);
+  border-radius: var(--pk-radius-control);
+  background: var(--pk-surface);
+  color: var(--pk-text);
+}

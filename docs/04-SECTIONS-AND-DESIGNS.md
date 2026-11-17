@@ -145,8 +145,11 @@ A family sets the feeling of the whole page: shapes, spacing, type scale, decora
 | `glass` | Modern, soft depth | Blurred translucent cards, gradients | Tech, product, personal |
 | `gradient` | Energetic, startup | Mesh gradients, soft glow, large radius | Startups, apps |
 | `classic-cv` | Like a printed CV | Sidebar with photo, compact, formal | Job seekers, academics |
+| `luxury` | Dark and refined | Thin rules in the accent color, wide letter spacing, centered light headings, outline buttons; dark by default (Onyx) | Hotels, jewellers, photographers, fine brands |
+| `retro` | Warm and chunky | Thick outlines, offset shadows in the main color, buttons that press in, round corners by default | Cafes, makers, illustrators |
+| `swiss` | A strict grid | Heavy rule on every section, big tight headings, small capital labels, square, black and one red (Signal) | Architects, designers, studios |
 
-Version 1 shipped 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creative`); the other 6 were added in Phase 6. `classic-cv` keeps the normal page flow (no fixed sidebar, so it still works at 360px and in the HTML export): its "sidebar" is the narrow heading column of each section, with a round photo in the hero and a compact print size. The onboarding styles now map to them: bold → brutalist, playful → playful, tech → glass, editorial → editorial, corporate → classic CV, creative → gradient, each as the second look of that style.
+Version 1 shipped 6 (`minimal`, `bold`, `elegant`, `tech`, `corporate`, `creative`); the other 6 were added in Phase 6. Phase 8E added `luxury`, `retro` and `swiss` (15 in all) and the Signal red palette (25 palettes). Like every family they set defaults only: corners come from the Corners setting, never a fixed radius. `classic-cv` keeps the normal page flow (no fixed sidebar, so it still works at 360px and in the HTML export): its "sidebar" is the narrow heading column of each section, with a round photo in the hero and a compact print size. The onboarding styles now map to them: bold → brutalist, playful → playful, tech → glass, editorial → editorial, corporate → classic CV, creative → gradient, each as the second look of that style.
 
 ## Colors
 
@@ -178,7 +181,7 @@ The CSS is `styles/personality.css`, after the families so the choice wins.
 **Starting points:** each of the 16 onboarding looks (`recommend/generate.ts`) has its own touches and signature layouts, and ideas 3 to 6 of a batch get a few random ones (`themes/variety.ts`), so no two ideas in a batch look the same (a test checks this). Shuffle in the Design tab picks colors, fonts, corners, touches and some layouts in one Undo step. Only sections whose layouts all take the same content are varied; contact and about are left alone.
 
 ## Settings a design must respect
-A design family sets defaults, never fixed values, for anything the person can change: corners come from `--pk-radius` and `--pk-radius-control` (a square family sets `radius: "none"` as its default instead of `border-radius: 0`), section colors only through rules on `data-pk-bg="default"`, and section space through `--pk-pad-base`. That way the Corners setting and every choice in a section's Style tab work in all 12 designs. The per-section style choices are listed in `05-EDITOR-AND-PREVIEW.md`.
+A design family sets defaults, never fixed values, for anything the person can change: corners come from `--pk-radius` and `--pk-radius-control` (a square family sets `radius: "none"` as its default instead of `border-radius: 0`), section colors only through rules on `data-pk-bg="default"`, and section space through `--pk-pad-base`. That way the Corners setting and every choice in a section's Style tab work in all 15 designs. The per-section style choices are listed in `05-EDITOR-AND-PREVIEW.md`.
 
 ## Quality bar for every section
 - Looks finished with the sample content, and still fine with very long or very short text, 1 item or 20 items, and no image.

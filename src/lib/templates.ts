@@ -20,6 +20,7 @@ const KIND_FOR: Record<string, SampleKind> = {
   gradient: "startup",
   glass: "startup",
   creative: "startup",
+  luxury: "company",
 };
 
 const FOR_WHOM: Record<string, string> = {
@@ -35,6 +36,9 @@ const FOR_WHOM: Record<string, string> = {
   glass: "Apps and modern products",
   gradient: "Startups launching something new",
   "classic-cv": "Job seekers and academics",
+  luxury: "Hotels, jewellers, photographers and fine brands",
+  retro: "Cafes, makers, illustrators and friendly brands",
+  swiss: "Architects, designers and studios who like order",
 };
 
 export const TEMPLATES: Template[] = families.map((family) => {

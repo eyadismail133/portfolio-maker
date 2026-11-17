@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: "Portfolio Maker",
   description:
-    "Build a portfolio page for a person, a company or a startup, in English and Arabic, with 12 designs and 43 sections.",
+    "Build a portfolio page for a person, a company or a startup, in English and Arabic, with 15 designs and 46 sections.",
   openGraph: {
     title: "Portfolio Maker",
     description: "Fill in your story once. See it in every design. In English and Arabic.",

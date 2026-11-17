@@ -12,6 +12,9 @@
 @import "./families/glass.css";
 @import "./families/gradient.css";
 @import "./families/classic-cv.css";
+@import "./families/luxury.css";
+@import "./families/retro.css";
+@import "./families/swiss.css";
 @import "../sections/navbar/navbar.css";
 @import "../sections/hero/hero.css";
 @import "../sections/about/about.css";

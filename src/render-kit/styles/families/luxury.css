@@ -1,0 +1,65 @@
+/* Luxury: dark and refined. Thin rules in the accent color, wide letter spacing on small text,
+   headings centered and light, outline buttons. */
+.pk-root[data-pk-family="luxury"] {
+  --pk-heading-weight: 500;
+  --pk-heading-tracking: 0.01em;
+  --pk-heading-leading: 1.1;
+  --pk-display-scale: 1.05;
+  --pk-h2-scale: 1.15;
+  --pk-body-leading: 1.75;
+  --pk-btn-weight: 500;
+  --pk-btn-tracking: 0.14em;
+}
+.pk-root[data-pk-family="luxury"] .pk-section {
+  --pk-rule: 1px solid color-mix(in srgb, var(--pk-accent) 55%, transparent);
+  --pk-card-bg: transparent;
+  --pk-card-border: 1px solid color-mix(in srgb, var(--pk-accent) 40%, transparent);
+  --pk-tag-border: 1px solid color-mix(in srgb, var(--pk-accent) 45%, transparent);
+}
+.pk-root[data-pk-family="luxury"] :is(.pk-stack__head, .pk-rail__head) {
+  text-align: center;
+  justify-items: center;
+}
+.pk-root[data-pk-family="luxury"] .pk-stack__head .pk-h2::after,
+.pk-root[data-pk-family="luxury"] .pk-rail__head .pk-h2::after {
+  content: "";
+  display: block;
+  width: 48px;
+  margin: 18px auto 0;
+  border-block-start: 1px solid var(--pk-accent);
+}
+.pk-root[data-pk-family="luxury"] :is(.pk-hero__title, .pk-sub, .pk-btn) {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8125rem;
+}
+.pk-root[data-pk-family="luxury"][lang="ar"] :is(.pk-hero__title, .pk-sub, .pk-btn) {
+  letter-spacing: 0;
+  font-size: 0.9375rem;
+}
+.pk-root[data-pk-family="luxury"] .pk-hero__title {
+  color: var(--pk-accent);
+}
+.pk-root[data-pk-family="luxury"] .pk-btn--primary {
+  background: transparent;
+  color: var(--pk-text);
+  border: 1px solid var(--pk-accent);
+}
+.pk-root[data-pk-family="luxury"] .pk-btn--primary:hover {
+  background: var(--pk-accent);
+  color: var(--pk-bg);
+}
+.pk-root[data-pk-family="luxury"] .pk-media {
+  filter: saturate(0.85);
+}
+.pk-root[data-pk-family="luxury"] .pk-media--empty {
+  background: var(--pk-surface);
+  color: var(--pk-accent);
+  font-family: var(--pk-font-heading);
+}
+.pk-root[data-pk-family="luxury"] .pk-navbar {
+  border-block-end: var(--pk-rule);
+}
+.pk-root[data-pk-family="luxury"] .pk-footer {
+  border-block-start: var(--pk-rule);
+}

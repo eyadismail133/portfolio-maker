@@ -8,7 +8,8 @@ Decided on 13 November 2026 and built. Limits live in `src/lib/plans.ts` and are
 |---|---|---|
 | Portfolios | 3 | Unlimited |
 | Published pages | 1 | 10 |
-| All 12 designs, 43 sections, 24 palettes | Yes | Yes |
+| All 15 designs, 43 sections, 25 palettes | Yes | Yes |
+| Showcase sections (device mockups, bento grid, moving band) | Try in the editor | Yes |
 | Arabic and English | Yes | Yes |
 | "Made with Portfolio Maker" badge | Shown | Removed |
 | Image storage | 50 MB | 2 GB |

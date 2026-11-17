@@ -205,6 +205,45 @@ export const families: DesignFamily[] = [
       palette: "navy",
     },
   },
+  {
+    id: "luxury",
+    name: "Luxury",
+    feeling: "Dark and refined: thin gold lines, wide letter spacing, slow and calm",
+    preferredVariants: { hero: "centered", projects: "rows", testimonials: "single", footer: "big" },
+    defaults: {
+      fonts: "couture",
+      radius: "none",
+      spacing: "airy",
+      mode: "dark",
+      palette: "onyx",
+    },
+  },
+  {
+    id: "retro",
+    name: "Retro",
+    feeling: "Warm and chunky: thick outlines, offset shadows, round buttons",
+    preferredVariants: { skills: "cards", projects: "grid", testimonials: "wall", cta: "card" },
+    defaults: {
+      fonts: "soft",
+      radius: "large",
+      spacing: "normal",
+      mode: "light",
+      palette: "sunset",
+    },
+  },
+  {
+    id: "swiss",
+    name: "Swiss",
+    feeling: "A strict grid, big plain type, black and one red",
+    preferredVariants: { hero: "statement", services: "numbered", projects: "index", stats: "big" },
+    defaults: {
+      fonts: "grotesk",
+      radius: "none",
+      spacing: "normal",
+      mode: "light",
+      palette: "signal",
+    },
+  },
 ];
 
 export function getFamily(id: string): DesignFamily {

@@ -1,0 +1,61 @@
+/* Swiss: a strict grid. Big plain headings set tight, a heavy rule on top of every section,
+   small labels, square everything, one strong color. */
+.pk-root[data-pk-family="swiss"] {
+  --pk-heading-weight: 700;
+  --pk-heading-tracking: -0.04em;
+  --pk-heading-leading: 0.98;
+  --pk-display-scale: 1.2;
+  --pk-h2-scale: 1.4;
+  --pk-btn-weight: 700;
+}
+.pk-root[data-pk-family="swiss"] .pk-section {
+  --pk-rule: 2px solid var(--pk-text);
+  --pk-card-bg: transparent;
+  --pk-card-border: 0 solid transparent;
+  --pk-tag-bg: transparent;
+  --pk-tag-border: 0 solid transparent;
+}
+.pk-root[data-pk-family="swiss"]
+  .pk-section:not(.pk-navbar, .pk-hero, .pk-footer, .pk-divider)
+  > .pk-container
+  > :is(.pk-rail, .pk-stack) {
+  border-block-start: 6px solid var(--pk-text);
+  padding-block-start: 22px;
+}
+.pk-root[data-pk-family="swiss"] .pk-card {
+  border-block-start: var(--pk-rule);
+  padding-inline: 0;
+}
+.pk-root[data-pk-family="swiss"] .pk-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.pk-root[data-pk-family="swiss"][lang="ar"] .pk-sub {
+  letter-spacing: 0;
+  font-size: 0.9375rem;
+}
+.pk-root[data-pk-family="swiss"] .pk-hero__title {
+  color: var(--pk-primary);
+  font-weight: 700;
+}
+.pk-root[data-pk-family="swiss"] .pk-tags li {
+  padding-inline: 0;
+  font-weight: 600;
+}
+.pk-root[data-pk-family="swiss"] .pk-tags li + li::before {
+  content: "·";
+  margin-inline-end: 10px;
+  color: var(--pk-primary);
+}
+.pk-root[data-pk-family="swiss"] .pk-media--empty {
+  background: var(--pk-primary);
+  color: var(--pk-on-primary);
+}
+.pk-root[data-pk-family="swiss"] .pk-navbar {
+  border-block-end: var(--pk-rule);
+}
+.pk-root[data-pk-family="swiss"] .pk-footer {
+  border-block-start: 6px solid var(--pk-text);
+}

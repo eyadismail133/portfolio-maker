@@ -56,7 +56,7 @@ const FEATURES: { title: string; text: string; icon: UiIconName; tint: string }[
     tint: "from-cyan-600/15 to-blue-600/15 text-cyan-600 dark:text-cyan-400",
   },
   {
-    title: "43 sections, 12 designs",
+    title: "46 sections, 15 designs",
     text: "From a CV-style profile to a startup page with pricing, team and FAQ.",
     icon: "palette",
     tint: "from-rose-600/15 to-pink-600/15 text-rose-600 dark:text-rose-400",
@@ -105,7 +105,7 @@ export default function Home() {
         <section className="mx-auto max-w-6xl px-5 pb-20 pt-14 sm:pt-22">
           <div className="pm-animate-in inline-flex items-center gap-2.5 rounded-full border border-blue-200/80 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-blue-700 shadow-2xs backdrop-blur-md dark:border-blue-900/70 dark:bg-zinc-900/80 dark:text-blue-300">
             <span className="size-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
-            <span>43 sections, 12 designs</span>
+            <span>46 sections, 15 designs</span>
           </div>
 
           <h1 className="pm-animate-in pm-stagger-1 mt-6 max-w-4xl text-4xl font-bold leading-[1.06] tracking-tight text-balance sm:text-6xl lg:text-[4.15rem]">

@@ -16,6 +16,15 @@
   display: grid;
   align-content: start;
 }
+/* A grid stretches its children; the title keeps its own width, as it had before (some designs
+   draw it as a badge). It sits at the start, or in the middle where the text is centered. */
+.pk-hero__copy > .pk-hero__title {
+  justify-self: start;
+}
+.pk-hero__center .pk-hero__copy > .pk-hero__title,
+.pk-section[data-pk-align="center"] .pk-hero__copy > .pk-hero__title {
+  justify-self: center;
+}
 .pk-hero__title {
   color: var(--pk-primary);
   font-weight: 600;

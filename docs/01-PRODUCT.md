@@ -34,7 +34,7 @@ We do not try to beat Canva at free-form graphic design. We beat it at one job: 
 - Sign up and log in (email + Google).
 - Onboarding questions and 6 generated starter ideas.
 - Section library: about 35 section types, most with 2 to 4 layout variants.
-- 12 design families, ready palettes plus custom color with automatic contrast checking, font pairs.
+- 15 design families, ready palettes plus custom color with automatic contrast checking, font pairs.
 - Editor: add, remove, reorder, hide, duplicate sections; edit content in forms; switch variant; change theme.
 - Live preview on desktop, tablet, phone sizes.
 - Image upload with crop.

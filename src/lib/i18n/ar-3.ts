@@ -3,7 +3,7 @@ export const AR_3: Record<string, string> = {
   "(prepaid, does not renew)": "(مدفوع مقدماً، لا يتجدد)",
   ", no end date": "، بلا تاريخ انتهاء",
   "2024-03 or 2024": "2024-03 أو 2024",
-  "43 sections, 12 designs": "43 قسماً و12 تصميماً",
+  "46 sections, 15 designs": "46 قسماً و15 تصميماً",
   "A portfolio page for a person, a company or a startup, built from your real details. Change the whole design in one click; your content stays.":
     "صفحة تعريفية لشخص أو شركة أو شركة ناشئة، مبنية من بياناتك الحقيقية. غيّر التصميم كله بنقرة واحدة؛ ويبقى محتواك.",
   "Agencies and confident brands": "الوكالات والعلامات الواثقة",
