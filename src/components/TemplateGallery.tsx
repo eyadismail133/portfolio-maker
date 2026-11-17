@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { UiIcon } from "@/editor/ui";
 import { templateDoc, TEMPLATES } from "@/lib/templates";
 import { MiniPreview } from "./MiniPreview";
+import { ProBadge } from "./ProBadge";
 import { TiltCard } from "./TiltCard";
 
 export function TemplateGallery() {
@@ -35,7 +36,10 @@ export function TemplateGallery() {
           </div>
           <div className="flex flex-1 flex-col gap-3.5 p-3.5 pt-4">
             <div>
-              <h2 className="text-base font-semibold tracking-tight">{template.name}</h2>
+              <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight">
+                {template.name}
+                {template.pro && <ProBadge />}
+              </h2>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{template.forWhom}</p>
             </div>
             <Link

@@ -8,10 +8,11 @@ import { readAnswers, writePending } from "@/lib/local-drafts";
 import { addStoredPicture } from "@/lib/picture-store";
 import { createPortfolio, friendlyError, saveOnboardingAnswers } from "@/lib/portfolios";
 import { createClient } from "@/lib/supabase/client";
-import { blankStart, generateIdeas } from "@/recommend/generate";
+import { blankStart, generateIdeas, proPresets, type Idea } from "@/recommend/generate";
 import { EMPTY_ANSWERS, type Answers } from "@/recommend/types";
 import type { PortfolioDoc } from "@/render-kit/schema/document";
 import { MiniPreview } from "./MiniPreview";
+import { ProBadge } from "./ProBadge";
 import { TiltCard } from "./TiltCard";
 
 /** Six starter portfolios made from the onboarding answers. Choosing one opens it in the editor. */
@@ -32,6 +33,7 @@ export function Ideas() {
   }, [router]);
 
   const ideas = useMemo(() => (answers ? generateIdeas(answers, seed) : []), [answers, seed]);
+  const presets = useMemo(() => (answers ? proPresets(answers) : []), [answers]);
 
   /** Saves the chosen start to the account, or keeps it for after login when there is none. */
   const use = async (key: string, doc: PortfolioDoc) => {
@@ -98,49 +100,7 @@ export function Ideas() {
           </p>
         )}
         <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ideas.map((idea, idx) => (
-            <TiltCard
-              key={`${seed}-${idea.id}`}
-              style={{ animationDelay: `${idx * 65}ms` }}
-              className="pm-animate-in pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
-            >
-              <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
-                <span className="size-2 rounded-full bg-rose-400/80" />
-                <span className="size-2 rounded-full bg-amber-400/80" />
-                <span className="size-2 rounded-full bg-emerald-400/80" />
-                <span
-                  data-no-translate
-                  className="ms-2 truncate rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[10px] text-zinc-400 dark:bg-zinc-800/80 dark:text-zinc-500"
-                >
-                  {idea.doc.theme.family}
-                </span>
-              </div>
-              <div className="overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800">
-                <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
-                  <MiniPreview doc={idea.doc} />
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col gap-3.5 p-3.5 pt-4">
-                <div>
-                  <h2 className="text-base font-semibold tracking-tight">{idea.name}</h2>
-                  <p className="mt-0.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-                    {idea.note}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  disabled={busy !== ""}
-                  className={`${primaryButtonClass} mt-auto py-2.5 disabled:opacity-60`}
-                  onClick={() => use(idea.id, idea.doc)}
-                >
-                  <span>{busy === idea.id ? "Opening…" : "Use this"}</span>
-                  {busy !== idea.id && (
-                    <UiIcon name="arrowRight" size={14} className="rtl:rotate-180" />
-                  )}
-                </button>
-              </div>
-            </TiltCard>
-          ))}
+          {ideas.map((idea, idx) => card(idea, idx))}
         </ul>
         <div className="mt-10 flex flex-wrap gap-3">
           <button
@@ -160,7 +120,68 @@ export function Ideas() {
             {busy === "blank" ? "Opening…" : "Start from a blank page"}
           </button>
         </div>
+        {presets.length > 0 && (
+          <section className="mt-14" aria-labelledby="pro-presets">
+            <h2
+              id="pro-presets"
+              className="flex items-center gap-2 text-xl font-bold tracking-tight"
+            >
+              Pro presets <ProBadge />
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Whole pages built around the showcase sections: device mockups, a bento grid and a
+              moving band. Try them for free; publishing them needs Pro.
+            </p>
+            <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {presets.map((idea, idx) => card(idea, idx))}
+            </ul>
+          </section>
+        )}
       </main>
     </div>
   );
+
+  function card(idea: Idea, idx: number) {
+    return (
+      <TiltCard
+        key={`${seed}-${idea.id}`}
+        style={{ animationDelay: `${idx * 65}ms` }}
+        className="pm-animate-in pm-card-interactive group flex flex-col overflow-hidden rounded-2xl p-2"
+      >
+        <div aria-hidden="true" className="mb-2 flex items-center gap-1.5 px-2 pt-1">
+          <span className="size-2 rounded-full bg-rose-400/80" />
+          <span className="size-2 rounded-full bg-amber-400/80" />
+          <span className="size-2 rounded-full bg-emerald-400/80" />
+          <span
+            data-no-translate
+            className="ms-2 truncate rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[10px] text-zinc-400 dark:bg-zinc-800/80 dark:text-zinc-500"
+          >
+            {idea.doc.theme.family}
+          </span>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-zinc-200/80 dark:border-zinc-800">
+          <div className="transition-transform duration-500 ease-out group-hover:scale-[1.03]">
+            <MiniPreview doc={idea.doc} />
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col gap-3.5 p-3.5 pt-4">
+          <div>
+            <h2 className="text-base font-semibold tracking-tight">{idea.name}</h2>
+            <p className="mt-0.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {idea.note}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={busy !== ""}
+            className={`${primaryButtonClass} mt-auto py-2.5 disabled:opacity-60`}
+            onClick={() => use(idea.id, idea.doc)}
+          >
+            <span>{busy === idea.id ? "Opening…" : "Use this"}</span>
+            {busy !== idea.id && <UiIcon name="arrowRight" size={14} className="rtl:rotate-180" />}
+          </button>
+        </div>
+      </TiltCard>
+    );
+  }
 }

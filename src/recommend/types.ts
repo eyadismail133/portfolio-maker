@@ -49,6 +49,11 @@ export type Answers = {
   styles: StyleId[];
   /** Id of a ready palette, or null. */
   palette: string | null;
+  /**
+   * Up to three looks picked on the mood board (ids from `MOOD_LOOKS`). When set, the ideas come
+   * from these looks and mixes of them instead of from `styles`. Missing in answers saved before.
+   */
+  looks?: string[];
   /** A brand color like #1f4fd8. Wins over `palette`. */
   brandColor: string | null;
   mode: "light" | "dark" | "both" | null;
@@ -63,6 +68,7 @@ export const EMPTY_ANSWERS: Answers = {
   field: null,
   goal: null,
   styles: [],
+  looks: [],
   palette: null,
   brandColor: null,
   mode: null,

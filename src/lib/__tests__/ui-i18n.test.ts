@@ -37,3 +37,11 @@ describe("Arabic interface", () => {
     expect(isPortfolioPath("/pro")).toBe(false);
   });
 });
+
+test("the color found in a logo is translated with the color kept", () => {
+  expect(translateUi("Found #1f4fd8 in your logo.")).toBe("وجدنا اللون #1f4fd8 في شعارك.");
+});
+
+test("two looks mixed on the mood board are translated name by name", () => {
+  expect(translateUi("Clean minimal + Warm retro")).toBe("بسيط ونظيف + دفء كلاسيكي");
+});

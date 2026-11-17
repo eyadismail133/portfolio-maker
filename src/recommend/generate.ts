@@ -164,6 +164,8 @@ export type Idea = {
   /** One line under the name: what makes this idea different. */
   note: string;
   doc: PortfolioDoc;
+  /** A Pro preset: anyone can try it, publishing needs Pro (it uses showcase sections). */
+  pro?: true;
 };
 
 type Content = Record<string, unknown>;
@@ -264,6 +266,8 @@ function buildIdea(
   index: number,
   next: () => number,
   surprise: boolean,
+  /** Section list to use instead of the recipe (Pro presets add showcase sections). */
+  sections?: string[],
 ): Idea {
   const recipe = recipeFor(answers);
   const family = getFamily(look.family);
@@ -273,7 +277,7 @@ function buildIdea(
     family: family.id,
     fonts: look.fonts,
     languages: answers.languages.length > 0 ? answers.languages : ["en"],
-    sections: recipe.sections,
+    sections: sections ?? recipe.sections,
     alternate,
   });
   const hasPhotos = answers.assets.includes("photos");
@@ -310,12 +314,65 @@ function buildIdea(
   };
 }
 
+/** Looks only on the mood board: the designs added in Phase 8E. */
+const EXTRA_LOOKS: Look[] = [
+  { name: "Dark luxury", family: "luxury", touches: { imageShape: "arch" } },
+  { name: "Warm retro", family: "retro", touches: { pattern: "dots", imageShape: "rounded" } },
+  { name: "Swiss grid", family: "swiss", layouts: { "work-experience": "compact" } },
+];
+
+const lookId = (look: Look) => look.name.toLowerCase().replace(/\s+/g, "-");
+
+/** Every look, for the mood board ("Pick three looks"). */
+export const MOOD_LOOKS: (Look & { id: string })[] = [
+  ...STYLES.flatMap((style) => LOOKS[style]),
+  ...EXTRA_LOOKS,
+].map((look) => ({ ...look, id: lookId(look) }));
+
+/**
+ * One look's design with another look's type, corners and touches: what "mixing" two looks from
+ * the mood board means.
+ */
+export function mixLooks(a: Look, b: Look): Look {
+  const other = getFamily(b.family).defaults;
+  return {
+    name: `${a.name} + ${b.name}`,
+    family: a.family,
+    fonts: b.fonts ?? other.fonts,
+    radius: b.radius ?? other.radius,
+    touches: { ...a.touches, ...b.touches },
+    layouts: { ...b.layouts, ...a.layouts },
+  };
+}
+
+/**
+ * Six ideas from up to three looks picked on the mood board: each look as it is, then mixes of
+ * every two of them, then each look with its second layouts. A different `seed` starts further on.
+ */
+function moodIdeas(answers: Answers, looks: Look[], seed: number): Idea[] {
+  const next = random(seed);
+  const mixes = looks.flatMap((a, i) => looks.filter((_, j) => j !== i).map((b) => mixLooks(a, b)));
+  const options = [
+    ...looks.map((look) => ({ look, alternate: false })),
+    ...mixes.map((look) => ({ look, alternate: false })),
+    ...looks.map((look) => ({ look, alternate: true })),
+  ];
+  const start = (seed * 6) % options.length;
+  const picks = Array.from({ length: 6 }, (_, i) => options[(start + i) % options.length]);
+  return picks.map((pick, i) => buildIdea(answers, pick.look, pick.alternate, i, next, false));
+}
+
 /**
  * Six starter portfolios for a set of answers: five in the styles the person chose and one
  * surprise from a style they did not. A different `seed` gives six more.
  */
 export function generateIdeas(answers: Answers, seed = 0): Idea[] {
   const next = random(seed);
+  const mood = (answers.looks ?? [])
+    .map((id) => MOOD_LOOKS.find((look) => look.id === id))
+    .filter((look): look is Look & { id: string } => Boolean(look))
+    .slice(0, 3);
+  if (mood.length > 0) return moodIdeas(answers, mood, seed);
   const who = answers.who ?? "professional";
   const chosen = answers.styles.length > 0 ? answers.styles.slice(0, 2) : DEFAULT_STYLES[who];
   const options = chosen
@@ -349,4 +406,62 @@ export function blankStart(answers: Answers): PortfolioDoc {
     sections: ["navbar", "hero", "footer"],
   });
   return normalizeDoc(personalise(sample, answers));
+}
+
+/** Where a showcase section goes: after the first of these sections the page has. */
+type Placement = [entry: string, after: string[]];
+
+/**
+ * Pro presets: whole pages built around the showcase sections. Shown under the ideas and in the
+ * template gallery; anyone can try them, publishing needs Pro.
+ */
+export const PRO_PRESETS: { id: string; look: Look; adds: Placement[] }[] = [
+  {
+    id: "launch",
+    look: { name: "Product launch", family: "gradient" },
+    adds: [
+      ["showcase-devices:duo", ["hero"]],
+      ["showcase-marquee:words", ["showcase-devices"]],
+      ["showcase-bento:mosaic", ["services", "features", "projects", "about"]],
+    ],
+  },
+  {
+    id: "studio",
+    look: { name: "Studio showcase", family: "swiss" },
+    adds: [
+      ["showcase-marquee:tags", ["hero"]],
+      ["showcase-bento:grid", ["projects", "services", "about"]],
+      ["showcase-devices:laptop", ["case-study", "projects", "showcase-bento"]],
+    ],
+  },
+];
+
+/** A section list with the showcase sections placed in it (before the footer if no anchor). */
+export function withShowcase(types: readonly string[], adds: readonly Placement[]): string[] {
+  const list = [...types];
+  const at = (type: string) => list.findIndex((entry) => entry.split(":")[0] === type);
+  for (const [entry, after] of adds) {
+    if (at(entry.split(":")[0]) !== -1) continue;
+    const anchor = after.map(at).find((i) => i !== -1);
+    const footer = at("footer");
+    list.splice(anchor !== undefined ? anchor + 1 : footer !== -1 ? footer : list.length, 0, entry);
+  }
+  return list;
+}
+
+/** The two Pro presets, personalised with the answers like the ideas. */
+export function proPresets(answers: Answers): Idea[] {
+  const next = random(7);
+  return PRO_PRESETS.map((preset, i) => ({
+    ...buildIdea(
+      answers,
+      preset.look,
+      false,
+      i,
+      next,
+      false,
+      withShowcase(recipeFor(answers).sections, preset.adds),
+    ),
+    pro: true as const,
+  }));
 }

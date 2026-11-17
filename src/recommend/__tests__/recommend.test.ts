@@ -7,7 +7,14 @@ import { getPalette } from "@/render-kit/themes/palettes";
 import { ICON_NAMES } from "@/render-kit/sections/icons";
 import { BUSINESS } from "../business-content";
 import { FIELDS } from "../content";
-import { blankStart, generateIdeas, LOOKS } from "../generate";
+import {
+  blankStart,
+  generateIdeas,
+  LOOKS,
+  MOOD_LOOKS,
+  proPresets,
+  withShowcase,
+} from "../generate";
 import { recipeFor } from "../recipes";
 import { EMPTY_ANSWERS, GOALS, WHO, type Answers } from "../types";
 
@@ -221,5 +228,79 @@ describe("onboarding picture", () => {
     const logo = withPicture(idea.doc, asset, "logo");
     expect((content(logo, "navbar").logo as { url: string }).url).toBe(asset.url);
     expect(content(logo, "hero").image).toEqual(content(idea.doc, "hero").image);
+  });
+});
+
+describe("mood board", () => {
+  test("every look on the board has a unique id and a real design", () => {
+    const ids = MOOD_LOOKS.map((look) => look.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const look of MOOD_LOOKS) {
+      expect(
+        families.some((f) => f.id === look.family),
+        look.id,
+      ).toBe(true);
+    }
+    for (const family of ["luxury", "retro", "swiss"]) {
+      expect(
+        MOOD_LOOKS.some((look) => look.family === family),
+        family,
+      ).toBe(true);
+    }
+  });
+
+  test("three looks give six ideas: the looks themselves and mixes of them", () => {
+    const answers = { ...EMPTY_ANSWERS, looks: ["clean-minimal", "warm-retro", "swiss-grid"] };
+    const ideas = generateIdeas(answers);
+    expect(ideas).toHaveLength(6);
+    expect(ideas.slice(0, 3).map((idea) => idea.doc.theme.family)).toEqual([
+      "minimal",
+      "retro",
+      "swiss",
+    ]);
+    const mixed = ideas.slice(3);
+    expect(mixed.every((idea) => idea.name.includes(" + "))).toBe(true);
+    // A mix keeps the first look's design and takes the second look's type.
+    expect(mixed[0].doc.theme.family).toBe("minimal");
+    expect(mixed[0].doc.theme.fonts).toBe(families.find((f) => f.id === "retro")!.defaults.fonts);
+    expect(new Set(ideas.map((idea) => idea.id)).size).toBe(6);
+    // The next batch starts further on.
+    expect(generateIdeas(answers, 1).map((i) => i.name)).not.toEqual(ideas.map((i) => i.name));
+  });
+
+  test("unknown looks are ignored and answers saved before the board still work", () => {
+    const old = { ...EMPTY_ANSWERS } as Partial<typeof EMPTY_ANSWERS>;
+    delete old.looks;
+    expect(generateIdeas(old as typeof EMPTY_ANSWERS)).toHaveLength(6);
+    expect(generateIdeas({ ...EMPTY_ANSWERS, looks: ["nope"] })).toHaveLength(6);
+  });
+});
+
+describe("Pro presets", () => {
+  test("two presets, marked Pro, each with all three showcase sections in place", () => {
+    const presets = proPresets({ ...EMPTY_ANSWERS, name: "Mona Adel" });
+    expect(presets).toHaveLength(2);
+    for (const preset of presets) {
+      expect(preset.pro).toBe(true);
+      const types = preset.doc.sections.map((s) => s.type);
+      expect(types.filter((t) => t.startsWith("showcase-"))).toHaveLength(3);
+      expect(types.at(-1)).toBe("footer");
+    }
+    const launch = presets[0].doc.sections.map((s) => s.type);
+    expect(launch.indexOf("showcase-devices")).toBe(launch.indexOf("hero") + 1);
+  });
+
+  test("showcase sections go after the first anchor found, else before the footer, never twice", () => {
+    expect(
+      withShowcase(["hero", "about", "footer"], [["showcase-bento:grid", ["projects", "about"]]]),
+    ).toEqual(["hero", "about", "showcase-bento:grid", "footer"]);
+    expect(withShowcase(["hero", "footer"], [["showcase-bento", ["projects"]]])).toEqual([
+      "hero",
+      "showcase-bento",
+      "footer",
+    ]);
+    expect(
+      withShowcase(["hero", "showcase-bento", "footer"], [["showcase-bento:grid", ["hero"]]]),
+    ).toEqual(["hero", "showcase-bento", "footer"]);
   });
 });

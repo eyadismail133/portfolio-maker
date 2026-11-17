@@ -18,7 +18,7 @@ import { readAnswers, writeAnswers } from "@/lib/local-drafts";
 import { ease, spring } from "@/lib/motion";
 import { clearPicture, readPicture, writePicture } from "@/lib/picture-store";
 import { FIELDS } from "@/recommend/content";
-import { LOOKS } from "@/recommend/generate";
+import { LOOKS, MOOD_LOOKS } from "@/recommend/generate";
 import {
   ASSETS,
   EMPTY_ANSWERS,
@@ -31,8 +31,10 @@ import {
   type StyleId,
   type Who,
 } from "@/recommend/types";
+import { brandColorFromFile } from "@/lib/logo-color";
 import { pickText } from "@/render-kit/i18n";
 import { createSampleDoc } from "@/render-kit/samples";
+import { getFamily } from "@/render-kit/themes/families";
 import { palettes } from "@/render-kit/themes/palettes";
 import { MiniPreview } from "./MiniPreview";
 
@@ -254,6 +256,7 @@ export function Onboarding() {
     }),
   };
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
+  const [logoNote, setLogoNote] = useState("");
   const set = (patch: Partial<Answers>) => setAnswers((current) => ({ ...current, ...patch }));
 
   // Pick up earlier answers when someone comes back from the ideas page.
@@ -283,6 +286,29 @@ export function Onboarding() {
         }),
       ),
     [],
+  );
+  // The mood board: every look as a small hero, built once and only when the board is open.
+  const [boardOpen, setBoardOpen] = useState(false);
+  const moodPreviews = useMemo(
+    () =>
+      boardOpen
+        ? MOOD_LOOKS.map((look) => {
+            const doc = createSampleDoc({
+              family: look.family,
+              fonts: look.fonts,
+              sections: ["hero"],
+              languages: ["en"],
+            });
+            return {
+              look,
+              doc: {
+                ...doc,
+                theme: { ...doc.theme, radius: look.radius ?? doc.theme.radius, ...look.touches },
+              },
+            };
+          })
+        : [],
+    [boardOpen],
   );
 
   const last = step === STEPS.length - 1;
@@ -419,6 +445,43 @@ export function Onboarding() {
                       </Choice>
                     ))}
                   </div>
+                  <div className="mt-6 grid gap-3 border-t border-zinc-200/80 pt-5 dark:border-zinc-800">
+                    <button
+                      type="button"
+                      className={`${buttonClass} justify-self-start`}
+                      aria-expanded={boardOpen}
+                      onClick={() => setBoardOpen((open) => !open)}
+                    >
+                      {boardOpen ? "Hide the mood board" : "Or pick looks from the mood board"}
+                    </button>
+                    {boardOpen && (
+                      <>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                          Pick up to three looks you like. Your ideas will be these looks and mixes
+                          of them.
+                        </p>
+                        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+                          {moodPreviews.map(({ look, doc }) => {
+                            const looks = answers.looks ?? [];
+                            return (
+                              <Choice
+                                key={look.id}
+                                selected={looks.includes(look.id)}
+                                disabled={!looks.includes(look.id) && looks.length >= 3}
+                                onClick={() => set({ looks: toggle(looks, look.id, 3) })}
+                                title={look.name}
+                                text={getFamily(look.family).name}
+                              >
+                                <div className="overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
+                                  <MiniPreview doc={doc} />
+                                </div>
+                              </Choice>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </>
               )}
 
@@ -484,6 +547,32 @@ export function Onboarding() {
                       >
                         Remove
                       </button>
+                    )}
+                    <label className={`${buttonClass} cursor-pointer`}>
+                      Take the color from my logo
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                        className="sr-only"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = "";
+                          if (!file) return;
+                          // Read in this browser only; the logo is not uploaded.
+                          const color = await brandColorFromFile(file).catch(() => null);
+                          setLogoNote(
+                            color
+                              ? `Found ${color} in your logo.`
+                              : "No color found in that picture. Pick one by hand.",
+                          );
+                          if (color) set({ brandColor: color, palette: null });
+                        }}
+                      />
+                    </label>
+                    {logoNote && (
+                      <p className="w-full text-xs text-zinc-500" role="status">
+                        {logoNote}
+                      </p>
                     )}
                   </div>
                   <div className="grid max-w-md gap-1.5">

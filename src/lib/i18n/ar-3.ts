@@ -265,4 +265,35 @@ export const AR_3: Record<string, string> = {
   Strong: "قوي",
   "Step cards": "بطاقات الخطوات",
   "Big email": "بريد كبير",
+  // Onboarding: the color from a logo.
+  "Take the color from my logo": "خذ اللون من شعاري",
+  "No color found in that picture. Pick one by hand.":
+    "لم نجد لوناً في هذه الصورة. اختر لوناً بنفسك.",
+  // Phase 8E: new designs, the Signal palette and the mood board.
+  Luxury: "فاخر",
+  Retro: "كلاسيكي دافئ",
+  Swiss: "سويسري",
+  "Signal red": "أحمر الإشارة",
+  "Dark luxury": "فخامة داكنة",
+  "Warm retro": "دفء كلاسيكي",
+  "Swiss grid": "شبكة سويسرية",
+  "Or pick looks from the mood board": "أو اختر من لوحة الإلهام",
+  "Hide the mood board": "إخفاء لوحة الإلهام",
+  "Pick up to three looks you like. Your ideas will be these looks and mixes of them.":
+    "اختر حتى ثلاثة أشكال تعجبك. ستكون أفكارك هذه الأشكال ومزيجاً منها.",
+  // Phase 8E: Pro presets and the new templates.
+  "Product launch": "إطلاق منتج",
+  "Studio showcase": "عرض الاستوديو",
+  "Pro presets": "قوالب Pro الجاهزة",
+  "Whole pages built around the showcase sections: device mockups, a bento grid and a moving band. Try them for free; publishing them needs Pro.":
+    "صفحات كاملة مبنية حول أقسام العرض: نماذج الأجهزة وشبكة البينتو والشريط المتحرك. جرّبها مجاناً؛ نشرها يحتاج إلى Pro.",
+  "Launching an app: devices, a bento grid and a moving band":
+    "لإطلاق تطبيق: أجهزة وشبكة بينتو وشريط متحرك",
+  "Studios and designers who want to show off": "للاستوديوهات والمصممين الذين يريدون إبهار زوارهم",
+  "Hotels, jewellers, photographers and fine brands":
+    "الفنادق ومحلات المجوهرات والمصورون والعلامات الراقية",
+  "Cafes, makers, illustrators and friendly brands":
+    "المقاهي والحرفيون والرسامون والعلامات الودودة",
+  "Architects, designers and studios who like order":
+    "المعماريون والمصممون والاستوديوهات التي تحب النظام",
 };

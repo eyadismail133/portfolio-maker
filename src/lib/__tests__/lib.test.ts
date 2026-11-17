@@ -138,10 +138,19 @@ describe("emails", () => {
 });
 
 describe("templates", () => {
-  test("one per design family, each opening a valid page", async () => {
+  test("one per design family plus the Pro presets, each opening a valid page", async () => {
     const { TEMPLATES, templateDoc } = await import("../templates");
     const { families } = await import("@/render-kit/themes/families");
-    expect(TEMPLATES).toHaveLength(families.length);
+    const pro = TEMPLATES.filter((t) => t.pro);
+    expect(TEMPLATES).toHaveLength(families.length + pro.length);
+    expect(pro.map((t) => t.id)).toEqual(["pro-launch", "pro-studio"]);
+    for (const t of pro) {
+      const types = templateDoc(t.id)!.sections.map((s) => s.type);
+      for (const type of ["showcase-devices", "showcase-bento", "showcase-marquee"]) {
+        expect(types, `${t.id} ${type}`).toContain(type);
+      }
+      expect(types.at(-1)).toBe("footer");
+    }
     expect(new Set(TEMPLATES.map((t) => t.id)).size).toBe(TEMPLATES.length);
     for (const t of TEMPLATES) expect(templateDoc(t.id)?.theme.family).toBe(t.family);
     expect(templateDoc("nope")).toBeNull();

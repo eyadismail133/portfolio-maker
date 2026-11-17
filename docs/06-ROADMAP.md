@@ -191,11 +191,11 @@ Finished, animated sections (device mockups, bento grid, animated hero, marquee,
 - [x] Document the rule in `docs/08-PLANS-AND-PAYMENTS.md`
 
 ### 8E - New looks and new ways to start (about 1 week, after 8C and 8D)
-- [ ] New design families (for example luxury, retro, Swiss grid, bento, magazine)
-- [ ] Start from a logo or brand color: palette taken from the picture
-- [ ] Start from a mood board: pick three looks, get ideas that mix them
-- [ ] Start blank
-- [ ] Pro page presets built from showcase sections, shown in the ideas and the template gallery
+- [x] New design families: Luxury, Retro and Swiss (bento is a showcase section; Editorial already covers magazine)
+- [x] Start from a logo or brand color: palette taken from the picture
+- [x] Start from a mood board: pick three looks, get ideas that mix them
+- [x] Start blank (was already there)
+- [x] Pro page presets built from showcase sections, shown in the ideas and the template gallery
 
 **Result:** people edit their page by clicking on it, have more and better designs to start from, and Pro has showcase content worth paying for, while every page is still one plain HTML file.
 

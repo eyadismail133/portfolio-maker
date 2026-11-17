@@ -20,10 +20,7 @@ export const metadata: Metadata = {
 export default function TemplatesPage() {
   return (
     <div className="pm-aurora-bg min-h-dvh bg-zinc-50/70 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <div
-        aria-hidden="true"
-        className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10"
-      />
+      <div aria-hidden="true" className="pm-grid-pattern pointer-events-none fixed inset-0 -z-10" />
       <header className="pm-glass-header sticky top-0 z-40">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
           <Link href="/" className="group inline-flex items-center gap-2.5 font-semibold">
@@ -44,9 +41,9 @@ export default function TemplatesPage() {
         <div className="pm-animate-in">
           <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">Portfolio templates</h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {TEMPLATES.length} designs for personal portfolios, company pages and startup launches.
-            Each one works in English and Arabic, on phones and computers, and can be changed down
-            to the last color. Open one in the editor without an account.
+            {TEMPLATES.filter((t) => !t.pro).length} designs for personal portfolios, company pages
+            and startup launches. Each one works in English and Arabic, on phones and computers, and
+            can be changed down to the last color. Open one in the editor without an account.
           </p>
         </div>
         <TemplateGallery />

@@ -101,6 +101,9 @@ const PATTERNS: [RegExp, (...groups: string[]) => string][] = [
   [/^(\S+(?: \S+)?) colors$/, (p) => `ألوان ${word(p)}`],
   [/^(\S+(?: \S+)?) design$/, (f) => `تصميم ${word(f)}`],
   [/^(.+) · Editor · Portfolio Maker$/, (t) => `${t} · المحرر · Portfolio Maker`],
+  // Two looks mixed on the mood board: each name on its own.
+  [/^([^+]+) \+ ([^+]+)$/, (a, b) => `${word(a)} + ${word(b)}`],
+  [/^Found (#[0-9a-f]{6}) in your logo\.$/, (color) => `وجدنا اللون ${color} في شعارك.`],
   [
     /^(.+) (portfolio|company page|startup page)$/,
     (f, k) =>

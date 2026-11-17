@@ -34,8 +34,8 @@ One question per screen, large clickable cards, never more than 8 steps. Every q
 | 1 | Who is this portfolio for? | One card: Me (professional) / Student / Freelancer / Creative (design, photo, video) / Company / Agency / Startup / Other | Which sections are included |
 | 2 | What is your field? | Search list: software, design, marketing, medicine, engineering, architecture, photography, education, finance, food, ... | Sample text, icons, sample images |
 | 3 | What is the main goal? | One card: Get hired / Get clients / Attract investors / Get sign-ups / Show my work | Section order and the main button text |
-| 4 | Which style feels like you? | Pick up to 2 visual cards: Minimal / Bold / Elegant / Playful / Tech / Editorial / Corporate / Creative | Design families offered |
-| 5 | Colors? | Ready palettes, or "I have a brand color" (color picker), plus Light / Dark / Both | Palette |
+| 4 | Which style feels like you? | Pick up to 2 visual cards: Minimal / Bold / Elegant / Playful / Tech / Editorial / Corporate / Creative, or open the mood board and pick up to 3 looks (Phase 8E) | Design families offered |
+| 5 | Colors? | Ready palettes, or "I have a brand color" (color picker), or "Take the color from my logo" (Phase 8E), plus Light / Dark / Both | Palette |
 | 6 | What do you have ready? | Many: photos of me or team, project images, logo, testimonials, CV, video, client logos, numbers to show | Sections with images vs text-first sections |
 | 7 | Which language? | English / Arabic / Both | Direction, fonts, language switch |
 | 8 | Basics | Name (or company name), one-line title, optional photo or logo | Fills the hero so ideas look real. The photo or logo is kept in the browser (IndexedDB) until there is an account, then uploaded when the chosen idea is saved: a photo goes into the hero, a logo into the navbar |
@@ -56,6 +56,12 @@ Input: the answers. Output: 6 complete portfolio documents.
 5. Show each idea as a live scaled-down preview (the real renderer, not a picture), with a name like "Clean Minimal" and a "Use this" button. Also offer "Show me 6 more" and "Start from blank".
 
 The recipes live in code in `src/recommend/` as plain data so they are easy to extend.
+
+## Added in Phase 8E
+- **Color from a logo:** the logo is read on a 64px canvas in the browser and never uploaded (`src/lib/logo-color.ts`). The strongest real color wins: transparent, near-white, near-black and grey pixels are left out, and strong colors count more than washed-out ones of the same area. A logo with no color gives its ink. The result becomes the brand color, so palettes are built from it as before.
+- **Mood board:** every look (the two per style and one each for Luxury, Retro and Swiss, `MOOD_LOOKS`) as a small live preview. Picking up to three stores `answers.looks`; the six ideas are then the looks themselves, mixes of every two (`mixLooks`: one look's design with the other's type, corners and touches, named "A + B"), and the looks with their second layouts. "Show me six more" starts further along that list. Answers saved before have no `looks` and work as before.
+- **Start from blank** was already there ("Start from a blank page" under the ideas).
+- **Pro presets:** under the ideas, two whole pages built around the showcase sections ("Product launch" in Gradient, "Studio showcase" in Swiss; `PRO_PRESETS`, `proPresets`). `withShowcase` puts each showcase section after the first of its anchor sections the page has, or before the footer. The same two are in the template gallery as `pro-launch` and `pro-studio` with a Pro badge. Anyone can open and try them; publishing needs Pro (`docs/08-PLANS-AND-PAYMENTS.md`).
 
 ## Empty and error states to design
 - Dashboard with no portfolios: big "Create your first portfolio" card.

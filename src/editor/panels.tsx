@@ -13,6 +13,7 @@ import { families } from "@/render-kit/themes/families";
 import { fontPairs } from "@/render-kit/themes/fonts";
 import { palettes } from "@/render-kit/themes/palettes";
 import { canMove } from "./doc-ops";
+import { ProBadge } from "@/components/ProBadge";
 import { FormFields } from "./fields";
 import { sectionName, useEditor } from "./store";
 import {
@@ -82,11 +83,7 @@ function AddSectionDialog({ doc }: { doc: PortfolioDoc }) {
                       >
                         <span className="flex items-center gap-1.5 font-semibold tracking-tight">
                           {def.name}
-                          {def.pro && (
-                            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-900 dark:bg-amber-900/60 dark:text-amber-100">
-                              Pro
-                            </span>
-                          )}
+                          {def.pro && <ProBadge />}
                         </span>
                         <span className="mt-0.5 block text-xs text-zinc-500">
                           {taken
