@@ -32,6 +32,11 @@ export type HtmlOptions = {
   /** Extra markup at the end of the page, written by our own code only (never by users). */
   trustedFooter?: string;
   /**
+   * False when the page owner is no longer Pro: Pro showcase sections draw their plain fallback.
+   * Missing means true (downloads are Pro-only anyway).
+   */
+  pro?: boolean;
+  /**
    * Public site key of the spam check (Cloudflare Turnstile) for forms that post to the inbox.
    * The page script reads it from a meta tag and shows the check when a visitor uses a form.
    */
@@ -55,6 +60,7 @@ export function buildHtmlPage(
       fontLink={false}
       languageHrefs={options.languageHrefs}
       formAction={options.formAction}
+      pro={options.pro ?? true}
       standalone
     />,
   );

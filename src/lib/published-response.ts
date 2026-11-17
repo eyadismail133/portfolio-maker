@@ -83,6 +83,8 @@ async function publishedHtml(
   const { renderToStaticMarkup } = await import("react-dom/server");
   return buildHtmlPage(renderToStaticMarkup, doc, {
     lang,
+    // The badge shows exactly when the owner is not Pro; then showcase sections go plain.
+    pro: !found.showBadge,
     css: pageCss(doc),
     script: `${PAGE_SCRIPT}\n${counter}`,
     languageHrefs,

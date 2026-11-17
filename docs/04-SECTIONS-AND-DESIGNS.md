@@ -104,6 +104,15 @@ The audit (16 November 2026) counted layouts per section against the starting pa
 
 Still at two layouts and next in line: pricing, case study, timeline, mission and values, problem and solution, press, partners, awards, languages, interests. The new Style tab choices (columns, photo shape, card shadow, heading look, section font) give every section more range without new layouts. The visual check (`npm run visual`, 96 pages) passes with all of it.
 
+### Pro showcase sections (Phase 8D)
+| Section | Layouts | Plain layout when the owner is no longer Pro |
+|---|---|---|
+| Device mockups (`showcase-devices`) | laptop, laptop and phone, phone; frames drawn in CSS around two screenshots, the phone floats | screenshot beside the text (image-text styles) |
+| Bento grid (`showcase-bento`) | four across, mosaic with a colored lead; tiles small, wide, tall or big | cards of one size |
+| Moving band (`showcase-marquee`) | big words, two rows of tags; slow, normal or fast, the other way on Arabic pages | the words standing still |
+
+Their movement is CSS only; it stops with reduced motion and with the page animation set to none. Each defines `fallback` in the registry (`defineSection` refuses a Pro section without one). Rules for publishing them are in `docs/08-PLANS-AND-PAYMENTS.md`.
+
 ## Content fields example
 
 Every section doc entry follows this pattern. Example for `work-experience`:

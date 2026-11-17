@@ -91,3 +91,16 @@ export const COMPARISON: { label: string; free: string; pro: string }[] = [
   { label: "PDF CV from your portfolio", free: "No", pro: "Yes" },
   { label: "Fill from a CV or LinkedIn PDF", free: "No", pro: "Yes" },
 ];
+
+/** True when a published document shows a Pro section (hidden ones do not count). */
+export function showsProSections(doc: unknown): boolean {
+  const sections = (doc as { sections?: unknown } | null)?.sections;
+  if (!Array.isArray(sections)) return false;
+  return sections.some(
+    (s) =>
+      typeof s === "object" &&
+      s !== null &&
+      (PRO_SECTION_TYPES as readonly string[]).includes((s as { type?: string }).type ?? "") &&
+      (s as { hidden?: boolean }).hidden !== true,
+  );
+}

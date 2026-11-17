@@ -182,12 +182,13 @@ Click and drag inside the layout, like a document editor. Not a free canvas: thi
 
 ### 8D - Pro showcase sections (about 1.5 weeks, needs 8A)
 Finished, animated sections (device mockups, bento grid, animated hero, marquee, scroll story). Their movement is CSS and `page-script.ts` only, and each works with no script.
-- [ ] Showcase sections in the registry with a `pro: true` mark, schemas, default content and every family
-- [ ] `showcaseSections` in `src/lib/plans.ts` and the Free/Pro comparison; the "All designs, sections and palettes" row changes
-- [ ] Free accounts can add and try them in the editor with a Pro badge; publishing and download need Pro
-- [ ] The database refuses to publish a document with showcase sections from a Free account (new migration, check in `database.test.ts`)
-- [ ] When Pro ends, live pages stay online and showcase sections draw a plain free layout instead; the owner is warned by email
-- [ ] Document the rule in `docs/08-PLANS-AND-PAYMENTS.md`
+- [x] Showcase sections in the registry with a `pro: true` mark, schemas, default content and every family (device mockups, bento grid, moving band; animated hero and scroll story left for later)
+- [x] `showcaseSections` in `src/lib/plans.ts` and the Free/Pro comparison; the "All designs, sections and palettes" row changes
+- [x] Free accounts can add and try them in the editor with a Pro badge; publishing and download need Pro
+- [x] The database refuses to publish a document with showcase sections from a Free account (`0011_pro_sections.sql`, checks in `database.test.ts`)
+- [ ] Run `0011` in the Supabase SQL editor (owner)
+- [x] When Pro ends, live pages stay online and showcase sections draw a plain free layout instead; the owner is warned by email
+- [x] Document the rule in `docs/08-PLANS-AND-PAYMENTS.md`
 
 ### 8E - New looks and new ways to start (about 1 week, after 8C and 8D)
 - [ ] New design families (for example luxury, retro, Swiss grid, bento, magazine)

@@ -27,6 +27,8 @@ Decided on 13 November 2026 and built. Limits live in `src/lib/plans.ts` and are
 
 **Where limits are enforced:** portfolios, published pages, storage, versions, messages, badge, AI (including the CV import) and custom domains are enforced by the database and cannot be bypassed. Download HTML and the PDF CV are built in the browser, so their Pro check is in the app only; someone technical could get around it. That is acceptable for now. Locked messages are hidden by the database too (`0008`): the table shows them only to Pro accounts, and the inbox reads through `list_messages()`, which returns locked messages with their name, email and text left empty for Free accounts.
 
+**Showcase sections (Pro, built in Phase 8D):** device mockups, bento grid and moving band (`PRO_SECTION_TYPES` in `src/lib/plans.ts`, `pro: true` in the render kit, `pro_section_types()` in `0011_pro_sections.sql`; a test checks the three agree). Anyone can add and try them in the editor, where they carry a Pro badge. Publishing a page that shows one needs Pro: the publish dialog says so and stays disabled, and the database trigger `portfolios_pro_sections` refuses the published document (`plan_pro_sections`) whenever it is written, so the browser cannot skip it. Hidden showcase sections do not count. Downloads are Pro-only already. When Pro ends nothing goes offline: the trigger only runs when a page is written, the live page keeps its document, and published pages are drawn with `pro: false` for owners who are not Pro, so each showcase section shows its plain fallback layout until Pro is back. The "Pro ends in 3 days" email says so when the account has such a page.
+
 ## Price and how people pay
 - **250 EGP or 6 USD a month**, bought as prepaid months: 1, 3, 6 or 12. Straight multiples, no discount yet; change `MONTHLY_PRICE` or add a yearly discount in `src/lib/plans.ts` (and the `months` list in the migration if new lengths are added).
 - **Nothing renews by itself.** This works with every Paymob method: cards, mobile wallets, kiosks. Auto-renewing card subscriptions can come later.
@@ -52,5 +54,4 @@ The refund page (`/refunds`) offers a full refund within 14 days of the first pu
 - Receipts (the account page already lists payments).
 - Emails: receipt, "Pro ends in 7 days".
 - Per-day visit charts for Pro.
-- Pro showcase sections (roadmap Phase 8D): finished, animated sections that Free accounts can try in the editor but not publish or download. The database refuses to publish them from a Free account. When Pro ends the page stays online and those sections draw a plain free layout, so nothing goes offline.
 - International buyers through a merchant of record (Lemon Squeezy) if USD through Paymob is not enough.

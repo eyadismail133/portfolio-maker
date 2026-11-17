@@ -10,6 +10,7 @@ import {
   MONTH_OPTIONS,
   priceFor,
   PRO_SECTION_TYPES,
+  showsProSections,
 } from "../plans";
 
 const SECRET = "test-hmac-secret";
@@ -174,5 +175,18 @@ describe("limits", () => {
         .map((s) => s.type),
     ).toEqual([...PRO_SECTION_TYPES]);
     expect(COMPARISON.map((row) => row.label).join(" ")).toContain("Showcase");
+  });
+});
+
+describe("showcase sections on live pages", () => {
+  test("only visible Pro sections count", () => {
+    const doc = (hidden: boolean) => ({
+      sections: [{ type: "hero" }, { type: "showcase-bento", hidden }],
+    });
+    expect(showsProSections(doc(false))).toBe(true);
+    expect(showsProSections(doc(true))).toBe(false);
+    expect(showsProSections({ sections: [{ type: "hero" }] })).toBe(false);
+    expect(showsProSections(null)).toBe(false);
+    expect(showsProSections({ sections: "x" })).toBe(false);
   });
 });

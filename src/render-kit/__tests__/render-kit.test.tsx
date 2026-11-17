@@ -54,6 +54,14 @@ describe("document", () => {
     ).toEqual(["showcase-devices", "showcase-bento", "showcase-marquee"]);
   });
 
+  test("a page whose owner is no longer Pro draws Pro sections in their plain layout", () => {
+    const doc = createSampleDoc({ sections: ["showcase-marquee:words"] });
+    expect(renderToHtml(doc)).toContain("pk-marquee--words");
+    const plain = renderToHtml(doc, { pro: false });
+    expect(plain).toContain("pk-marquee--still");
+    expect(plain).not.toContain("pk-marquee__track");
+  });
+
   test("every Pro section has a plain fallback that renders, also with empty content", () => {
     for (const def of allSections().filter((s) => s.pro)) {
       expect(def.fallback, def.type).toBeTypeOf("function");

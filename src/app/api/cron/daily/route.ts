@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { accountEmail, emailEnabled, sendEmail } from "@/lib/email";
+import { showsProSections } from "@/lib/plans";
 import { siteUrl } from "@/lib/site";
 
 /**
@@ -33,12 +34,24 @@ export async function GET(request: NextRequest) {
       const to = await accountEmail(String(profile.id));
       if (!to) return false;
       const until = new Date(profile.pro_until).toLocaleDateString("en-GB", { dateStyle: "long" });
+      // Live pages that show Pro showcase sections switch them to a plain layout when Pro ends.
+      const { data: live } = await admin
+        .from("portfolios")
+        .select("published_doc")
+        .eq("user_id", profile.id)
+        .eq("status", "published");
+      const showcase = (live ?? []).some((row) => showsProSections(row.published_doc));
       return sendEmail({
         to,
         subject: "Your Pro months end in 3 days",
         paragraphs: [
           `Your Portfolio Maker Pro ends on ${until}. It does not renew by itself.`,
           "After that your account is Free again. Nothing is deleted and your published pages stay online. The badge comes back, AI, HTML downloads, the PDF CV and custom domains stop, and new pages follow the Free limits.",
+          ...(showcase
+            ? [
+                "Your live page uses showcase sections (device mockups, bento grid or moving band). They stay on the page but switch to a plain layout until Pro is back.",
+              ]
+            : []),
           "To keep Pro, add more months before that date; they start when the current ones end.",
         ],
         action: { label: "Add Pro months", href: `${siteUrl()}/pro` },
