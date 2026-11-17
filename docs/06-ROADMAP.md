@@ -186,7 +186,7 @@ Finished, animated sections (device mockups, bento grid, animated hero, marquee,
 - [x] `showcaseSections` in `src/lib/plans.ts` and the Free/Pro comparison; the "All designs, sections and palettes" row changes
 - [x] Free accounts can add and try them in the editor with a Pro badge; publishing and download need Pro
 - [x] The database refuses to publish a document with showcase sections from a Free account (`0011_pro_sections.sql`, checks in `database.test.ts`)
-- [ ] Run `0011` in the Supabase SQL editor (owner)
+- [x] Run `0011` in the Supabase SQL editor (checked live on 17 November 2026: both functions answer, the trigger `portfolios_pro_sections` exists)
 - [x] When Pro ends, live pages stay online and showcase sections draw a plain free layout instead; the owner is warned by email
 - [x] Document the rule in `docs/08-PLANS-AND-PAYMENTS.md`
 
